@@ -15,3 +15,4 @@ To find final values for the measurent I will do one preliminary experiment wher
 
 ### time resolution requirements - longer runtime measurement ?
 Is it a sensible approach to compensate fot the limited time resolution of out energy measurements by just running a large N of repitions with a lower, known good time resolution and averging these measurements afterwards ?
+We dont't really care about the time resolution, but it is desirable to have relatively short measurements, to allow for more measurements with different operator configurations and different operators.
