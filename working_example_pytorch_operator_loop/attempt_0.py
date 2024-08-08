@@ -26,7 +26,7 @@ data_size = (1000,) + input_size[1:]  # Large dataset to simulate caching scenar
 input_data = torch.randn(data_size).cuda()
 
 # Number of iterations to run
-iterations = 1000000
+iterations = 250000
 
 # Start the timer
 start_time = time.time()
