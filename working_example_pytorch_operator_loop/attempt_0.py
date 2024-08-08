@@ -14,7 +14,7 @@ batch_size = 32
 input_size = (batch_size, in_channels, 56, 56)
 
 # Create a large array of random convolutional layers stored in VRAM
-num_layers = 10000  # Large number of layers to simulate a large model
+num_layers = 30000  # Large number of layers to simulate a large model
 conv_layers = []
 for _ in range(num_layers):
     layer = nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
@@ -26,7 +26,7 @@ data_size = (1000,) + input_size[1:]  # Large dataset to simulate caching scenar
 input_data = torch.randn(data_size).cuda()
 
 # Number of iterations to run
-iterations = 1000000
+iterations = 15000000
 
 # Start the timer
 start_time = time.time()
