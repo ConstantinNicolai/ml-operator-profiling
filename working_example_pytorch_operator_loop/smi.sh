@@ -40,7 +40,7 @@ read_gpu_model
 
 gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
 for gpu_id in "${gpu_ids[@]}"; do
-nvidia-smi -i ${gpu_id} -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_node${SLURM_NODEID}_gpu${gpu_id}.log &
+nvidia-smi -i ${gpu_id} -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
 done
 
 
