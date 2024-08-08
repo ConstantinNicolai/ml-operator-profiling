@@ -1,0 +1,9 @@
+global parameters:
+
+
+number of measurement runs
+number of operator iterations per measurement run
+
+dtype
+tensorcore_on_off
+powercapping ???

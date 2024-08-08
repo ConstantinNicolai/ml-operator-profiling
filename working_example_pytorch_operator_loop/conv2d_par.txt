@@ -9,7 +9,3 @@ stride,
 
 
 
-optional, maybe later
-padding,
-dtype,
-tensorcore_on_off
