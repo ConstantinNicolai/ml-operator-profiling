@@ -14,17 +14,10 @@ column_name = 'your_column'
 # Extract the data from the column
 data = df[column_name].dropna()  # Drop any NaN values
 
-# Calculate mean
-mean = data.mean()
-
-# Calculate standard deviation
-std_dev = data.std(ddof=1)  # Use ddof=1 for sample standard deviation
 
 # Calculate median
 median = data.median()
 
-print(f"Mean: {mean}")
-print(f"Standard Deviation: {std_dev}")
 print(f"Median: {median}")
 
 # Optionally, fit a Gaussian distribution and get the parameters
