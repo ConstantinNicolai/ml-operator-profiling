@@ -1,6 +1,6 @@
 # ml-operator-profiling
 
-To replicate please use the provided conda environment
+To replicate please use the provided conda environment "constabass.yml"
 
 The idea is to use either nvidia-smi or nvitop to continously monitor energy and time for a yet to be determined set of pytorch machine learning operators and measure their cost in terms of time and energy. These measurements will be collected in a databse to be used shortly after in my master thesis work. 
 
