@@ -1,0 +1,15 @@
+parameters to use vary in conv2d
+
+
+batch_size
+in_channels
+out_channels
+kernel_size,
+stride,
+
+
+
+optional, maybe later
+padding,
+dtype,
+tensorcore_on_off
