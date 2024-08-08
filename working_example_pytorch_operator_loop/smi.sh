@@ -46,9 +46,8 @@ done
 
 # srun log_gpu_usage &  # Run the logging function in the background
 
-#sleep 20
 # Run the benchmark
-srun torchrun attempt_0.py >> logs/training_output_${SLURM_JOB_ID}.log
+srun python3 attempt_0.py >> logs/training_output_${SLURM_JOB_ID}.log
 
 #kill of background logging
 bg_pids=$(jobs -p)
