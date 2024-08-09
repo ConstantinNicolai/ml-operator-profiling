@@ -3,6 +3,7 @@ import torch.nn as nn
 import time
 import multiprocessing
 import os
+import subprocess
 
 
 # Configuration for the convolutional layer
@@ -35,7 +36,7 @@ iterations = 50000
 startup = """
 gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
 for gpu_id in "${gpu_ids[@]}"; do
-nvidia-smi -i ${gpu_id} -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
+    nvidia-smi -i ${gpu_id} -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
 done
 """
 
@@ -46,7 +47,10 @@ for pid in $bg_pids; do
 done
 """
 
-os.system(startup)
+#os.system(startup)
+
+# Execute the shell command using subprocess.run()
+subprocess.run(startup, shell=True, check=True)
 
 # Start the timer
 start_time = time.time()
@@ -66,7 +70,8 @@ for i in range(iterations):
 # Stop the timer
 end_time = time.time()
 
-os.system(finishup)
+#os.system(finishup)
+subprocess.run(finishup, shell=True, check=True)
 
 # Calculate the time taken
 total_time = end_time - start_time
