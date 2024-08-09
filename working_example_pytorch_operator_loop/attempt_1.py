@@ -29,7 +29,7 @@ data_size = (1000,) + input_size[1:]  # Large dataset to simulate caching scenar
 input_data = torch.randn(data_size).cuda()
 
 # Number of iterations to run
-iterations = 15000000
+iterations = 50000
 
 command = (
     f"nvidia-smi -i {gpu_id} -lms=1 "
