@@ -2,7 +2,6 @@ import threading
 import time
 import torch
 import torch.nn as nn
-import torch.optim as optim
 from pynvml import (
     nvmlInit,
     nvmlShutdown,
@@ -65,29 +64,47 @@ class GPUStatLogger:
 
             time.sleep(self.log_interval)
 
-# Example PyTorch Workload
-def run_pytorch_workload():
+# Workload: Large Convolutional Network Simulation
+def run_large_conv_workload():
     """
-    A dummy PyTorch workload to simulate GPU activity.
+    Simulates a large convolutional network by creating a large number of convolutional layers
+    and running a large number of iterations with random input data.
     """
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model = nn.Linear(1000, 1000).to(device)
-    optimizer = optim.SGD(model.parameters(), lr=0.01)
-    criterion = nn.MSELoss()
+    in_channels = 64
+    out_channels = 128
+    kernel_size = 3
+    stride = 1
+    padding = 1
 
-    # Dummy data
-    inputs = torch.randn(64, 1000).to(device)
-    targets = torch.randn(64, 1000).to(device)
+    batch_size = 32
+    input_size = (batch_size, in_channels, 56, 56)
 
-    num_iterations = 1000
-    for _ in range(num_iterations):
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
-        loss.backward()
-        optimizer.step()
-        # Introduce a small sleep to simulate processing time
-        time.sleep(0.01)
+    # Create a large array of random convolutional layers stored in VRAM
+    num_layers = 30000  # Large number of layers to simulate a large model
+    conv_layers = []
+    for _ in range(num_layers):
+        layer = nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
+                          kernel_size=kernel_size, stride=stride, padding=padding).cuda()
+        conv_layers.append(layer)
+
+    # Create a large array of random input data on the GPU
+    data_size = (1000,) + input_size[1:]  # Large dataset to simulate caching scenario
+    input_data = torch.randn(data_size).cuda()
+
+    iterations = 15000000  # Number of iterations to run
+
+    start_time = time.time()
+
+    # Run the convolution operation in a loop, accessing layers linearly
+    for i in range(iterations):
+        conv_layer = conv_layers[i % num_layers]
+        index = i % data_size[0]
+        x = input_data[index:index+1]
+        output = conv_layer(x)
+
+    end_time = time.time()
+    total_time = end_time - start_time
+    print(f"Total time for {iterations} iterations: {total_time:.4f} seconds")
 
 if __name__ == "__main__":
     # Initialize the GPUStatLogger
@@ -96,57 +113,9 @@ if __name__ == "__main__":
     # Start logging
     logger.start()
     
-    # Run the PyTorch workload
+    # Run the large convolutional workload
     try:
-        run_pytorch_workload()
-        # # Configuration for the convolutional layer
-        # in_channels = 64
-        # out_channels = 128
-        # kernel_size = 3
-        # stride = 1
-        # padding = 1
-
-        # # Assume the input tensor size after initial downsampling is (batch_size, 64, 56, 56)
-        # batch_size = 32
-        # input_size = (batch_size, in_channels, 56, 56)
-
-        # # Create a large array of random convolutional layers stored in VRAM
-        # num_layers = 30000  # Large number of layers to simulate a large model
-        # conv_layers = []
-        # for _ in range(num_layers):
-        #     layer = nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
-        #                     kernel_size=kernel_size, stride=stride, padding=padding).cuda()
-        #     conv_layers.append(layer)
-
-        # # Create a large array of random input data on the GPU
-        # data_size = (1000,) + input_size[1:]  # Large dataset to simulate caching scenario
-        # input_data = torch.randn(data_size).cuda()
-
-        # # Number of iterations to run
-        # iterations = 500000
-
-        # # Start the timer
-        # start_time = time.time()
-
-        # # Run the convolution operation in a loop, accessing layers linearly
-        # for i in range(iterations):
-        #     # Linearly access the convolutional layer from the pre-created list
-        #     conv_layer = conv_layers[i % num_layers]
-            
-        #     # Index into the data array, using modulo to loop over if necessary
-        #     index = i % data_size[0]
-        #     x = input_data[index:index+1]
-            
-        #     # Apply the convolution operation
-        #     output = conv_layer(x)
-
-        # # Stop the timer
-        # end_time = time.time()
-
-        # # Calculate the time taken
-        # total_time = end_time - start_time
-        # print(f"Total time for {iterations} iterations: {total_time:.4f} seconds")
-
+        run_large_conv_workload()
     finally:
         # Ensure that logging stops even if an error occurs
         logger.stop()
