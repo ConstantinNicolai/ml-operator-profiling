@@ -81,7 +81,7 @@ def run_intensive_gpu_workload():
 
 if __name__ == "__main__":
     # Initialize the GPUStatLogger
-    logger = GPUStatLogger(device_index=0, log_interval=0.001, log_file_path="gpu_usage_log.txt")
+    logger = GPUStatLogger(device_index=0, log_interval=0.01, log_file_path="gpu_usage_log.txt")
     
     # Start logging
     logger.start()
