@@ -22,8 +22,9 @@ class GPUStatLogger:
     def start(self):
         nvmlInit()
         self.handle = nvmlDeviceGetHandleByIndex(self.device_index)
+        self.start_time = time.time()  # Capture the start time
         with open(self.log_file_path, "w") as log_file:
-            log_file.write("Timestamp,GPU Usage (%),Memory Usage (MB),Power Usage (W)\n")
+            log_file.write("Elapsed Time (ms),GPU Usage (%),Memory Usage (MB),Power Usage (W)\n")
         self._logger_thread.start()
         print("GPU logging started.")
     
@@ -35,23 +36,26 @@ class GPUStatLogger:
     
     def _log_stats(self):
         while not self._stop_event.is_set():
-            timestamp = time.time()
+            # Calculate elapsed time in milliseconds
+            elapsed_time_ms = (time.time() - self.start_time) * 1000
+            
             memory_info = nvmlDeviceGetMemoryInfo(self.handle)
             utilization = nvmlDeviceGetUtilizationRates(self.handle)
             
+            # Attempt to get power usage with retry logic
             power_usage = None
-            for _ in range(3):
+            for _ in range(3):  # Try 3 times
                 try:
-                    power_usage = nvmlDeviceGetPowerUsage(self.handle) / 1000.0
+                    power_usage = nvmlDeviceGetPowerUsage(self.handle) / 1000.0  # Convert from milliwatts to watts
                     break
                 except Exception:
                     time.sleep(0.1)
                     continue
             
             if power_usage is not None:
-                log_entry = f"{timestamp},{utilization.gpu},{memory_info.used / 1024**2},{power_usage}\n"
+                log_entry = f"{elapsed_time_ms:.2f},{utilization.gpu},{memory_info.used / 1024**2},{power_usage}\n"
             else:
-                log_entry = f"{timestamp},{utilization.gpu},{memory_info.used / 1024**2},N/A\n"
+                log_entry = f"{elapsed_time_ms:.2f},{utilization.gpu},{memory_info.used / 1024**2},N/A\n"
             
             with open(self.log_file_path, "a") as log_file:
                 log_file.write(log_entry)
@@ -81,7 +85,7 @@ def run_intensive_gpu_workload():
 
 if __name__ == "__main__":
     # Initialize the GPUStatLogger
-    logger = GPUStatLogger(device_index=0, log_interval=0.01, log_file_path="gpu_usage_log.txt")
+    logger = GPUStatLogger(device_index=0, log_interval=0.001, log_file_path="gpu_usage_log.txt")
     
     # Start logging
     logger.start()
