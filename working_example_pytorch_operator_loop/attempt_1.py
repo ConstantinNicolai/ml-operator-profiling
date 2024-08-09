@@ -18,7 +18,7 @@ batch_size = 32
 input_size = (batch_size, in_channels, 56, 56)
 
 # Create a large array of random convolutional layers stored in VRAM
-num_layers = 30000  # Large number of layers to simulate a large model
+num_layers = 5000  # Large number of layers to simulate a large model
 conv_layers = []
 for _ in range(num_layers):
     layer = nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
