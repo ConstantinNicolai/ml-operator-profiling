@@ -38,17 +38,17 @@ kill_background_jobs() {
 
 read_gpu_model
 
-gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
-for gpu_id in "${gpu_ids[@]}"; do
-nvidia-smi -i ${gpu_id} -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
-done
+# gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
+# for gpu_id in "${gpu_ids[@]}"; do
+# nvidia-smi -i ${gpu_id} -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
+# done
 
 
 # srun log_gpu_usage &  # Run the logging function in the background
 
 # Run the benchmark
-srun python3 attempt_0.py >> logs/training_output_${SLURM_JOB_ID}.log
+srun python3 attempt_1.py >> logs/training_output_${SLURM_JOB_ID}.log
 
 #kill of background logging
-bg_pids=$(jobs -p)
-kill_background_jobs $bg_pids
+# bg_pids=$(jobs -p)
+# kill_background_jobs $bg_pids
