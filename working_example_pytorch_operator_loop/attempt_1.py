@@ -47,10 +47,14 @@ for pid in $bg_pids; do
 done
 """
 
+test_shell = """
+echo "hello world"
+"""
+
 #os.system(startup)
 
 # Execute the shell command using subprocess.run()
-subprocess.run(startup, shell=True, check=True)
+#subprocess.run(startup, shell=True, check=True)
 
 # Start the timer
 start_time = time.time()
@@ -71,7 +75,7 @@ for i in range(iterations):
 end_time = time.time()
 
 #os.system(finishup)
-subprocess.run(finishup, shell=True, check=True)
+#subprocess.run(finishup, shell=True, check=True)
 
 # Calculate the time taken
 total_time = end_time - start_time
