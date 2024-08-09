@@ -91,7 +91,7 @@ def run_large_conv_workload():
     data_size = (1000,) + input_size[1:]  # Large dataset to simulate caching scenario
     input_data = torch.randn(data_size).cuda()
 
-    iterations = 15000000  # Number of iterations to run
+    iterations = 100000  # Number of iterations to run
 
     start_time = time.time()
 
