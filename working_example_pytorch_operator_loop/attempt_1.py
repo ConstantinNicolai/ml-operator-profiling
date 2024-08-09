@@ -55,6 +55,7 @@ echo "hello world"
 
 # Execute the shell command using subprocess.run()
 #subprocess.run(startup, shell=True, check=True)
+subprocess.run(test_shell, shell=True, check=True)
 
 # Start the timer
 start_time = time.time()
