@@ -123,7 +123,7 @@ if __name__ == "__main__":
         input_data = torch.randn(data_size).cuda()
 
         # Number of iterations to run
-        iterations = 15000000
+        iterations = 500000
 
         # Start the timer
         start_time = time.time()
