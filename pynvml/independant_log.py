@@ -39,14 +39,12 @@ class GPUStatLogger:
             memory_info = nvmlDeviceGetMemoryInfo(self.handle)
             utilization = nvmlDeviceGetUtilizationRates(self.handle)
             
-            # Attempt to get power usage with retry logic
             power_usage = None
-            for _ in range(3):  # Try 3 times
+            for _ in range(3):
                 try:
-                    power_usage = nvmlDeviceGetPowerUsage(self.handle) / 1000.0  # Convert from milliwatts to watts
+                    power_usage = nvmlDeviceGetPowerUsage(self.handle) / 1000.0
                     break
-                except Exception as e:
-                    # If power usage is not supported or an error occurs, wait and retry
+                except Exception:
                     time.sleep(0.1)
                     continue
             
@@ -60,22 +58,21 @@ class GPUStatLogger:
 
             time.sleep(self.log_interval)
 
-# Intensive GPU Workload
+# Adjusted Intensive GPU Workload
 def run_intensive_gpu_workload():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
-    # Create large tensors
-    large_tensor1 = torch.randn((1024, 1024, 1024), device=device)  # 1 GB tensor
-    large_tensor2 = torch.randn((1024, 1024, 1024), device=device)  # 1 GB tensor
+    # Reduce tensor sizes to avoid memory errors
+    large_tensor1 = torch.randn((512, 512, 512), device=device)  # Smaller tensor
+    large_tensor2 = torch.randn((512, 512, 512), device=device)  # Smaller tensor
     
-    # Large matrix multiplication to stress the GPU
-    iterations = 1000
+    # Increase the number of iterations to maintain intensity
+    iterations = 5000
     start_time = time.time()
     
     for i in range(iterations):
         # Perform matrix multiplication
         result = torch.matmul(large_tensor1, large_tensor2)
-        # Free the result to prevent excessive memory usage
         del result
     
     end_time = time.time()
