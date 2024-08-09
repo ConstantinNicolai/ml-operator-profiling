@@ -17,6 +17,18 @@ padding = 1
 batch_size = 32
 input_size = (batch_size, in_channels, 56, 56)
 
+
+startup = """
+nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
+"""
+
+finishup = """
+bg_pids=$(jobs -p)
+for pid in $bg_pids; do
+    kill $pid
+done
+"""
+
 # Create a large array of random convolutional layers stored in VRAM
 num_layers = 5000  # Large number of layers to simulate a large model
 conv_layers = []
@@ -31,18 +43,6 @@ input_data = torch.randn(data_size).cuda()
 
 # Number of iterations to run
 iterations = 50000
-
-
-startup = """
-nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
-"""
-
-finishup = """
-bg_pids=$(jobs -p)
-for pid in $bg_pids; do
-    kill $pid
-done
-"""
 
 subprocess.run(startup, shell=True, check=True)
 
