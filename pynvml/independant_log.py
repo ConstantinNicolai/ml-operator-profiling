@@ -67,7 +67,7 @@ def run_intensive_gpu_workload():
     large_tensor2 = torch.randn((512, 512, 512), device=device)  # Smaller tensor
     
     # Increase the number of iterations to maintain intensity
-    iterations = 4000
+    iterations = 2500
     start_time = time.time()
     
     for i in range(iterations):
