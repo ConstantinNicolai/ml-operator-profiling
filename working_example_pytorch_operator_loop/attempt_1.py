@@ -44,7 +44,8 @@ input_data = torch.randn(data_size).cuda()
 # Number of iterations to run
 iterations = 50000
 
-subprocess.run(startup, shell=True, check=True)
+#subprocess.run(startup, shell=True, check=True)
+os.system(startup)
 
 # Start the timer
 start_time = time.time()
@@ -64,7 +65,8 @@ for i in range(iterations):
 # Stop the timer
 end_time = time.time()
 
-subprocess.run(finishup, shell=True, check=True)
+#subprocess.run(finishup, shell=True, check=True)
+os.system(finishup)
 
 # Calculate the time taken
 total_time = end_time - start_time
