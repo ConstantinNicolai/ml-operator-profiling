@@ -31,7 +31,7 @@ done
 
 # Create a large array of random convolutional layers stored in VRAM
 num_layers = 5000  # Large number of layers to simulate a large model
-conv_layers = []
+conv_layergits = []
 for _ in range(num_layers):
     layer = nn.Conv2d(in_channels=in_channels, out_channels=out_channels,
                       kernel_size=kernel_size, stride=stride, padding=padding).cuda()
@@ -44,8 +44,11 @@ input_data = torch.randn(data_size).cuda()
 # Number of iterations to run
 iterations = 50000
 
+time.sleep(15)
+
 #subprocess.run(startup, shell=True, check=True)
 os.system(startup)
+
 
 # Start the timer
 start_time = time.time()
