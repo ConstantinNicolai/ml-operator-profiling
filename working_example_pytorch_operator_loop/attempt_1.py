@@ -49,6 +49,7 @@ done
 
 test_shell = """
 echo "hello world"
+gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
 """
 
 #os.system(startup)
