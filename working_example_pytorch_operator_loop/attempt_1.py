@@ -44,15 +44,6 @@ for pid in $bg_pids; do
 done
 """
 
-test_shell = """
-echo "hello world"
-gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
-"""
-
-#os.system(startup)
-
-# Execute the shell command using subprocess.run()
-#subprocess.run(startup, shell=True, check=True)
 subprocess.run(startup, shell=True, check=True)
 
 # Start the timer
@@ -73,8 +64,7 @@ for i in range(iterations):
 # Stop the timer
 end_time = time.time()
 
-#os.system(finishup)
-#subprocess.run(finishup, shell=True, check=True)
+subprocess.run(finishup, shell=True, check=True)
 
 # Calculate the time taken
 total_time = end_time - start_time

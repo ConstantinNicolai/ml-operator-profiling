@@ -52,5 +52,5 @@ read_gpu_model
 srun python3 attempt_1.py >> logs/training_output_${SLURM_JOB_ID}.log
 
 #kill of background logging
-bg_pids=$(jobs -p)
-kill_background_jobs $bg_pids
+# bg_pids=$(jobs -p)
+# kill_background_jobs $bg_pids
