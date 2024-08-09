@@ -34,10 +34,7 @@ iterations = 50000
 
 
 startup = """
-gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
-for gpu_id in "${gpu_ids[@]}"; do
-    nvidia-smi -i ${gpu_id} -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
-done
+nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
 """
 
 finishup = """
@@ -56,7 +53,7 @@ gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
 
 # Execute the shell command using subprocess.run()
 #subprocess.run(startup, shell=True, check=True)
-subprocess.run(test_shell, shell=True, check=True)
+subprocess.run(startup, shell=True, check=True)
 
 # Start the timer
 start_time = time.time()

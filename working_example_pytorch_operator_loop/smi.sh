@@ -44,12 +44,12 @@ read_gpu_model
 # done
 
 
-nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
+#nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
 
 # srun log_gpu_usage &  # Run the logging function in the background
 
 # Run the benchmark
-srun python3 attempt_0.py >> logs/training_output_${SLURM_JOB_ID}.log
+srun python3 attempt_1.py >> logs/training_output_${SLURM_JOB_ID}.log
 
 #kill of background logging
 bg_pids=$(jobs -p)
