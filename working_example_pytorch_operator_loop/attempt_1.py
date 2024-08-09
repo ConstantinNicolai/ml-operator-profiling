@@ -31,11 +31,14 @@ input_data = torch.randn(data_size).cuda()
 # Number of iterations to run
 iterations = 50000
 
-command = (
-    f"nvidia-smi -i {gpu_id} -lms=1 "
-    f"--query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total "
-    f"--format=csv,noheader,nounits >> {log_file_path} &"
-)
+
+startup = """
+gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
+for gpu_id in "${gpu_ids[@]}"; do
+nvidia-smi -i ${gpu_id} -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
+done
+"""
+
 finishup = """
 bg_pids=$(jobs -p)
 for pid in $bg_pids; do
@@ -43,7 +46,7 @@ for pid in $bg_pids; do
 done
 """
 
-os.system(command)
+os.system(startup)
 
 # Start the timer
 start_time = time.time()
