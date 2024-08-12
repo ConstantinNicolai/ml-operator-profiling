@@ -24,5 +24,6 @@ kill_background_jobs() {
 # Main script
 
 # Run the benchmark
-srun python3 attempt_4.py --in_channels 32 --out_channels 64 --kernel_size 5 --stride 2 --padding 0 --batch_size 16 --ifmap_size 28 >> logs/training_output_${SLURM_JOB_ID}.log
+#srun python3 attempt_4.py --in_channels 32 --out_channels 64 --kernel_size 5 --stride 2 --padding 0 --batch_size 16 --ifmap_size 28 >> logs/training_output_${SLURM_JOB_ID}.log
 
+srun python3 attempt_4.py >> logs/training_output_${SLURM_JOB_ID}.log
