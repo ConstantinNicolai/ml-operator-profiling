@@ -50,7 +50,7 @@ iterations = 20000
 
 
 startup = """
-nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
+nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/conv2d_${in_channels}.log &
 """
 
 # --in_channels "$in_channels" \
