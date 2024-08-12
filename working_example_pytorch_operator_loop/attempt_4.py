@@ -39,6 +39,8 @@ for _ in range(num_layers):
 
 ifmap = torch.randn(input_size).cuda()
 
+time.sleep(3)
+
 # Starting the gpu stats logging in the background
 os.system(startup)
 
