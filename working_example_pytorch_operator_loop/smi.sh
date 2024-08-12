@@ -33,6 +33,9 @@ padding_list=(1 1 1)
 batch_size_list=(16 32 64)
 ifmap_size_list=(28 32 56)
 
+
+
+num_combinations=${#in_channels_list[@]}
 # Run the benchmark for each indexed combination of parameters
 for ((i=0; i<$num_combinations; i++)); do
     in_channels=${in_channels_list[$i]}
