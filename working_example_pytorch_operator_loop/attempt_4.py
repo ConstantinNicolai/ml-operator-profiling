@@ -32,6 +32,7 @@ for pid in $bg_pids; do
 done
 """
 
+conv_layers = []
 for _ in range(num_layers):
     layer = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride, padding=padding).cuda()
     conv_layers.append(layer)
