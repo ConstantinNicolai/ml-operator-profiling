@@ -49,17 +49,15 @@ iterations = 20000
 
 
 
-startup = """
-nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/conv2d_${in_channels}.log &
-"""
+# startup = """
+# nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/conv2d_in_channels_out_channels_etc.log &
+# """
 
-# --in_channels "$in_channels" \
-#         --out_channels "$out_channels" \
-#         --kernel_size "$kernel_size" \
-#         --stride "$stride" \
-#         --padding "$padding" \
-#         --batch_size "$batch_size" \
-#         --ifmap_size "$ifmap_size" \
+
+# Create the startup command string with parameters
+startup = f"""
+nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/conv2d_{in_channels}in_{out_channels}out_{kernel_size}k_{stride}s_{padding}p_{batch_size}b_{ifmap_size}fs.log &
+"""
 
 
 finishup = """
