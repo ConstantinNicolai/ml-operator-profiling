@@ -14,19 +14,6 @@ eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 conda activate constabass
 
 
-# Check if Nvidia SMI is installed
-if ! command -v nvidia-smi &> /dev/null; then
-    echo "Error: Nvidia SMI is not installed on this node."
-    exit 1
-fi
-
-# Function to read GPU model
-read_gpu_model() {
-    gpu_model=$(nvidia-smi --query-gpu=name --format=csv,noheader)
-    echo "GPU Model: $gpu_model"
-}
-
-
 kill_background_jobs() {
     for pid in $@; do
         kill $pid
@@ -36,21 +23,6 @@ kill_background_jobs() {
 
 # Main script
 
-read_gpu_model
-
-# gpu_ids=(${CUDA_VISIBLE_DEVICES//,/ })
-# for gpu_id in "${gpu_ids[@]}"; do
-# nvidia-smi -i ${gpu_id} -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
-# done
-
-
-#nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
-
-# srun log_gpu_usage &  # Run the logging function in the background
-
 # Run the benchmark
 srun python3 attempt_4.py >> logs/training_output_${SLURM_JOB_ID}.log
 
-#kill of background logging
-# bg_pids=$(jobs -p)
-# kill_background_jobs $bg_pids
