@@ -2,7 +2,7 @@
 
 #SBATCH --partition=all
 #SBATCH --job-name=smi_meas
-#SBATCH --output=rolling_output_nojobnumber.out
+#SBATCH --output=resnet50print.out
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:RTX2080TI:1
