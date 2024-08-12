@@ -36,3 +36,30 @@ conv_layers = []
 for _ in range(num_layers):
     layer = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, stride=stride, padding=padding).cuda()
     conv_layers.append(layer)
+
+ifmap = torch.randn(input_size).cuda()
+
+# Starting the gpu stats logging in the background
+os.system(startup)
+
+# Start the timer
+start_time = time.time()
+
+
+# Run the convolution operation in a loop, accessing layers linearly
+for i in range(iterations):
+    # Linearly access the convolutional layer from the pre-created list
+    conv_layer = conv_layers[i % num_layers]
+    
+    # Apply the convolution operation
+    output = conv_layer(ifmap)
+
+# Stop the timer
+end_time = time.time()
+
+# Stopping the gpu stats logging running in the background
+os.system(finishup)
+
+# Calculate the time taken
+total_time = end_time - start_time
+print(f"Total time for {iterations} iterations: {total_time:.4f} seconds")
