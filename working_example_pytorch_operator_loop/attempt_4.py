@@ -17,7 +17,7 @@ input_size = (batch_size, in_channels, 56, 56)
 num_layers = 5000 
 
 # Number of iterations to run
-iterations = 5000
+iterations = 20000
 
 
 
