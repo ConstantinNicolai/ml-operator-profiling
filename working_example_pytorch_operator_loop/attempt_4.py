@@ -2,17 +2,45 @@ import torch
 import torch.nn as nn
 import time
 import os
+import argparse
 
-# Configuration for the convolutional layer
-in_channels = 64
-out_channels = 128
-kernel_size = 3
-stride = 1
-padding = 1
+# Set up argument parser
+parser = argparse.ArgumentParser(description="Configuration for the convolutional layer")
 
-# Assume the input tensor size after initial downsampling is (batch_size, 64, 56, 56)
-batch_size = 32
-input_size = (batch_size, in_channels, 56, 56)
+# Add command-line arguments
+parser.add_argument('--in_channels', type=int, default=64, help='Number of input channels')
+parser.add_argument('--out_channels', type=int, default=128, help='Number of output channels')
+parser.add_argument('--kernel_size', type=int, default=3, help='Kernel size for the convolution')
+parser.add_argument('--stride', type=int, default=1, help='Stride for the convolution')
+parser.add_argument('--padding', type=int, default=1, help='Padding for the convolution')
+parser.add_argument('--batch_size', type=int, default=32, help='Batch size for the input tensor')
+parser.add_argument('--ifmap_size', type=int, default=56, help='Size of the input feature map')
+
+# Parse the arguments
+args = parser.parse_args()
+
+# Assign the arguments to variables
+in_channels = args.in_channels
+out_channels = args.out_channels
+kernel_size = args.kernel_size
+stride = args.stride
+padding = args.padding
+batch_size = args.batch_size
+ifmap_size = args.ifmap_size
+
+
+
+# # Configuration for the convolutional layer
+# in_channels = 64
+# out_channels = 128
+# kernel_size = 3
+# stride = 1
+# padding = 1
+
+# # Assume the input tensor size after initial downsampling is (batch_size, 64, 56, 56)
+# batch_size = 32
+# ifmap_size = 56
+input_size = (batch_size, in_channels, ifmap_size, ifmap_size)
 
 num_layers = 5000 
 
