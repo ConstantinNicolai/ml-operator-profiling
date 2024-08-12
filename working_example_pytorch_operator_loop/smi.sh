@@ -49,7 +49,7 @@ read_gpu_model
 # srun log_gpu_usage &  # Run the logging function in the background
 
 # Run the benchmark
-srun python3 attempt_5.py >> logs/training_output_${SLURM_JOB_ID}.log
+srun python3 attempt_4.py >> logs/training_output_${SLURM_JOB_ID}.log
 
 #kill of background logging
 # bg_pids=$(jobs -p)
