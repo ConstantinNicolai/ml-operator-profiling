@@ -53,6 +53,15 @@ startup = """
 nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/gpu_usage_${SLURM_JOB_ID}.log &
 """
 
+# --in_channels "$in_channels" \
+#         --out_channels "$out_channels" \
+#         --kernel_size "$kernel_size" \
+#         --stride "$stride" \
+#         --padding "$padding" \
+#         --batch_size "$batch_size" \
+#         --ifmap_size "$ifmap_size" \
+
+
 finishup = """
 bg_pids=$(jobs -p)
 for pid in $bg_pids; do
@@ -91,3 +100,10 @@ os.system(finishup)
 # Calculate the time taken
 total_time = end_time - start_time
 print(f"Total time for {iterations} iterations: {total_time:.4f} seconds")
+
+
+# Cleanup
+del ifmap
+for layer in conv_layers:
+    del layer
+torch.cuda.empty_cache()
