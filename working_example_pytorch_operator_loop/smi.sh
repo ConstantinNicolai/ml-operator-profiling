@@ -23,7 +23,41 @@ kill_background_jobs() {
 
 # Main script
 
-# Run the benchmark
-srun python3 attempt_4.py --in_channels 32 --out_channels 64 --kernel_size 5 --stride 2 --padding 0 --batch_size 16 --ifmap_size 28 >> logs/training_output_${SLURM_JOB_ID}.log
 
-srun python3 attempt_4.py --ifmap_size 32 >> logs/training_output_${SLURM_JOB_ID}.log
+# Define lists for each parameter
+in_channels_list=(32 64 128)
+out_channels_list=(64 128 256)
+kernel_size_list=(3 5 7)
+stride_list=(1 1 1)
+padding_list=(1 1 1)
+batch_size_list=(16 32 64)
+ifmap_size_list=(28 32 56)
+
+# Run the benchmark for each indexed combination of parameters
+for ((i=0; i<$num_combinations; i++)); do
+    in_channels=${in_channels_list[$i]}
+    out_channels=${out_channels_list[$i]}
+    kernel_size=${kernel_size_list[$i]}
+    stride=${stride_list[$i]}
+    padding=${padding_list[$i]}
+    batch_size=${batch_size_list[$i]}
+    ifmap_size=${ifmap_size_list[$i]}
+
+    echo "Running: in_channels=$in_channels, out_channels=$out_channels, kernel_size=$kernel_size, stride=$stride, padding=$padding, batch_size=$batch_size, ifmap_size=$ifmap_size"
+    srun python3 attempt_4.py \
+        --in_channels "$in_channels" \
+        --out_channels "$out_channels" \
+        --kernel_size "$kernel_size" \
+        --stride "$stride" \
+        --padding "$padding" \
+        --batch_size "$batch_size" \
+        --ifmap_size "$ifmap_size" \
+        >> logs/training_output_${SLURM_JOB_ID}.log
+done
+
+
+
+# # Run the benchmark
+# srun python3 attempt_4.py --in_channels 32 --out_channels 64 --kernel_size 5 --stride 2 --padding 0 --batch_size 16 --ifmap_size 28 >> logs/training_output_${SLURM_JOB_ID}.log
+
+# srun python3 attempt_4.py --ifmap_size 32 >> logs/training_output_${SLURM_JOB_ID}.log
