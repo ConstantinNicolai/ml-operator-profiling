@@ -35,32 +35,32 @@ ifmap_size_list=(28 32 56)
 
 
 
-num_combinations=${#in_channels_list[@]}
-# Run the benchmark for each indexed combination of parameters
-for ((i=0; i<$num_combinations; i++)); do
-    in_channels=${in_channels_list[$i]}
-    out_channels=${out_channels_list[$i]}
-    kernel_size=${kernel_size_list[$i]}
-    stride=${stride_list[$i]}
-    padding=${padding_list[$i]}
-    batch_size=${batch_size_list[$i]}
-    ifmap_size=${ifmap_size_list[$i]}
+# num_combinations=${#in_channels_list[@]}
+# # Run the benchmark for each indexed combination of parameters
+# for ((i=0; i<$num_combinations; i++)); do
+#     in_channels=${in_channels_list[$i]}
+#     out_channels=${out_channels_list[$i]}
+#     kernel_size=${kernel_size_list[$i]}
+#     stride=${stride_list[$i]}
+#     padding=${padding_list[$i]}
+#     batch_size=${batch_size_list[$i]}
+#     ifmap_size=${ifmap_size_list[$i]}
 
-    echo "Running: in_channels=$in_channels, out_channels=$out_channels, kernel_size=$kernel_size, stride=$stride, padding=$padding, batch_size=$batch_size, ifmap_size=$ifmap_size"
-    srun python3 attempt_4.py \
-        --in_channels "$in_channels" \
-        --out_channels "$out_channels" \
-        --kernel_size "$kernel_size" \
-        --stride "$stride" \
-        --padding "$padding" \
-        --batch_size "$batch_size" \
-        --ifmap_size "$ifmap_size" \
-        >> logs/training_output_${SLURM_JOB_ID}.log
-done
+#     echo "Running: in_channels=$in_channels, out_channels=$out_channels, kernel_size=$kernel_size, stride=$stride, padding=$padding, batch_size=$batch_size, ifmap_size=$ifmap_size"
+#     srun python3 attempt_4.py \
+#         --in_channels "$in_channels" \
+#         --out_channels "$out_channels" \
+#         --kernel_size "$kernel_size" \
+#         --stride "$stride" \
+#         --padding "$padding" \
+#         --batch_size "$batch_size" \
+#         --ifmap_size "$ifmap_size" \
+#         >> logs/training_output_${SLURM_JOB_ID}.log
+# done
 
 
 
-# # Run the benchmark
-# srun python3 attempt_4.py --in_channels 32 --out_channels 64 --kernel_size 5 --stride 2 --padding 0 --batch_size 16 --ifmap_size 28 >> logs/training_output_${SLURM_JOB_ID}.log
+# Run the benchmark
+srun python3 attempt_4.py --in_channels 128 --out_channels 256 --kernel_size 7 --stride 1 --padding 1 --batch_size 64 --ifmap_size 56 >> logs/training_output_${SLURM_JOB_ID}.log
 
 # srun python3 attempt_4.py --ifmap_size 32 >> logs/training_output_${SLURM_JOB_ID}.log
