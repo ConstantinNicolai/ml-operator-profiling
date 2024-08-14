@@ -11,48 +11,69 @@ def save_json_file(data, file_path):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=4)
 
+# Function to process the dictionaries to flatten certain fields
+def process_dicts(dict_list):
+    processed_list = []
+    for d in dict_list:
+        processed_dict = d.copy()
+        
+        # Flatten kernel_size, padding, stride, input_size, output_size
+        if isinstance(processed_dict.get('kernel_size'), list):
+            processed_dict['kernel_size'] = processed_dict['kernel_size'][0]
+        
+        if isinstance(processed_dict.get('padding'), list):
+            processed_dict['padding'] = processed_dict['padding'][0]
+        
+        if isinstance(processed_dict.get('stride'), list):
+            processed_dict['stride'] = processed_dict['stride'][0]
+
+        if isinstance(processed_dict.get('input_size'), list):
+            processed_dict['input_size'] = processed_dict['input_size'][0]
+        
+        if isinstance(processed_dict.get('output_size'), list):
+            processed_dict['output_size'] = processed_dict['output_size'][0]
+
+        processed_list.append(processed_dict)
+    
+    return processed_list
+
+# Function to merge corresponding dictionaries from two lists
+def merge_lists(list1, list2):
+    merged_list = []
+    for dict1, dict2 in zip(list1, list2):
+        merged_dict = {**dict1, **dict2}
+        merged_list.append(merged_dict)
+    return merged_list
+
 # Paths to your JSON files
 json_file1 = 'print_data_unique.json'
 json_file2 = 'tree_data_unique.json'
 
-# Load the JSON files
 list1 = load_json_file(json_file1)
 list2 = load_json_file(json_file2)
 
-# Check if the lengths match
-if len(list1) != len(list2):
-    raise ValueError("The lists have different lengths and cannot be merged element-wise.")
+# Process the lists to flatten the specified fields
+processed_list1 = process_dicts(list1)
+processed_list2 = process_dicts(list2)
 
-# Merge corresponding dictionaries and create a list with only the first dictionary of each pair
-merged_list = []
-first_entry_list = []
-
-for dict1, dict2 in zip(list1, list2):
-    # Merge the two dictionaries
-    merged_dict = {**dict1, **dict2}
-    merged_list.append(merged_dict)
-    
-    # Store only the first dictionary in the tuple
-    first_entry_list.append(dict1)
+# Merge the lists
+merged_list = merge_lists(processed_list1, processed_list2)
 
 # Save the merged list of dictionaries to a new JSON file
 output_file_merged = 'merged_list.json'
 save_json_file(merged_list, output_file_merged)
 
-# Save the list with only the first entries to a new JSON file
+# Save the list with only the first dictionaries from the first list
 output_file_first_entries = 'first_entry_list.json'
-save_json_file(first_entry_list, output_file_first_entries)
+save_json_file(processed_list1, output_file_first_entries)
 
 # Print the merged list of dictionaries
 print("Merged List of Dictionaries:")
 for item in merged_list:
     print(item)
 
-print(f"\nMerged list saved to {output_file_merged}")
-
 # Print the list with only the first entries
 print("\nList with Only the First Entries of Each Pair:")
-for item in first_entry_list:
+for item in processed_list1:
     print(item)
 
-print(f"\nFirst entries list saved to {output_file_first_entries}")
