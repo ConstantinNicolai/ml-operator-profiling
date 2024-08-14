@@ -1,6 +1,6 @@
 #!/bin/bash
 
-operator  = "conv" 
+operator="conv" 
 
 python3 print.py | grep $operator >> temp_print_$operator
 
