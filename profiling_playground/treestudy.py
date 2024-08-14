@@ -22,9 +22,8 @@ def extract_values_from_line(line):
         )
         
         return {
-            "function_name": function_name,
-            "input_size_last_two": input_size_last_two,
-            "output_size_last_two": output_size_last_two
+            "input_size": input_size_last_two,
+            "output_size": output_size_last_two
         }
     else:
         raise ValueError("The line does not match the expected pattern")
