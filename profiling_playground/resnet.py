@@ -9,7 +9,7 @@ from torch_profiling_utils.fvcorewriter import FVCoreWriter
 from torch_profiling_utils.torchinfowriter import TorchinfoWriter
 
 # Load the pretrained ResNet-50 model
-model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V2)
+model = resnet18(weights=ResNet18_Weights.DEFAULT)
 
 
 
