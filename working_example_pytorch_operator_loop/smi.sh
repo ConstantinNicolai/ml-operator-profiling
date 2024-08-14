@@ -25,13 +25,13 @@ kill_background_jobs() {
 
 
 # Define lists for each parameter
-in_channels_list=(64 64 64 64 64 64 64 64 64 64)
-out_channels_list=(128 128 128 128 128 128 128 128 128 128)
-kernel_size_list=(3 3 3 3 3 3 3 3 3 3)
-stride_list=(1 1 1 1 1 1 1 1 1 1 )
-padding_list=(1 1 1 1 1 1 1 1 1 1 )
+in_channels_list=(3 64 64 64 256 256 128 128 64 64)
+out_channels_list=(64 64 64 256 64 128 128 512 128 128)
+kernel_size_list=(7 1 3 1 1 1 3 1 3 3)
+stride_list=(2 1 1 1 1 1 2 1 1 1 )
+padding_list=(3 0 1 0 0 0 1 0 1 1 )
 batch_size_list=(32 32 32 32 32 32 32 32 32 32)
-ifmap_size_list=(56 56 56 56 56 56 56 56 56 56)
+ifmap_size_list=(224 56 56 56 56 56 56 56 56 56)
 
 
 
