@@ -1,0 +1,85 @@
+import re
+import json
+
+def extract_values_from_line(line):
+    # Regular expression pattern to capture the function name and the last two dimensions of input size and output size
+    pattern = re.compile(
+        r"(\w+)\s*\[Input Size=\[([0-9]+),\s*[0-9]+,\s*[0-9]+,\s*([0-9]+)\],\s*"
+        r"Output Size=\[([0-9]+),\s*[0-9]+,\s*[0-9]+,\s*([0-9]+)\]\]"
+    )
+    
+    match = pattern.search(line)
+    
+    if match:
+        function_name = match.group(1)  # Extract function name
+        input_size_last_two = (
+            int(match.group(3)),  # Last two dimension of input size
+            int(match.group(4))   # Last dimension of output size
+        )
+        output_size_last_two = (
+            int(match.group(5)),  # Last dimension of output size
+            int(match.group(6))   # Last two dimension of output size
+        )
+        
+        return {
+            "function_name": function_name,
+            "input_size_last_two": input_size_last_two,
+            "output_size_last_two": output_size_last_two
+        }
+    else:
+        raise ValueError("The line does not match the expected pattern")
+
+def process_file(filename):
+    results = []
+    
+    # Read the text from the file
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+    
+    # Process each line and extract values
+    for line in lines:
+        line = line.strip()
+        try:
+            result = extract_values_from_line(line)
+            results.append(result)
+        except ValueError as e:
+            print(f"Skipping line due to error: {e}")
+    
+    return results
+
+def get_unique_data(data):
+    # Convert dictionaries to JSON strings to use as set elements
+    seen = set()
+    unique_data = []
+    
+    for item in data:
+        # Convert the dictionary to a JSON string for comparison
+        item_str = json.dumps(item, sort_keys=True)
+        if item_str not in seen:
+            seen.add(item_str)
+            unique_data.append(item)
+    
+    return unique_data
+
+# Example usage
+filename = 'resnet18_tree.out'
+data = process_file(filename)
+
+# Get unique lines
+data_unique = get_unique_data(data)
+
+# Print the results
+print("All data:")
+for i, entry in enumerate(data):
+    print(f"Line {i+1}: {entry}")
+
+print("\nUnique data:")
+for i, entry in enumerate(data_unique):
+    print(f"Unique Line {i+1}: {entry}")
+
+# Optionally write results to files
+with open('data.json', 'w') as file:
+    json.dump(data, file, indent=4)
+
+with open('data_unique.json', 'w') as file:
+    json.dump(data_unique, file, indent=4)
