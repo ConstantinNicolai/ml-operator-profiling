@@ -1,14 +1,29 @@
 import torch
+
+
+import sys
+
+
+# Check if a command-line argument was provided
+if len(sys.argv) != 3:
+    print("Usage: python example.py <filepath>")
+    sys.exit(1)
+
+# Read the command-line argument
+model = sys.argv[1]
+weights_par = sys.argv[2]
+
+
 import torch.nn as nn
 import torch.nn.functional as F
-from torchvision.models import resnet18, resnet18_Weights
+from torchvision.models import model, weights_par
 from torchvision import transforms
 from torchsummary import summary
 from torch_profiling_utils.fvcorewriter import FVCoreWriter
 from torch_profiling_utils.torchinfowriter import TorchinfoWriter
 
 # Load the pretrained ResNet-50 model
-model = resnet18(weights=resnet18_Weights.DEFAULT)
+model = model(weights=weights_par_Weights.DEFAULT)
 
 input_size = (3, 56, 56)
 

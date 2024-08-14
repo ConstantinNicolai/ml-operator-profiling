@@ -5,7 +5,8 @@ eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 conda activate constabass
 
 operator="conv"
-model="resnet50
+model="resnet50"
+weights="ResNet50"
 
 python3 print.py | grep $operator >> temp_print_$operator
 
