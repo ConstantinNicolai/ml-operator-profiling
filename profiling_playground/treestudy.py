@@ -78,8 +78,8 @@ for i, entry in enumerate(data_unique):
     print(f"Unique Line {i+1}: {entry}")
 
 # Optionally write results to files
-with open('data.json', 'w') as file:
+with open('data_tree.json', 'w') as file:
     json.dump(data, file, indent=4)
 
-with open('data_unique.json', 'w') as file:
+with open('data_unique_tree.json', 'w') as file:
     json.dump(data_unique, file, indent=4)
