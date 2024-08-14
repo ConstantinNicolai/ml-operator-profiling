@@ -7,8 +7,8 @@ from torchsummary import summary
 from torch_profiling_utils.fvcorewriter import FVCoreWriter
 from torch_profiling_utils.torchinfowriter import TorchinfoWriter
 
-# # Load the pretrained ResNet-50 model
-# model = resnet50(pretrained=True)
+# Load the pretrained ResNet-50 model
+model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V2)
 
 
 
@@ -54,7 +54,7 @@ class SimpleCNN(nn.Module):
 #print(model)
 
 
-model = SimpleCNN(num_classes=10)
+# model = SimpleCNN(num_classes=10)
 print(model)
 
 
