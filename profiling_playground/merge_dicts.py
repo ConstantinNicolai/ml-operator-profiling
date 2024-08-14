@@ -1,12 +1,12 @@
 import json
 
-# Function to load a JSON file into a list
+# Function to load a JSON file into a list of dictionaries
 def load_json_file(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)
     return data
 
-# Function to save a list as a JSON file
+# Function to save a list of dictionaries as a JSON file
 def save_json_file(data, file_path):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=4)
@@ -19,10 +19,17 @@ json_file2 = 'tree_data_unique.json'
 list1 = load_json_file(json_file1)
 list2 = load_json_file(json_file2)
 
-# Merge the lists
-merged_list = list1 + list2  # Combine the lists
+# Check if the lengths match
+if len(list1) != len(list2):
+    raise ValueError("The lists have different lengths and cannot be merged element-wise.")
 
-# Save the merged list to a new JSON file
+# Merge corresponding dictionaries
+merged_list = []
+for dict1, dict2 in zip(list1, list2):
+    merged_dict = {**dict1, **dict2}  # Combine dictionaries
+    merged_list.append(merged_dict)
+
+# Save the merged list of dictionaries to a new JSON file
 output_file = 'merged_list.json'
 save_json_file(merged_list, output_file)
 
