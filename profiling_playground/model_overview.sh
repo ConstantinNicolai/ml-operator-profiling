@@ -14,6 +14,6 @@ python3 dictex_unique_count.py temp_print_$operator
 
 python3 treestudy1.py temp_tree_$operator
 
-python3 merge_dicts.py temp_print_$operator.json temp_tree_$operator.json resnet50_$operator
+python3 merge_dicts.py temp_print_$operator.json temp_tree_$operator.json resnet18_$operator
 
 #cp resnet50_{$operator}_merged.json ../working_example_pytorch_operator_loop
