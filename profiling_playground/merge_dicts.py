@@ -21,6 +21,7 @@ list2 = load_json_file(json_file2)
 
 # Merge the lists
 merged_list = list1 + list2  # Combine the lists
+print(merged_list)
 
 # Save the merged list to a new JSON file
 output_file = 'merged_list.json'
