@@ -5,6 +5,7 @@ from torchvision.models import resnet50
 from torchvision import transforms
 from torchsummary import summary
 from torch_profiling_utils.fvcorewriter import FVCoreWriter
+from torch_profiling_utils.torchinfowriter import TorchinfoWriter
 
 # # Load the pretrained ResNet-50 model
 # model = resnet50(pretrained=True)
@@ -77,7 +78,7 @@ input_size = (3, 32, 32)
 #     layer.register_forward_hook(print_activation_shape)
 
 # Create a dummy input tensor with the ImageNet input size
-dummy_input = torch.randn(1, *input_size)
+input_data = torch.randn(1, *input_size)
 #dummy_input = torch.randn(1, *input_size).to(device)
 
 # # Perform a forward pass to trigger the hooks
@@ -88,7 +89,7 @@ dummy_input = torch.randn(1, *input_size)
 
 
 
-fvcore_writer = FVCoreWriter(model, dummy_input)
+fvcore_writer = FVCoreWriter(model, input_data)
 
 fvcore_writer.get_flop_dict('by_module')
 fvcore_writer.get_flop_dict('by_operator')
@@ -99,3 +100,11 @@ fvcore_writer.get_activation_dict('by_operator')
 fvcore_writer.write_flops_to_json("output_test.json", 'by_module')
 
 fvcore_writer.write_activations_to_json("operator_fvcore.json",'by_operator')
+
+
+
+torchinfo_writer = TorchinfoWriter(model,
+                                    input_data=input_data,
+                                    verbose=0)
+
+torchinfo_writer.construct_model_tree()
