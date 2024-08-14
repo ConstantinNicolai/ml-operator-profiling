@@ -103,10 +103,10 @@ input_data = torch.randn(1, *input_size)
 
 
 
-torchinfo_writer = TorchinfoWriter(model,
-                                    input_data=input_data,
-                                    verbose=0)
+# torchinfo_writer = TorchinfoWriter(model,
+#                                     input_data=input_data,
+#                                     verbose=0)
 
-torchinfo_writer.construct_model_tree()
+# torchinfo_writer.construct_model_tree()
 
-torchinfo_writer.show_model_tree(attr_list=['Name', 'Kernel Size', 'Input Size', 'Output Size', 'Parameters', 'MACs'])
+# torchinfo_writer.show_model_tree(attr_list=['Name', 'Kernel Size', 'Input Size', 'Output Size', 'Parameters', 'MACs'])
