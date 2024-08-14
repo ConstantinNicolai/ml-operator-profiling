@@ -67,7 +67,7 @@ class SimpleCNN(nn.Module):
 # model.to(device)
 
 # ImageNet input size is (3, 224, 224)
-input_size = (3, 32, 32)
+input_size = (3, 50, 50)
 
 # # Define a hook to register and print the shape of activations
 # def print_activation_shape(module, input, output):
