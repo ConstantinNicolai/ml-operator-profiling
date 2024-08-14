@@ -26,9 +26,9 @@ merged_list = list1 + list2  # Combine the lists
 output_file = 'merged_list.json'
 save_json_file(merged_list, output_file)
 
+# Print the merged list of dictionaries
+print("Merged List of Dictionaries:")
+for item in merged_list:
+    print(item)
 
-# Print the merged list in a nice format
-print("Merged List:")
-print(json.dumps(merged_list, indent=4))
-
-print(f"Merged list saved to {output_file}")
+print(f"\nMerged list saved to {output_file}")
