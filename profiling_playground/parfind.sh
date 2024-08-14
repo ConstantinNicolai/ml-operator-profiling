@@ -1,0 +1,1 @@
+cat resnet18_print.out | grep conv
