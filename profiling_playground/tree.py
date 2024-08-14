@@ -16,7 +16,7 @@ weights_par = sys.argv[2]
 
 import torch.nn as nn
 import torch.nn.functional as F
-from torchvision.models import {model}, weights_par
+import torchvision.models
 from torchvision import transforms
 from torchsummary import summary
 from torch_profiling_utils.fvcorewriter import FVCoreWriter
