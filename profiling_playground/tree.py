@@ -23,7 +23,7 @@ from torch_profiling_utils.fvcorewriter import FVCoreWriter
 from torch_profiling_utils.torchinfowriter import TorchinfoWriter
 
 # Load the pretrained ResNet-50 model
-model = model(weights=weights_par_Weights.DEFAULT)
+model = model_par(weights=weights_par_Weights.DEFAULT)
 
 input_size = (3, 56, 56)
 
