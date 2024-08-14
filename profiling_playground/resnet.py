@@ -108,3 +108,5 @@ torchinfo_writer = TorchinfoWriter(model,
                                     verbose=0)
 
 torchinfo_writer.construct_model_tree()
+
+torchinfo_writer.show_model_tree(attr_list=['Name', 'Kernel Size', 'Input Size', 'Output Size', 'Parameters', 'MACs'])
