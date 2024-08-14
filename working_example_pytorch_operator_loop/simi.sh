@@ -23,7 +23,7 @@ kill_background_jobs() {
 # Main script
 
 # Define the JSON file
-json_file="../profiling_playground/merged_list.json"
+json_file="../profiling_playground/resnet50_conv_merged.json"
 
 
 # Read and process the JSON file using jq
