@@ -1,14 +1,61 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torchvision.models import resnet50
 from torchvision import transforms
 from torchsummary import summary
 from torch_profiling_utils.fvcorewriter import FVCoreWriter
 
-# Load the pretrained ResNet-50 model
-model = resnet50(pretrained=True)
+# # Load the pretrained ResNet-50 model
+# model = resnet50(pretrained=True)
+
+
+
+
+class SimpleCNN(nn.Module):
+    def __init__(self, num_classes=10):
+        super(SimpleCNN, self).__init__()
+        
+        # First Convolutional Layer
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=1, padding=1)
+        
+        # Second Convolutional Layer
+        self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
+        
+        # Third Convolutional Layer
+        self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
+        
+        # Fully Connected Layer (Linear Layer)
+        # Assuming input images are 32x32
+        self.fc1 = nn.Linear(64 * 4 * 4, num_classes)
+
+    def forward(self, x):
+        # Pass through the first conv layer and apply ReLU activation
+        x = F.relu(self.conv1(x))
+        x = F.max_pool2d(x, kernel_size=2, stride=2)  # Apply max pooling
+        
+        # Pass through the second conv layer and apply ReLU activation
+        x = F.relu(self.conv2(x))
+        x = F.max_pool2d(x, kernel_size=2, stride=2)  # Apply max pooling
+        
+        # Pass through the third conv layer and apply ReLU activation
+        x = F.relu(self.conv3(x))
+        x = F.max_pool2d(x, kernel_size=2, stride=2)  # Apply max pooling
+        
+        # Flatten the output from the conv layers before passing into the fully connected layer
+        x = x.view(x.size(0), -1)
+        
+        # Pass through the fully connected layer
+        x = self.fc1(x)
+        
+        return x
 
 #print(model)
+
+
+model = SimpleCNN(num_classes=10)
+print(model)
+
 
 # # ImageNet has 1000 classes, so we don't need to modify the model
 # # However, if you want to modify it (e.g., for transfer learning), you could do something like this:
@@ -41,13 +88,13 @@ dummy_input = torch.randn(1, *input_size)
 
 
 
-fvcore_writer = FVCoreWriter(model, dummy_input)
+# fvcore_writer = FVCoreWriter(model, dummy_input)
 
-fvcore_writer.get_flop_dict('by_module')
-fvcore_writer.get_flop_dict('by_operator')
+# fvcore_writer.get_flop_dict('by_module')
+# fvcore_writer.get_flop_dict('by_operator')
 
-fvcore_writer.get_activation_dict('by_module')
-fvcore_writer.get_activation_dict('by_operator')
+# fvcore_writer.get_activation_dict('by_module')
+# fvcore_writer.get_activation_dict('by_operator')
 
-fvcore_writer.write_flops_to_json("output_test.json", 'by_module')
+# fvcore_writer.write_flops_to_json("output_test.json", 'by_module')
 
