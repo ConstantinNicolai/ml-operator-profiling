@@ -1,6 +1,18 @@
 import re
 import json
 from collections import defaultdict
+import sys
+
+
+# Check if a command-line argument was provided
+if len(sys.argv) != 2:
+    print("Usage: python example.py <filepath>")
+    sys.exit(1)
+
+# Read the command-line argument
+path = sys.argv[1]
+
+
 
 def extract_values_from_line(line):
     # Regular expression pattern to capture the function name and the last two dimensions of input size and output size
@@ -72,18 +84,18 @@ data = process_file(filename)
 # Get unique lines with counts
 data_unique = get_unique_data(data)
 
-# Print the results
-print("All data:")
-for i, entry in enumerate(data):
-    print(f"Line {i+1}: {entry}")
+# # Print the results
+# print("All data:")
+# for i, entry in enumerate(data):
+#     print(f"Line {i+1}: {entry}")
 
-print("\nUnique data with counts:")
-for i, entry in enumerate(data_unique):
-    print(f"Unique Line {i+1}: {entry}")
+# print("\nUnique data with counts:")
+# for i, entry in enumerate(data_unique):
+#     print(f"Unique Line {i+1}: {entry}")
 
-# Optionally write results to files
-with open('tree_data.json', 'w') as file:
-    json.dump(data, file, indent=4)
+# # Optionally write results to files
+# with open('tree_data.json', 'w') as file:
+#     json.dump(data, file, indent=4)
 
-with open('tree_data_unique.json', 'w') as file:
+with open(f"{path}.json", 'w') as file:
     json.dump(data_unique, file, indent=4)

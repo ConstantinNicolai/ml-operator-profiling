@@ -1,4 +1,16 @@
 import json
+import sys
+
+
+# Check if a command-line argument was provided
+if len(sys.argv) != 4:
+    print("Usage: python example.py <filepath>")
+    sys.exit(1)
+
+# Read the command-line argument
+path0 = sys.argv[1]
+path1 = sys.argv[2]
+output = sys.argv[3]
 
 # Function to load a JSON file into a list of dictionaries
 def load_json_file(file_path):
@@ -46,8 +58,8 @@ def merge_lists(list1, list2):
     return merged_list
 
 # Paths to your JSON files
-json_file1 = 'print_data_unique.json'
-json_file2 = 'tree_data_unique.json'
+json_file1 = path0
+json_file2 = path1
 
 list1 = load_json_file(json_file1)
 list2 = load_json_file(json_file2)
@@ -60,7 +72,7 @@ processed_list2 = process_dicts(list2)
 merged_list = merge_lists(processed_list1, processed_list2)
 
 # Save the merged list of dictionaries to a new JSON file
-output_file_merged = 'merged_list.json'
+output_file_merged = f"{output}_merged.json"#'merged_list.json'
 save_json_file(merged_list, output_file_merged)
 
 # Print the merged list of dictionaries
