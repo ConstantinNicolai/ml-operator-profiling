@@ -120,5 +120,5 @@ data_unique = get_unique_data(data)
 # with open('print_data.json', 'w') as file:
 #     json.dump(data, file, indent=4)
 
-with open(:"{path}.json", 'w') as file:
+with open("{path}.json", 'w') as file:
     json.dump(data_unique, file, indent=4)
