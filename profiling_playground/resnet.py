@@ -66,7 +66,7 @@ print(model)
 # model.to(device)
 
 # ImageNet input size is (3, 224, 224)
-input_size = (3, 224, 224)
+input_size = (3, 32, 32)
 
 # # Define a hook to register and print the shape of activations
 # def print_activation_shape(module, input, output):
@@ -88,13 +88,13 @@ dummy_input = torch.randn(1, *input_size)
 
 
 
-# fvcore_writer = FVCoreWriter(model, dummy_input)
+fvcore_writer = FVCoreWriter(model, dummy_input)
 
-# fvcore_writer.get_flop_dict('by_module')
-# fvcore_writer.get_flop_dict('by_operator')
+fvcore_writer.get_flop_dict('by_module')
+fvcore_writer.get_flop_dict('by_operator')
 
-# fvcore_writer.get_activation_dict('by_module')
-# fvcore_writer.get_activation_dict('by_operator')
+fvcore_writer.get_activation_dict('by_module')
+fvcore_writer.get_activation_dict('by_operator')
 
-# fvcore_writer.write_flops_to_json("output_test.json", 'by_module')
+fvcore_writer.write_flops_to_json("output_test.json", 'by_module')
 
