@@ -4,8 +4,8 @@ import json
 def extract_values_from_line(line):
     # Regular expression pattern to capture the function name and the last two dimensions of input size and output size
     pattern = re.compile(
-        r"(\w+)\s*\[Input Size=\[([0-9]+),\s*[0-9]+,\s*[0-9]+,\s*([0-9]+)\],\s*"
-        r"Output Size=\[([0-9]+),\s*[0-9]+,\s*[0-9]+,\s*([0-9]+)\]\]"
+        r"(\w+)\s*\[Input Size=\[([0-9]+),\s*[0-9]+,\s*([0-9]+),\s*([0-9]+)\],\s*"
+        r"Output Size=\[([0-9]+),\s*[0-9]+,\s*([0-9]+),\s*([0-9]+)\]\]"
     )
     
     match = pattern.search(line)
@@ -13,12 +13,12 @@ def extract_values_from_line(line):
     if match:
         function_name = match.group(1)  # Extract function name
         input_size_last_two = (
-            int(match.group(3)),  # Last two dimension of input size
-            int(match.group(4))   # Last dimension of output size
+            int(match.group(3)),  # Height of input size
+            int(match.group(4))   # Width of input size
         )
         output_size_last_two = (
-            int(match.group(5)),  # Last dimension of output size
-            int(match.group(6))   # Last two dimension of output size
+            int(match.group(6)),  # Height of output size
+            int(match.group(7))   # Width of output size
         )
         
         return {
@@ -78,8 +78,8 @@ for i, entry in enumerate(data_unique):
     print(f"Unique Line {i+1}: {entry}")
 
 # Optionally write results to files
-with open('data_tree.json', 'w') as file:
+with open('data.json', 'w') as file:
     json.dump(data, file, indent=4)
 
-with open('data_unique_tree.json', 'w') as file:
+with open('data_unique.json', 'w') as file:
     json.dump(data_unique, file, indent=4)
