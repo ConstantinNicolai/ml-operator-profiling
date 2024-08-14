@@ -86,7 +86,7 @@ def get_unique_data(data):
     return unique_data
 
 # Example usage
-filename = 'your_file.txt'
+filename = 'resnet18_conv.out'
 data = process_file(filename)
 
 # Get unique lines
