@@ -98,3 +98,4 @@ fvcore_writer.get_activation_dict('by_operator')
 
 fvcore_writer.write_flops_to_json("output_test.json", 'by_module')
 
+fvcore_writer.write_activations_to_json("operator_fvcore.json",'by_operator')
