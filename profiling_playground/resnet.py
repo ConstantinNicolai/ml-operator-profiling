@@ -89,17 +89,17 @@ input_data = torch.randn(1, *input_size)
 
 
 
-fvcore_writer = FVCoreWriter(model, input_data)
+# fvcore_writer = FVCoreWriter(model, input_data)
 
-fvcore_writer.get_flop_dict('by_module')
-fvcore_writer.get_flop_dict('by_operator')
+# fvcore_writer.get_flop_dict('by_module')
+# fvcore_writer.get_flop_dict('by_operator')
 
-fvcore_writer.get_activation_dict('by_module')
-fvcore_writer.get_activation_dict('by_operator')
+# fvcore_writer.get_activation_dict('by_module')
+# fvcore_writer.get_activation_dict('by_operator')
 
-fvcore_writer.write_flops_to_json("output_test.json", 'by_module')
+# fvcore_writer.write_flops_to_json("output_test.json", 'by_module')
 
-fvcore_writer.write_activations_to_json("operator_fvcore.json",'by_operator')
+# fvcore_writer.write_activations_to_json("operator_fvcore.json",'by_operator')
 
 
 
