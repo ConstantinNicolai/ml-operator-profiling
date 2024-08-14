@@ -107,18 +107,18 @@ data = process_file(filename)
 # Get unique lines with counts
 data_unique = get_unique_data(data)
 
-# Print the results
-print("All data:")
-for i, entry in enumerate(data):
-    print(f"Line {i+1}: {entry}")
+# # Print the results
+# print("All data:")
+# for i, entry in enumerate(data):
+#     print(f"Line {i+1}: {entry}")
 
-print("\nUnique data with counts:")
-for i, entry in enumerate(data_unique):
-    print(f"Unique Line {i+1}: {entry}")
+# print("\nUnique data with counts:")
+# for i, entry in enumerate(data_unique):
+#     print(f"Unique Line {i+1}: {entry}")
 
-# Optionally write results to files
-with open('print_data.json', 'w') as file:
-    json.dump(data, file, indent=4)
+# # Optionally write results to files
+# with open('print_data.json', 'w') as file:
+#     json.dump(data, file, indent=4)
 
-with open('print_data_unique.json', 'w') as file:
+with open(:"{path}.json", 'w') as file:
     json.dump(data_unique, file, indent=4)
