@@ -1,6 +1,16 @@
 import re
 import json
 from collections import defaultdict
+import sys
+
+
+# Check if a command-line argument was provided
+if len(sys.argv) != 2:
+    print("Usage: python example.py <filepath>")
+    sys.exit(1)
+
+# Read the command-line argument
+path = sys.argv[1]
 
 def extract_values_from_text(text, default_stride=(1, 1), default_padding=(0, 0)):
     # Regular expression pattern to capture the function name and parameters
@@ -91,7 +101,7 @@ def get_unique_data(data):
     return unique_data
 
 # Example usage
-filename = 'resnet18_conv.out'
+filename = path
 data = process_file(filename)
 
 # Get unique lines with counts
