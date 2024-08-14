@@ -63,17 +63,7 @@ merged_list = merge_lists(processed_list1, processed_list2)
 output_file_merged = 'merged_list.json'
 save_json_file(merged_list, output_file_merged)
 
-# Save the list with only the first dictionaries from the first list
-output_file_first_entries = 'first_entry_list.json'
-save_json_file(processed_list1, output_file_first_entries)
-
 # Print the merged list of dictionaries
 print("Merged List of Dictionaries:")
 for item in merged_list:
     print(item)
-
-# Print the list with only the first entries
-print("\nList with Only the First Entries of Each Pair:")
-for item in processed_list1:
-    print(item)
-
