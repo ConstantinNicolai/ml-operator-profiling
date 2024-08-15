@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --partition=all
-#SBATCH --job-name=smi_meas
+#SBATCH --job-name=auto_benchmark
 #SBATCH --output=rolling_output_nojobnumber.out
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=1
