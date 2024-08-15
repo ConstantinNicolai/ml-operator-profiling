@@ -78,7 +78,7 @@ def get_unique_data(data):
     return unique_data
 
 # Example usage
-filename = 'resnet18_tree.out'
+filename = path
 data = process_file(filename)
 
 # Get unique lines with counts
