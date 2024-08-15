@@ -42,7 +42,7 @@ ifmap_size = args.ifmap_size
 # ifmap_size = 56
 input_size = (batch_size, in_channels, ifmap_size, ifmap_size)
 
-num_layers = 5000 
+num_layers = 500 
 
 # Number of iterations to run
 iterations = 120000
