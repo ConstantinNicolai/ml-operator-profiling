@@ -3,6 +3,7 @@ import torch.nn as nn
 import time
 import os
 import argparse
+import math
 
 # Set up argument parser
 parser = argparse.ArgumentParser(description="Configuration for the convolutional layer")
@@ -73,6 +74,14 @@ for _ in range(num_layers):
     conv_layers.append(layer)
 
 ifmap = torch.randn(input_size).cuda()
+
+# Run the convolution operation in a loop, accessing layers linearly
+for i in range(math.ceil(iterations/4)):
+    # Linearly access the convolutional layer from the pre-created list
+    conv_layer = conv_layers[i % num_layers]
+    
+    # Apply the convolution operation
+    output = conv_layer(ifmap)
 
 # Starting the gpu stats logging in the background
 os.system(startup)
