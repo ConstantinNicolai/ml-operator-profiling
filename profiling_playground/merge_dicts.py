@@ -1,7 +1,6 @@
 import json
 import sys
 
-
 # Check if a command-line argument was provided
 if len(sys.argv) != 4:
     print("Usage: python example.py <filepath>")
@@ -51,10 +50,15 @@ def process_dicts(dict_list):
 
 # Function to merge corresponding dictionaries from two lists
 def merge_lists(list1, list2):
+    max_length = max(len(list1), len(list2))
     merged_list = []
-    for dict1, dict2 in zip(list1, list2):
+    
+    for i in range(max_length):
+        dict1 = list1[i] if i < len(list1) else {}
+        dict2 = list2[i] if i < len(list2) else {}
         merged_dict = {**dict1, **dict2}
         merged_list.append(merged_dict)
+    
     return merged_list
 
 # Paths to your JSON files
@@ -72,7 +76,7 @@ processed_list2 = process_dicts(list2)
 merged_list = merge_lists(processed_list1, processed_list2)
 
 # Save the merged list of dictionaries to a new JSON file
-output_file_merged = f"{output}_merged.json"#'merged_list.json'
+output_file_merged = f"{output}_merged.json"
 save_json_file(merged_list, output_file_merged)
 
 # Print the merged list of dictionaries
