@@ -15,6 +15,8 @@ parser.add_argument('--stride', type=int, default=1, help='Stride for the convol
 parser.add_argument('--padding', type=int, default=1, help='Padding for the convolution')
 parser.add_argument('--batch_size', type=int, default=32, help='Batch size for the input tensor')
 parser.add_argument('--ifmap_size', type=int, default=56, help='Size of the input feature map')
+parser.add_argument('--num_layers', type=int, default=500, help='Size of the input feature map')
+parser.add_argument('--iterations', type=int, default=120000, help='Size of the input feature map')
 
 # Parse the arguments
 args = parser.parse_args()
@@ -27,6 +29,8 @@ stride = args.stride
 padding = args.padding
 batch_size = args.batch_size
 ifmap_size = args.ifmap_size
+num_layers = args.num_layers
+iterations = args.iterations
 
 
 
@@ -42,10 +46,6 @@ ifmap_size = args.ifmap_size
 # ifmap_size = 56
 input_size = (batch_size, in_channels, ifmap_size, ifmap_size)
 
-num_layers = 500 
-
-# Number of iterations to run
-iterations = 120000
 
 
 
@@ -56,7 +56,7 @@ iterations = 120000
 
 # Create the startup command string with parameters
 startup = f"""
-nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/conv2d_{in_channels}in_{out_channels}out_{kernel_size}k_{stride}s_{padding}p_{batch_size}b_{ifmap_size}ifm.log &
+nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits >> logs/conv2d_{in_channels}in_{out_channels}out_{kernel_size}k_{stride}s_{padding}p_{batch_size}b_{ifmap_size}ifm_{iterations}iter.log &
 """
 
 
