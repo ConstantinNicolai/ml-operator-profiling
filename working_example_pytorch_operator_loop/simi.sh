@@ -65,6 +65,6 @@ for ((i=0; i<$num_combinations; i++)); do
         --padding "$padding" \
         --batch_size "$batch_size" \
         --ifmap_size "$ifmap_size" \
-        --iterations 90000 \
+        --iterations 110000 \
         >> logs/benchmark_durations_${SLURM_JOB_ID}.log
 done
