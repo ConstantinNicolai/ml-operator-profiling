@@ -72,7 +72,7 @@ warmup_time = warmup_stop_time - warmup_start_time
 
 time_per_iteration = warmup_time / math.ceil(iterations/4)
 
-required_iterations = int(3 / time_per_iteration)
+required_iterations = int(30 / time_per_iteration)
 
 print(required_iterations)
 
