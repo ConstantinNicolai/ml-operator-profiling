@@ -19,3 +19,7 @@ working_example_pytorch_operator_loop/newoldlogs/*
 working_example_pytorch_operator_loop/*.out
 
 profiling_playground/*
+
+analysis/*.csv
+
+analysis/logs/*
