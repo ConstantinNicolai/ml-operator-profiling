@@ -61,6 +61,7 @@ kill_background_jobs() {
 
 
 # Run the benchmark
-srun python3 attempt_4.py --in_channels 256 --out_channels 256 --kernel_size 3 --stride 1 --padding 1 --batch_size 32 --ifmap_size 3 >> logs/training_output_${SLURM_JOB_ID}.log
+srun python3 attempt_4.py --in_channels 128 --out_channels 256 --kernel_size 3 --stride 2 --padding 1 --batch_size 32 --ifmap_size 7 --iterations 300000 >> logs/training_output_${SLURM_JOB_ID}.log
 
+srun python3 attempt_4.py --in_channels 128 --out_channels 256 --kernel_size 3 --stride 2 --padding 1 --batch_size 32 --ifmap_size 7 --iterations 450000 >> logs/training_output_${SLURM_JOB_ID}.log
 # srun python3 attempt_4.py --ifmap_size 32 >> logs/training_output_${SLURM_JOB_ID}.log
