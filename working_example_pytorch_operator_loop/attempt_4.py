@@ -133,7 +133,7 @@ os.system(finishup)
 
 # Calculate the time taken
 total_time = end_time - start_time
-print(f"Total time for {iterations} iterations: {total_time:.4f} seconds")
+print(f"Total time for {required_iterations} iterations: {total_time:.4f} seconds")
 
 
 # Cleanup
