@@ -75,6 +75,9 @@ for _ in range(num_layers):
 
 ifmap = torch.randn(input_size).cuda()
 
+
+warmup_start_time = time.time()
+
 # Run the convolution operation in a loop, accessing layers linearly
 for i in range(math.ceil(iterations/4)):
     # Linearly access the convolutional layer from the pre-created list
@@ -82,6 +85,30 @@ for i in range(math.ceil(iterations/4)):
     
     # Apply the convolution operation
     output = conv_layer(ifmap)
+
+warmup_stop_time = time.time()
+
+warmup_time = warmup_stop_time - warmup_start_time
+
+time_per_iteration = warmup_time / math.ceil(iterations/4)
+
+required_iterations = int(20 / time_per_iteration)
+
+print(required_iterations)
+
+
+# Create the startup command string with parameters
+startup = f"""
+nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total,pstate --format=csv,noheader,nounits > logs/conv2d_{in_channels}in_{out_channels}out_{kernel_size}k_{stride}s_{padding}p_{batch_size}b_{ifmap_size}ifm_{iterations}iter.log &
+"""
+
+
+finishup = """
+bg_pids=$(jobs -p)
+for pid in $bg_pids; do
+    kill $pid
+done
+"""
 
 # Starting the gpu stats logging in the background
 os.system(startup)
@@ -91,7 +118,7 @@ start_time = time.time()
 
 
 # Run the convolution operation in a loop, accessing layers linearly
-for i in range(iterations):
+for i in range(required_iterations):
     # Linearly access the convolutional layer from the pre-created list
     conv_layer = conv_layers[i % num_layers]
     
