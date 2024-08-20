@@ -22,7 +22,7 @@ torchinfo_writer = TorchinfoWriter(model,
 
 torchinfo_writer.construct_model_tree()
 
-torchinfo_writer.show_model_tree(attr_list=['Input Size', 'Output Size'])
+torchinfo_writer.show_model_tree(attr_list=['Type', 'Kernel Size', 'Input Size', 'Output Size'])
 
 
 #WE NEED TO HAEV MORE ATTRIBUTES FOR BOIGTREE SO IT DOES NOT COUTN DIFFERETN LAYERS AS THE SAME BASED ON INPUT AND OUTPUT SIZES
