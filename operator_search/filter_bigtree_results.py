@@ -14,32 +14,72 @@ path = sys.argv[1]
 
 
 
-def extract_values_from_line(line):
-    # Regular expression pattern to capture the function name and the last two dimensions of input size and output size
-    pattern = re.compile(
-        r"(\w+)\s*\[Input Size=\[([0-9]+),\s*[0-9]+,\s*([0-9]+),\s*([0-9]+)\],\s*"
-        r"Output Size=\[([0-9]+),\s*[0-9]+,\s*([0-9]+),\s*([0-9]+)\]\]"
-    )
+# def extract_values_from_line(line):
+
+#     # Extract kernel size (only one dimension needed since it's square)
+#     kernel_size = int(entry.split("Kernel Size=[")[1].split(",")[0].strip())
     
-    match = pattern.search(line)
+#     # Extract input and output channels and sizes
+#     input_size = entry.split("Input Size=[")[1].split("]")[0].split(", ")
+#     in_channels = int(input_size[1])
+#     input_spatial_size = int(input_size[2])
+
+#     output_size = entry.split("Output Size=[")[1].split("]")[0].split(", ")
+#     out_channels = int(output_size[1])
+#     # # Regular expression pattern to capture the function name and the last two dimensions of input size and output size
+#     # pattern = re.compile(
+#     #     r"(\w+)\s*\[Input Size=\[([0-9]+),\s*[0-9]+,\s*([0-9]+),\s*([0-9]+)\],\s*"
+#     #     r"Output Size=\[([0-9]+),\s*[0-9]+,\s*([0-9]+),\s*([0-9]+)\]\]"
+#     # )
     
-    if match:
-        function_name = match.group(1)  # Extract function name
-        input_size_last_two = (
-            int(match.group(3)),  # Height of input size
-            int(match.group(4))   # Width of input size
-        )
-        output_size_last_two = (
-            int(match.group(6)),  # Height of output size
-            int(match.group(7))   # Width of output size
-        )
+#     # match = pattern.search(line)
+    
+#     # if match:
+#     #     function_name = match.group(1)  # Extract function name
+#     #     input_size_last_two = (
+#     #         int(match.group(3)),  # Height of input size
+#     #         int(match.group(4))   # Width of input size
+#     #     )
+#     #     output_size_last_two = (
+#     #         int(match.group(6)),  # Height of output size
+#     #         int(match.group(7))   # Width of output size
+#     #     )
+
+
         
-        return {
-            "input_size": input_size_last_two,
-            "output_size": output_size_last_two
-        }
-    else:
-        raise ValueError("The line does not match the expected pattern")
+#         # return {
+#         #     "input_size": input_size_last_two,
+#         #     "output_size": output_size_last_two
+#         # }
+
+#     return {
+#         "kernel_size": kernel_size,
+#         "in_channels": in_channels,
+#         "out_channels": out_channels,
+#         "input_size": input_spatial_size,
+#         "output_size": output_spatial_size
+#         }
+
+def extract_values_from_line(line):
+    kernel_size = int(line.split("Kernel Size=[")[1].split(",")[0].strip())
+    
+    input_size = line.split("Input Size=[")[1].split("]")[0].split(", ")
+    in_channels = int(input_size[1])
+    input_spatial_size = int(input_size[2])
+
+    output_size = line.split("Output Size=[")[1].split("]")[0].split(", ")
+    out_channels = int(output_size[1])
+    output_spatial_size = int(output_size[2])
+
+    return {
+        "kernel_size": kernel_size,
+        "in_channels": in_channels,
+        "out_channels": out_channels,
+        "input_size": input_spatial_size,
+        "output_size": output_spatial_size
+    } 
+
+
 
 def process_file(filename):
     results = []
