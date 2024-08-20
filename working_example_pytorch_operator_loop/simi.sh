@@ -57,7 +57,7 @@ for ((i=0; i<$num_combinations; i++)); do
     ifmap_size=${ifmap_size_list[$i]}
 
     echo "Running: in_channels=$in_channels, out_channels=$out_channels, kernel_size=$kernel_size, stride=$stride, padding=$padding, batch_size=$batch_size, ifmap_size=$ifmap_size"
-    srun python3 attempt_4.py \
+    srun python3 benchmark.py \
         --in_channels "$in_channels" \
         --out_channels "$out_channels" \
         --kernel_size "$kernel_size" \
@@ -65,6 +65,6 @@ for ((i=0; i<$num_combinations; i++)); do
         --padding "$padding" \
         --batch_size "$batch_size" \
         --ifmap_size "$ifmap_size" \
-        --iterations 50000 \
+        --iterations 100000 \
         >> logs/benchmark_durations_${SLURM_JOB_ID}.log
 done
