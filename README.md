@@ -3,7 +3,7 @@
 ## Today's To do's
 Read this paper: Inspired by: Lorenz Braun, Sotirios Nikas, Chen Song, Vincent Heuveline and Holger Fröning, A Simple Model for Portable and Fast Prediction of Execution Time and Power Consumption of GPU Kernels - see website \
 Measure the dataset for conv2D with a sensible, but moderate amount of configurable parameters. Then perform an energy comparison with ResNet50. Done. We have a problem. Our measurement overestimates the the energy a lot.\
-We could switch to a stack of similar layers passed to pytorch as a model, to achieve a more inference like measurement scenario, but this would make us havge to drop all layers from our study that cahnge the ifmap size. \
+We could switch to a stack of similar layers passed to pytorch as a model, to achieve a more inference like measurement scenario, but this would make us havge to drop all layers from our study that cahnge the ifmap size.
 
 
 To replicate please use the provided conda environment "constabass.yml"
