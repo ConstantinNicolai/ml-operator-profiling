@@ -4,7 +4,7 @@
 eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 conda activate constabass
 
-operator="Conv2d"
+operator="conv"
 
 python3 model_analysis_print.py | grep $operator > temp_print_$operator
 
@@ -14,4 +14,4 @@ python3 filter_print_results.py temp_print_$operator
 
 python3 filter_bigtree_results.py temp_tree_$operator
 
-python3 merge_dicts.py temp_print_$operator.json temp_tree_$operator.json efficientnetb4_$operator
+python3 merge_dicts.py temp_print_$operator.json temp_tree_$operator.json resnet50_$operator
