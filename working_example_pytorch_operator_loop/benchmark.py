@@ -33,20 +33,14 @@ ifmap_size = args.ifmap_size
 num_layers = args.num_layers
 iterations = args.iterations
 
+finishup = """
+bg_pids=$(jobs -p)
+for pid in $bg_pids; do
+    kill $pid
+done
+"""
 
-
-# # Configuration for the convolutional layer
-# in_channels = 64
-# out_channels = 128
-# kernel_size = 3
-# stride = 1
-# padding = 1
-
-# # Assume the input tensor size after initial downsampling is (batch_size, 64, 56, 56)
-# batch_size = 32
-# ifmap_size = 56
 input_size = (batch_size, in_channels, ifmap_size, ifmap_size)
-
 
 conv_layers = []
 for _ in range(num_layers):
@@ -55,10 +49,9 @@ for _ in range(num_layers):
 
 ifmap = torch.randn(input_size).cuda()
 
-
 warmup_start_time = time.time()
 
-# Run the convolution operation in a loop, accessing layers linearly
+# Warmup iterations, to avoid measuring the cold start of the gpu
 for i in range(math.ceil(iterations/4)):
     # Linearly access the convolutional layer from the pre-created list
     conv_layer = conv_layers[i % num_layers]
@@ -82,13 +75,6 @@ startup = f"""
 nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total,pstate --format=csv,noheader,nounits > logs/conv2d_{in_channels}in_{out_channels}out_{kernel_size}k_{stride}s_{padding}p_{batch_size}b_{ifmap_size}ifm_{required_iterations}iter.log &
 """
 
-
-finishup = """
-bg_pids=$(jobs -p)
-for pid in $bg_pids; do
-    kill $pid
-done
-"""
 
 # Starting the gpu stats logging in the background
 os.system(startup)
