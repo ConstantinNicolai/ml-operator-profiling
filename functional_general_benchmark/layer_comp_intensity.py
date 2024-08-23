@@ -16,7 +16,7 @@ model = nn.TransformerEncoderLayer(d_model=512, nhead=8)
 # model = nn.TransformerEncoder(encoder_layer, num_layers=6)
 # src = torch.rand(10, 32, 512)
 
-input_size = (10, 32, 512)
+input_size = (3, 224, 224)
 
 
 input_data = torch.randn(1, *input_size)
