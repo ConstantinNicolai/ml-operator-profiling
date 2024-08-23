@@ -87,3 +87,20 @@ def extract_layer_info(model):
     df = pd.concat([df.drop(columns=['Parameters']), params_df], axis=1)
 
     return df
+
+
+
+def parse_model_and_weights():
+    """
+    Parse command-line arguments.
+    
+    Returns:
+        argparse.Namespace: Parsed arguments.
+    """
+    parser = argparse.ArgumentParser(description='Load a model and its weights.')
+    parser.add_argument('--model', type=str, required=True,
+                        help='Name of the model to load (e.g., "resnet50", "vgg16").')
+    parser.add_argument('--weights', type=str, required=True,
+                        help='Name of the weights class to load (e.g., "ResNet50_Weights", "VGG16_Weights").')
+
+    return parser.parse_args()
