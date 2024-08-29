@@ -177,8 +177,25 @@ def process_model(input_size=(3, 224, 224), filter_types=['Conv2d', 'Linear'], e
     # Combine filtered DataFrames
     df = filtered_df.join(filtered_df_bigtree)
 
-    df = df.rename(columns={0: 'input_channels', 1: 'output_channels'})
+    df = df.rename(columns={0: 'input_channels', 1: 'output_channels', 2: 'kernel_size', 3: 'stride', 4: 'padding', 5: 'bias'})
     df = df.drop(columns=['MACs', 'Parameters'])
+
+    word_to_find = 'bias'
+    replacement_entry = 'padding=(0, 0)'
+
+    # Move entries containing the word to 'other' column and replace with 'replacement entry'
+    # df['bias'] = df['padding'].apply(lambda x: x if word_to_find in x else None)
+    # df['padding'] = df['column1'].apply(lambda x: replacement_entry if word_to_find in x else x)
+    # Use str.contains to identify rows that contain the specific word
+    df['bias'] = df['padding'].where(df['padding'].str.contains(word_to_find, na=False))
+
+    # Replace the matching entries in 'column1' with the replacement entry
+    # df['padding'] = df['padding'].where(~df['padding'].str.contains(word_to_find, na=True), replacement_entry)
+    df.loc[
+    (df['Type'] == 'Conv2d') & (df['padding'].str.contains(word_to_find, na=False)),
+    'padding'
+] = replacement_entry
+
 
     # Adjust column data types
     df['Input Size'] = df['Input Size'].apply(lambda x: tuple(x) if isinstance(x, list) else x)
@@ -193,6 +210,7 @@ def process_model(input_size=(3, 224, 224), filter_types=['Conv2d', 'Linear'], e
     total_count = df_counts['count'].sum()
 
     assert len(df) == total_count, "Error: The number of layers does not match the sum of all counted layers!"
+
 
     return(df_counts)
 

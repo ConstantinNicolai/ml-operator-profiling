@@ -4,7 +4,8 @@
 Read this paper: Inspired by: Lorenz Braun, Sotirios Nikas, Chen Song, Vincent Heuveline and Holger Fröning, A Simple Model for Portable and Fast Prediction of Execution Time and Power Consumption of GPU Kernels - see website \
 Measure the dataset for conv2D with a sensible, but moderate amount of configurable parameters. Then perform an energy comparison with ResNet50. Done. As expected by only measuring the conv2D layers we measure less energy in the addition of those then for the full model. Next we should also measure some linear layers we need for the resnets. \
 We also should add a pipeline to read in the model analysis and add up the layers in a model according to the number of their incidences. If we can build this in a sufficiently generalized manner this should allow us to study many different models. \
-Where are we? Initial pipelines for resnets and conv2d work. This is a promising prove of concept. Now we need to generalize.
+Where are we? Initial pipelines for resnets and conv2d work. This is a promising prove of concept. Now we need to generalize. \
+Lets not do the approach with print(model) and torchsummary and instead work with the pytorch objects themsleves. Meaning we want to store the layer objects themselves and also profile them with the the register_module_forward_hook Kevin suggested. This way we should probably be able to get both the pytorch layer object as well as the inputs and outputs.
 
 
 To replicate please use the provided conda environment "constabass.yml"
