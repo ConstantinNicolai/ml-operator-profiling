@@ -11,6 +11,10 @@ To replicate please use the provided conda environment "constabass.yml"
 
 The idea is to use either nvidia-smi or nvitop to continously monitor energy and time for a yet to be determined set of pytorch machine learning operators and measure their cost in terms of time and energy. These measurements will be collected in a databse to be used shortly after in my master thesis work. 
 
+
+### workflow considerations
+For any pytorch model we want to study we need to do an initial human assessment defining which layer types we expect to be sigificant contributors in terms of runtime and energy consumption. We also need to set an accuracy target, e.g. we can attribute 90% of the full model runtime and energy to measured operators. We then measure and compare. If we do not reach our accuracy target, we add more operators to the significant contributors list. We measure again. This process is repeated until we reach the desired accuracy. This way we should be able to measure all significant operators which are used in the pytorch models we study for our dataset.
+
 ### operator configrurations
 For a pytorch operator such as conv2d a number or configurations can be tested. There can be different sizes, sparsities, kernel sizes, step sizes etc.
 
