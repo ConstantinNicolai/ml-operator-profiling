@@ -2,6 +2,7 @@ import torch
 from torchvision import models, transforms
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision.models import resnet34, ResNet34_Weights
 from dataclasses import dataclass
 
 
@@ -49,36 +50,69 @@ num_classes = 10    # Number of output classes
 
 # Instantiate the model
 model = TwoConvLayerNet(input_channels, num_classes).to(device)
+model = resnet34(weights=ResNet34_Weights.DEFAULT).to(device)
 
-# Create a random input tensor with 3 channels and 32x32 dimensions
-input_tensor = torch.randn(1, input_channels, 32, 32).to(device)
+# # Create a random input tensor with 3 channels and 32x32 dimensions
+# input_tensor = torch.randn(1, input_channels, 32, 32).to(device)
 
-# Forward pass through the model
-output = model(input_tensor)
+# # Forward pass through the model
+# output = model(input_tensor)
 
 # Print the model and the output
-print(type(model))
+# print(type(model))
 
-print(model)
+# print(model)
 
 
 # Create a LayerInfo struct to store the second layer, input size, and batch size
 layer_info = LayerInfo(
-    layer=model.conv2,
+    layer=model.layer1[2],
     input_size=(16, 20, 20),
     batch_size=32
 )
 
 # Print the stored information
-print(layer_info)
+# print(layer_info)
 
 
-# Create an input tensor with the specified input size and batch size
-input_tensor = torch.randn(layer_info.batch_size, layer_info.input_size[0], layer_info.input_size[1], layer_info.input_size[2])
+# # Create an input tensor with the specified input size and batch size
+# input_tensor = torch.randn(layer_info.batch_size, layer_info.input_size[0], layer_info.input_size[1], layer_info.input_size[2])
 
 
-# Run the stored layer with the input tensor
-output = layer_info.layer(input_tensor)
+# # Run the stored layer with the input tensor
+# output = layer_info.layer(input_tensor)
 
 
 
+# print(dir(model.layer1))
+
+# print(model.layer1.children)
+
+child = list(model.layer1.children())[0]  # Get the first child
+# print(child)
+
+# print(dir(child))
+
+# print(child.named_children)
+
+subchild = list(child.named_children())[0]
+
+print(subchild)
+
+print(type(subchild[1]))
+
+layer_info1 = LayerInfo(
+    layer=subchild[1],
+    input_size=(16, 20, 20),
+    batch_size=32
+)
+
+print(layer_info1)
+
+
+print(list(list(model.layer1.children())[0].named_children())[0][1])
+
+# depending on the model architecture there wil be a lot to iterate over
+
+# in this case we need the direct sublayers of model, and then the names layers like layer1
+# their children, which have named_children, and those are tuples of the name and the pytorch object
