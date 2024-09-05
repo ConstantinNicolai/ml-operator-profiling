@@ -117,11 +117,34 @@ for module in model.modules():
 output = model(input_data)
 
 
-
 # Print the results
 
-for key, value in operation_dict.items():
-    print(f'{key}: {value}')
+# for key, value in operation_dict.items():
+#     print(f'{key}: {value}')
 
 
+# List all the keys in the defaultdict
+lititi = list(operation_dict.keys())
 
+
+# print(lititi[11])
+# print(operation_dict[lititi[11]])
+print(lititi[12])
+print(operation_dict[lititi[12]])
+# print(lititi[13])
+# print(operation_dict[lititi[13]])
+print(lititi[14])
+print(operation_dict[lititi[14]])
+
+
+print(lititi[14][1] == lititi[12][1])
+
+# print(dir(lititi[14][0]))
+
+print(lititi[14][0]._get_name)
+print(type(lititi[14][0]._get_name))
+print(id(lititi[14][0]._get_name))
+print(id(lititi[12][0]._get_name))
+print(lititi[12][0]._get_name)
+
+print(lititi[14][0]._get_name == lititi[12][0]._get_name)
