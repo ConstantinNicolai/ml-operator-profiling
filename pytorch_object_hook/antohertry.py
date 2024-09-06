@@ -148,3 +148,34 @@ print(id(lititi[12][0]._get_name))
 print(lititi[12][0]._get_name)
 
 print(lititi[14][0]._get_name == lititi[12][0]._get_name)
+
+# print(dir(lititi[14][0]))
+
+print(lititi[12][0].named_modules())
+
+print(lititi[12][0].extra_repr())
+
+print(id(lititi[14][0]._get_name()))
+print(id(lititi[12][0]._get_name()))
+
+
+testconv0 = nn.Conv2d(3, 32, 3, 3, (1,1), bias=False)
+
+testconv1 = nn.Conv2d(3, 32, 3, 3, (1,1), bias=False)
+
+testattent = nn.MultiheadAttention(6, 3, dropout=0, bias=False)
+
+
+print(id(testconv0._get_name()))
+print(id(testconv1._get_name()))
+
+print(testconv0._get_name() == testconv1._get_name())
+
+print(testattent._get_name())
+print(testattent.extra_repr())
+
+print(type(lititi[12][0].extra_repr()))
+
+
+for i in range(len(lititi)):
+    print(lititi[i][0].extra_repr())
