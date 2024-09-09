@@ -17,14 +17,19 @@ from torchsummary import summary
 from torch_profiling_utils.fvcorewriter import FVCoreWriter
 from torch_profiling_utils.torchinfowriter import TorchinfoWriter
 import ast
-
-
-
-
-
-
 from utils import get_model_and_weights, extract_layer_info, parse_model_and_weights, process_model
 
+
+
+args = parse_model_and_weights()  # Get the parsed arguments
+
+# Access the variables
+model_name = args.model
+weights_name = args.weights
+
+model = get_model_and_weights(model_name, weights_name)
+
+print(model)
 
 # Example usage:
 df_counts = process_model(input_size=(3, 224, 224), filter_types=['Conv2d', 'Linear'], exclude_string='downsample')
