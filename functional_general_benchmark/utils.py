@@ -126,6 +126,20 @@ def extract_layer_info(model):
 
 
 
+# def parse_model_and_weights():
+#     """
+#     Parse command-line arguments.
+    
+#     Returns:
+#         argparse.Namespace: Parsed arguments.
+#     """
+#     parser = argparse.ArgumentParser(description='Load a model and its weights.')
+#     parser.add_argument('--model', type=str, required=True,
+#                         help='Name of the model to load (e.g., "resnet50", "vgg16").')
+#     parser.add_argument('--weights', type=str, required=True,
+#                         help='Name of the weights class to load (e.g., "ResNet50_Weights", "VGG16_Weights").')
+
+#     return parser.parse_args()
 def parse_model_and_weights():
     """
     Parse command-line arguments.
@@ -133,14 +147,21 @@ def parse_model_and_weights():
     Returns:
         argparse.Namespace: Parsed arguments.
     """
-    parser = argparse.ArgumentParser(description='Load a model and its weights.')
+    parser = argparse.ArgumentParser(description='Load a model, weights, and input size.')
+    
+    # Model argument
     parser.add_argument('--model', type=str, required=True,
                         help='Name of the model to load (e.g., "resnet50", "vgg16").')
+    
+    # Weights argument
     parser.add_argument('--weights', type=str, required=True,
                         help='Name of the weights class to load (e.g., "ResNet50_Weights", "VGG16_Weights").')
+    
+    # Input size argument (expects a tuple of integers, e.g., 3,224,224)
+    parser.add_argument('--input_size', type=lambda s: tuple(map(int, s.split(','))), required=True,
+                        help='Input size as a tuple of three integers (e.g., 3,224,224).')
 
     return parser.parse_args()
-
 
 
 

@@ -23,3 +23,5 @@ profiling_playground/*
 analysis/*.csv
 
 analysis/logs/*
+
+functional_general_benchmark/*.pkl.xz

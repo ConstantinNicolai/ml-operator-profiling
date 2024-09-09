@@ -22,6 +22,7 @@ args = parse_model_and_weights()  # Get the parsed arguments
 # Access the variables
 model_name = args.model
 weights_name = args.weights
+input_size = args.input_size
 
 model = get_model_and_weights(model_name, weights_name)
 
@@ -29,8 +30,6 @@ model = get_model_and_weights(model_name, weights_name)
 
 ##########################################################################
 
-# Define the input size
-input_size = (3, 8, 8)
 
 # Generate random input data
 input_data = torch.randn(32, *input_size)
@@ -93,6 +92,6 @@ with lzma.open(filename) as file_:
 
 list_attemps = list(saved_dict.items())
 
-print(list_attemps[1][1][0])
-print(list_attemps[1][1][1])
-print(type(list_attemps[1][1][0]))
+# print(list_attemps[1][1][0])
+# print(list_attemps[1][1][1])
+# print(type(list_attemps[1][1][0]))
