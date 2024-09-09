@@ -13,26 +13,9 @@ import ast
 from collections import defaultdict
 import pickle
 import lzma
+import yaml
+import os
 from utils import get_model_and_weights, extract_layer_info, parse_model_and_weights, process_model
-
-
-
-args = parse_model_and_weights()  # Get the parsed arguments
-
-# Access the variables
-model_name = args.model
-weights_name = args.weights
-input_size = args.input_size
-
-model = get_model_and_weights(model_name, weights_name)
-
-
-
-##########################################################################
-
-
-# Generate random input data
-input_data = torch.randn(32, *input_size)
 
 
 # Define the forward hook function
@@ -55,43 +38,125 @@ def forward_hook_new(module, input, output):
 
 
 
-# Register the forward hook only for leaf nodes
-for module in model.modules():
-    # if len(list(module.children())) == 0:
-    module.register_forward_hook(forward_hook_new)
+for entry in os.listdir('./../measurements'):
+    with open('./../measurements/' + entry + '/summary.yml', 'r') as file:
+        config = yaml.safe_load(file)
+
+    config['input_size'] = tuple(config['input_size'])
+
+    # Dynamically create variables
+    for key, value in config.items():
+        globals()[key] = value
 
 
-# Create the defaultdict to store the module (first occurrence) and the count
-opus_magnum_dict = defaultdict(lambda: [None, 0])  # {key: [first_module_object, count]}
+    if done == False:
+        model = get_model_and_weights(model_name, weights_name)
 
 
-output = model(input_data)
+        ##########################################################################
 
 
-opus_magnum_dict = dict(opus_magnum_dict)
-
-# for key, value in opus_magnum_dict.items():
-#     print(f'{key}: {value}')
+        # Generate random input data
+        input_data = torch.randn(*input_size)
 
 
-tuple_str = "_".join(map(str, input_size))
-
-# Format the filename using both variables
-filename = f"{model_name}_{tuple_str}.pkl.xz"
-
-with lzma.open(filename, "wb") as file_:
-    pickle.dump(opus_magnum_dict, file_)
-
-# Load operation dict
-
-with lzma.open(filename) as file_:
-    saved_dict = pickle.load(file_)
-
-# print(saved_dict)
+        # Register the forward hook only for leaf nodes
+        for module in model.modules():
+            # if len(list(module.children())) == 0:
+            module.register_forward_hook(forward_hook_new)
 
 
-list_attemps = list(saved_dict.items())
+        # Create the defaultdict to store the module (first occurrence) and the count
+        opus_magnum_dict = defaultdict(lambda: [None, 0])  # {key: [first_module_object, count]}
 
-# print(list_attemps[1][1][0])
-# print(list_attemps[1][1][1])
-# print(type(list_attemps[1][1][0]))
+
+        output = model(input_data)
+
+
+        opus_magnum_dict = dict(opus_magnum_dict)
+
+        # for key, value in opus_magnum_dict.items():
+        #     print(f'{key}: {value}')
+
+
+        tuple_str = "_".join(map(str, input_size))
+
+        # Format the filename using both variables
+        filename = f"{model_name}_{tuple_str}.pkl.xz"
+
+        with lzma.open('./../measurements/' + entry + '/' + filename, "wb") as file_:
+            pickle.dump(opus_magnum_dict, file_)
+
+        config['done'] = True
+        config['input_size'] = list(config['input_size'])
+
+        with open('./../measurements/' + entry + '/summary.yml', 'w') as file:
+            yaml.safe_dump(config, file)
+
+        
+
+
+
+
+# with open('./../measurements/resnet18_32,3,224,224/summary.yml', 'r') as file:
+#     config = yaml.safe_load(file)
+
+
+# config['input_size'] = tuple(config['input_size'])
+
+# # Dynamically create variables
+# for key, value in config.items():
+#     globals()[key] = value
+
+
+
+# model = get_model_and_weights(model_name, weights_name)
+
+
+# ##########################################################################
+
+
+# # Generate random input data
+# input_data = torch.randn(*input_size)
+
+
+# # Register the forward hook only for leaf nodes
+# for module in model.modules():
+#     # if len(list(module.children())) == 0:
+#     module.register_forward_hook(forward_hook_new)
+
+
+# # Create the defaultdict to store the module (first occurrence) and the count
+# opus_magnum_dict = defaultdict(lambda: [None, 0])  # {key: [first_module_object, count]}
+
+
+# output = model(input_data)
+
+
+# opus_magnum_dict = dict(opus_magnum_dict)
+
+# # for key, value in opus_magnum_dict.items():
+# #     print(f'{key}: {value}')
+
+
+# tuple_str = "_".join(map(str, input_size))
+
+# # Format the filename using both variables
+# filename = f"{model_name}_{tuple_str}.pkl.xz"
+
+# with lzma.open('./../measurements/resnet18_32,3,224,224/' + filename, "wb") as file_:
+#     pickle.dump(opus_magnum_dict, file_)
+
+# # Load operation dict
+
+# with lzma.open(filename) as file_:
+#     saved_dict = pickle.load(file_)
+
+# # print(saved_dict)
+
+
+# list_attemps = list(saved_dict.items())
+
+# # print(list_attemps[1][1][0])
+# # print(list_attemps[1][1][1])
+# # print(type(list_attemps[1][1][0]))
