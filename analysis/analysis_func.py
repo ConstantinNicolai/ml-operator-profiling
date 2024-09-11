@@ -41,3 +41,31 @@ def process_log_file(in_file, iterations):
 
     # Return the values directly
     return iterations, time_difference_seconds, filtered_mean_wattage, std_wattage, total_energy_joules, energy_per_iteration_in_milli_joule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+                num_iterations, total_time, time_per_iter, filtered_mean_wattage, std_wattage, total_energy, energy_per_iter = process_log_file('current_temp.log', required_iterations)
+
+
+
+            print(example_layer, input_size, time_per_iter, energy_per_iter)

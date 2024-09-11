@@ -21,10 +21,4 @@ kill_background_jobs() {
 }
 
 
-# pwd
-
-# echo change
-
-# cat ./../measurements/*/summary.yml
-
-srun python3 general_pipeline_block2.py
+srun python3 cuda_test.py

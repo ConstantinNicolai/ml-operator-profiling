@@ -295,5 +295,7 @@ def process_log_file(in_file, iterations):
 
     energy_per_iteration_in_milli_joule = 1000 * energy_per_iteration
 
+    time_per_iteration = time_difference_seconds / iterations
+
     # Return the values directly
-    return iterations, time_difference_seconds, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule
+    return iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule

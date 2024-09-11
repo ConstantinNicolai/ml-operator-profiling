@@ -53,6 +53,10 @@ for entry in os.listdir('./../measurements'):
 
             example_layer = list_attemps[to_be_removed_nth_test_layer][1][0]
 
+
+
+            test_layer_removeme = example_layer.cuda()
+
             operators = []
             for _ in range(num_layers):
                 layer = list_attemps[to_be_removed_nth_test_layer][1][0].cuda()
