@@ -25,6 +25,8 @@ def forward_hook_new(module, input, output):
         # Extract the input shape (assuming input is a tuple)
         input_shape = tuple(input[0].size())
 
+        hook_handles[module].remove()
+
         # Create a key based on module name, extra_repr, and input shape
         key = (module._get_name(), module.extra_repr(), input_shape)
 
@@ -60,10 +62,16 @@ for entry in os.listdir('./../measurements'):
         input_data = torch.randn(*input_size)
 
 
-        # Register the forward hook only for leaf nodes
+        # # Register the forward hook only for leaf nodes
+        # for module in model.modules():
+        #     handle = module.register_forward_hook(forward_hook_new)
+
+        hook_handles = {}
+
+        # Loop through the modules and register hooks
         for module in model.modules():
-            # if len(list(module.children())) == 0:
-            module.register_forward_hook(forward_hook_new)
+            handle = module.register_forward_hook(forward_hook_new)
+            hook_handles[module] = handle
 
 
         # Create the defaultdict to store the module (first occurrence) and the count
@@ -87,7 +95,7 @@ for entry in os.listdir('./../measurements'):
         with lzma.open('./../measurements/' + entry + '/' + filename, "wb") as file_:
             pickle.dump(opus_magnum_dict, file_)
 
-        config['done'] = True
+        config['done'] = False
         config['input_size'] = list(config['input_size'])
 
         with open('./../measurements/' + entry + '/summary.yml', 'w') as file:

@@ -26,4 +26,8 @@ analysis/logs/*
 
 functional_general_benchmark/*.pkl.xz
 
+functional_general_benchmark/*.log
+
+functional_general_benchmark/*.out
+
 measurements/*
