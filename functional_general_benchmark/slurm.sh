@@ -21,4 +21,4 @@ kill_background_jobs() {
 }
 
 
-srun python3 cuda_test.py
+srun python3 general_pipeline_block2.py

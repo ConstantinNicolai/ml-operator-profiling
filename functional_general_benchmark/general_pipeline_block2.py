@@ -54,9 +54,6 @@ for entry in os.listdir('./../measurements'):
             example_layer = list_attemps[to_be_removed_nth_test_layer][1][0]
 
 
-
-            test_layer_removeme = example_layer.cuda()
-
             operators = []
             for _ in range(num_layers):
                 layer = list_attemps[to_be_removed_nth_test_layer][1][0].cuda()
@@ -121,5 +118,6 @@ for entry in os.listdir('./../measurements'):
             total_time = end_time - start_time
             # print(f"Total time for {required_iterations} iterations: {total_time:.4f} seconds")
 
+            iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule = process_log_file('current_temp.log', required_iterations)
 
-            print(process_log_file('current_temp.log', required_iterations))
+            print(example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule)
