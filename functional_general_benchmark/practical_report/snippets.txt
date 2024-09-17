@@ -1,0 +1,28 @@
+So in this report, overview, communication to the reader of some kind I am trying to achieve what exactly. To exercise the old receiver sender metaphor, what is my reader capable to and willing to receive. 
+I believe that I am mostly just supposed to narrate what I did, or still am doing in my practical, which I would assume does not only include the minimal path the the things I tried that worked well for me, which I intend to keep, but also the attempts that did not succeed, and where I stumbled. 
+So, lets begin. 
+
+The general idea of what we are trying to achieve in this practical is to build up a database. This database is supposed to contain various machine learning operators and their corresponding execution time and power consumption. 
+To be more precise, we are going to be studying operators within the PyTorch framework. Many of these operators have a few parameters that can be set differently depending on where they are used within a model. One such parameter is for example simply the number of in_features and out_features for a linear layer. In many cases these parameters can determine, or at least have a significant impact on the computational intensity of the operator. Therefore we will study each operator with its corresponding parameter setting individually. Furthermore, there are operators, which, for the same parameter settings, can ingest different sizes of input feature maps. One such example would be a Conv2d layer. Looking at this example we can see that the size of the input feature map can also be a strong influence on the computational intensity of the using the operator on this input. Therefore we also need to study each size of input feature map for a tuple of operator and parameters individually as well. 
+Going through all of this we end up studying entities made up of operator, parameters and input size, hereinafter called operator tuples. 
+
+
+Measurement Utility
+
+There were multiple options available to choose from, in deciding which measurement utility to use to read of the power consumption of the Nvidia GPUs. While some seemed more fancy than plain nvidia-smi, we still settled on this one, because its interface seemed to most parsable and we could directly set the measurement frequency as high as supported by the hardware, while still getting back simple timestamps for each measurement allowing for a countercheck of that set frequency. 
+
+
+Prove of Concept
+
+One advantage of the framework we are working in is, that it is rather easy to measure execution time and power consumption for whole models, especially since we can use a very similar measurement pipeline to the one used for operator tuples. This allows for a readily available sanity check for the general viability of our measurement approach. To do this we simply measure our execution time and power consumption for the most computationally intensive operator, in all the operator tuples it appears in, within a certain model and add these results up. Then we can compare them to the results for running the full model. Assuming we haven’t introduced a large overhead for the individual operator tuples benchmarked, we should expect to find a smaller runtime and power consumption for the summed up results than for the full model, since they do not contain all operators which are present in the model. Given that we have opted for the most computationally intensive operator and chosen a model that is mostly made up of the operator we should also not expect an orders of magnitude smaller result then for the full model.
+The model I chose for this experiment is the ResNet34 with an input size of (3, 56, 36), and the operator in question is Conv2d. In order to measure what I need to sum up later it was necessary to find out how many individual operator tuples there are in a Resnet34 with and input size of (3, 56, 56), and how many occurrences of each individual one. With this information there is a basis to know which operator tuples need to be measured and how they need to be summed up later, more specifically how often each operator tuple counts towards the total runtime and power consumption.
+The first approach taken towards finding this information was to learn the operator and parameters present in the model from printing the model object in PyTorch. Unfortunately, while this does indeed yield the desired operator and parameters, it does nothing to help find the input sizes for each operator tuple. Furthermore it also only yields them in string form since they are being printed.  In the search for a tool to provide the input sizes, we used torchprofilingutils from Kevin Stehle, which was able to provide the input sizes that were needed. This way all the information needed was available and the measurements could commence. 
+
+
+
+
+Here not be dragons but rather a description of the measurement methodology
+
+
+Fortunately the results came in about where we would expect them. We measured 1375 mJ for the full model and ~ 1000 mJ for the sum of all Conv2d operator tuples according to their number of occurrences.
+This appears to be a promising prove of concept for the measurement approach and a good motivation for building out a more general measurement pipeline in order to build up the database on a larger scale of different models with their respective operator tuples. 

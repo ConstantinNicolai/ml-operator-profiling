@@ -266,8 +266,8 @@ def process_log_file(in_file, iterations):
     # Assign column names
     df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4', 'Category']
 
-    # Convert the 'Timestamp' column to datetime format
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%Y/%m/%d %H:%M:%S.%f')
+    # Convert the 'Timestamp' column to datetime, letting pandas infer the format
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
 
     # Calculate the time difference between the first and last timestamp in seconds
     time_difference_seconds = (df['Timestamp'].iloc[-1] - df['Timestamp'].iloc[0]).total_seconds()
@@ -299,3 +299,31 @@ def process_log_file(in_file, iterations):
 
     # Return the values directly
     return iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule
+
+
+
+# Get the latest dataset file
+def get_latest_dataset_file():
+    files = [f for f in os.listdir(DATASET_DIR) if f.startswith("dataset_") and f.endswith(".pt")]
+    if not files:
+        return None
+    latest_file = max(files, key=lambda f: os.path.getmtime(os.path.join(DATASET_DIR, f)))
+    return os.path.join(DATASET_DIR, latest_file)
+
+# Load the latest dataset
+def load_latest_dataset():
+    latest_file = get_latest_dataset_file()
+    if latest_file:
+        print(f"Loading dataset from {latest_file}")
+        return torch.load(latest_file)
+    else:
+        print("No dataset found, initializing new dataset")
+        return []
+
+# Save the dataset with a timestamp
+def save_dataset(dataset):
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"dataset_{timestamp}.pt"
+    filepath = os.path.join(DATASET_DIR, filename)
+    torch.save(dataset, filepath)
+    print(f"Dataset saved to {filepath}")
