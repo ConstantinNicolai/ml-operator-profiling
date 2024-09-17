@@ -261,7 +261,7 @@ def forward_hook_new(module, input, output):
 
 def process_log_file(in_file, iterations):
     # Load the log file into a pandas DataFrame
-    df = pd.read_csv(in_file, header=None)
+    df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
 
     # Assign column names
     df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4', 'Category']
