@@ -19,10 +19,14 @@ The model I chose for this experiment is the ResNet34 with an input size of (3, 
 The first approach taken towards finding this information was to learn the operator and parameters present in the model from printing the model object in PyTorch. Unfortunately, while this does indeed yield the desired operator and parameters, it does nothing to help find the input sizes for each operator tuple. Furthermore it also only yields them in string form since they are being printed.  In the search for a tool to provide the input sizes, we used torchprofilingutils from Kevin Stehle, which was able to provide the input sizes that were needed. This way all the information needed was available and the measurements could commence. 
 
 
+Measurement Methodology
+
+The general idea for how to perform these measurements is, to have power consumption logging running continuously in the background while performing a benchmarking loop. This means the operator tuple is executed N times and the logging runs for that amount of time. Knowing the number or iterations N and having the log, it is possible to extrapolate the execution time and power consumption per iteration, ergo per operator tuple. 
+In order to minimize the introduced errors a couple of measures were taken. In order to have the logging start as closely before the benchmark starts, it is called from within the python script performing the benchmark. Even then though, this call takes some time and leads to some non-representative behavior for continuous benchmarking in the first few lines of the measurement log. We will call this a startup effect for the measurement, similar effects can also be observed for the shutdown of said measurement. Two measures are taken to combat these effects. The first is a warm up run, simply running a considerable number of benchmark iterations before starting the measurement to get closer to a continuous measurement. The second is to ensure that each benchmark run, runs for 30s, not prohibitively long, when we want to measure many operators tuples, but also long enough to push the couple of milliseconds startup and shutdown effect into a realm of insignificance.
 
 
-Here not be dragons but rather a description of the measurement methodology
 
+Prove of Concept Results
 
 Fortunately the results came in about where we would expect them. We measured 1375 mJ for the full model and ~ 1000 mJ for the sum of all Conv2d operator tuples according to their number of occurrences.
 This appears to be a promising prove of concept for the measurement approach and a good motivation for building out a more general measurement pipeline in order to build up the database on a larger scale of different models with their respective operator tuples. 
