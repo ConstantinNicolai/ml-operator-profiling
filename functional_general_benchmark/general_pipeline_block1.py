@@ -37,38 +37,3 @@ for entry in os.listdir('./../measurements'):
         with lzma.open('./../measurements/' + entry + '/' + filename + '_filtered', "wb") as file_:
             pickle.dump(dict(result_list), file_)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# print(list_attemps[1][1][0])
-# print(list_attemps[1][1][1])
-# print(type(list_attemps[1][1][0]))
-
-
-# for i in range(len(list_attemps)):
-#     print(list_attemps[i][1][1])
-#     print(list_attemps[i][1][0])
-#     print(list_attemps[i][0][2])
-
-
-# for i in range(len(result_list)):
-#     print(result_list[i][0][0])
-#     print(result_list[i][0][2])
-#     print(result_list[i][0][1])
-#     print(result_list[i])
-    # print(list_attemps[i][1][0])
-    # print(list_attemps[i][0][2])
-
-

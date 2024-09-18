@@ -61,14 +61,17 @@ for entry in os.listdir('./../measurements'):
 
                 example_layer = list_attemps[h][1][0]
 
+                print(example_layer)
+
 
                 operators = []
                 for _ in range(num_layers):
                     layer = list_attemps[h][1][0].cuda()
                     if hasattr(example_layer, 'weight') and example_layer.weight is not None:
                         init.xavier_uniform_(layer.weight)
-                    if hasattr(example_layer, 'weight') and example_layer.bias is not None:
-                        init.xavier_uniform_(layer.bias)
+                    if hasattr(example_layer, 'bias') and example_layer.bias is not None:
+                        #init.xavier_uniform_(layer.bias)
+                        init.uniform_(layer.bias, a=-0.1, b=0.1)
                     operators.append(layer)
 
 
@@ -96,7 +99,7 @@ for entry in os.listdir('./../measurements'):
 
                 # Create the startup command string with parameters
                 startup = f"""
-                nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total,pstate --format=csv,noheader,nounits > current_temp.log &
+                nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits > current_temp.log &
                 """
 
 
@@ -132,6 +135,8 @@ for entry in os.listdir('./../measurements'):
 
                 new_measurements.append((example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule))
 
+                # os.system('head current_temp.log')
+
 
             DATASET_DIR = "dataset_history/"
 
@@ -144,74 +149,7 @@ for entry in os.listdir('./../measurements'):
             dataset.extend(new_measurements)  # Append new data
             save_dataset(dataset)
 
+    config['done'] = True
 
-        
-
-
-
-
-
-##############################################################################
-# approach I prompted 
-
-
-# import torch
-# import torch.nn as nn
-# from collections import defaultdict
-# from statistics import mean
-
-# # Create example dataset
-# dataset = [
-#     (nn.Conv2d(3, 64, kernel_size=3), (64, 3, 32, 32), 0.5, 0.01, 15.2, 0.2),
-#     (nn.Conv2d(3, 64, kernel_size=3), (64, 3, 32, 32), 0.6, 0.02, 14.8, 0.3),
-#     (nn.Linear(64, 10), (64, 64), 0.7, 0.03, 10.5, 0.1),
-#     (nn.Linear(64, 10), (64, 64), 0.8, 0.04, 10.6, 0.2)
-# ]
-
-# # Helper function to create a key from the layer type, extra_repr, and input shape
-# def layer_to_key(layer, input_shape):
-#     # Use layer type (_get_name) and its configuration (extra_repr), along with input shape
-#     layer_name = layer._get_name()
-#     layer_repr = layer.extra_repr()  # Describes the layer's configuration
-#     return (layer_name, layer_repr, input_shape)
-
-# # Group entries by (layer_key, input_tuple)
-# grouped_data = defaultdict(list)
-
-# for layer, input_tuple, time, delta_time, energy, delta_energy in dataset:
-#     # Create a unique key based on the layer type, config (extra_repr), and input shape
-#     layer_key = layer_to_key(layer, input_tuple)
-    
-#     # Append measurements to the corresponding group
-#     grouped_data[layer_key].append((time, delta_time, energy, delta_energy))
-
-# # Example: Print out the groups
-# for key, measurements in grouped_data.items():
-#     layer_name, layer_repr, input_shape = key
-#     print(f"Layer: {layer_name} ({layer_repr}), Input Shape: {input_shape}, Measurements: {measurements}")
-
-# # Now, you can process the measurements, for example, by taking the mean of each group
-# processed_data = []
-# for key, measurements in grouped_data.items():
-#     # Unpack the measurements
-#     times, delta_times, energies, delta_energies = zip(*measurements)
-    
-#     # Calculate means (or apply other statistical methods)
-#     mean_time = mean(times)
-#     mean_delta_time = mean(delta_times)
-#     mean_energy = mean(energies)
-#     mean_delta_energy = mean(delta_energies)
-    
-#     # Store the processed data (layer_key, input_tuple, mean_time, mean_delta_time, mean_energy, mean_delta_energy)
-#     processed_data.append((key[0], key[2], mean_time, mean_delta_time, mean_energy, mean_delta_energy))
-
-# # Example: Print out the processed data
-# for item in processed_data:
-#     layer_name, input_shape, mean_time, mean_delta_time, mean_energy, mean_delta_energy = item
-#     print(f"Layer: {layer_name}, Input: {input_shape}, Mean Time: {mean_time}, Mean Energy: {mean_energy}")
-
-
-##############################################################################################
-
-
-
+    with open('./../measurements/' + entry + '/summary.yml', 'w') as file:
+        yaml.safe_dump(config, file)

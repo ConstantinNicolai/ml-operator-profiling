@@ -8,10 +8,18 @@ import torch.nn.functional as F
 import re
 import pandas as pd
 import numpy as np
+import os
+from datetime import datetime
 from torchsummary import summary
 from torch_profiling_utils.fvcorewriter import FVCoreWriter
 from torch_profiling_utils.torchinfowriter import TorchinfoWriter
 
+from collections import defaultdict
+import pickle
+import lzma
+import yaml
+import time
+import math
 
 def get_model_and_weights(model_name, weights_name):
     # Load the model function from torchvision.models
@@ -257,14 +265,14 @@ def forward_hook_new(module, input, output):
             opus_magnum_dict[key][1] += 1
 
 
-
+DATASET_DIR = "dataset_history/"
 
 def process_log_file(in_file, iterations):
     # Load the log file into a pandas DataFrame
     df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
 
     # Assign column names
-    df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4', 'Category']
+    df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4']
 
     # Convert the 'Timestamp' column to datetime, letting pandas infer the format
     df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
