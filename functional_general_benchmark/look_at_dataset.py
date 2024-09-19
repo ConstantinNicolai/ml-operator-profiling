@@ -48,6 +48,7 @@ for entry in os.listdir('./../measurements'):
 
     # print("type of list attempts antries", type(list_attemps[0]))
 
+    # working_list = []
 
 
     # # print(model_name)
@@ -57,9 +58,12 @@ for entry in os.listdir('./../measurements'):
     # print(len(list_attemps[0]))
     # print(type(list_attemps[0][1][0]))
     # print(type(list_attemps[0][1]))
+    # print(list_attemps[0][0][2])
 
 
-    working_list =  [item[1] for item in list_attemps] #list_attemps[:][1]  #
+    #working_list =  [item[1] for item in list_attemps] #list_attemps[:][1]  #
+    working_list = [item[1] + [item[0][2]] for item in list_attemps]
+    
 
     # print(working_list[0])
     # print(type(working_list))
@@ -67,17 +71,27 @@ for entry in os.listdir('./../measurements'):
 
     print(working_list[0])
 
+    # print("len of working list", len(working_list[0]))
+
 
     # Add missing entries from the master list to the list to modify, while preserving existing ones
     for item in working_list:
         for master_item in dataset_list:
-            if item[0]._get_name() == master_item[0]._get_name() and item[0].extra_repr() == master_item[0].extra_repr():    # module._get_name(), module.extra_repr()
+            if item[0]._get_name() == master_item[0]._get_name() and item[0].extra_repr() == master_item[0].extra_repr() and item[2] == master_item[1] and len(item) == 3:    # module._get_name(), module.extra_repr()
                 # Check which items from master_item are missing in item and extend it
                 for entry in master_item[1:]:
-                    print(entry)
-                    if entry not in item:
-                        item.append(entry)
+                    # print(entry)
+                    item.append(entry)
 
+
+    for item in working_list:
+        item = item[:2] + item[3:]
+
+    # print(working_list[0][:2] + working_list[0][3:])
+    # print(type(working_list[0]))
+
+
+    print(working_list[0])
 
 
 
