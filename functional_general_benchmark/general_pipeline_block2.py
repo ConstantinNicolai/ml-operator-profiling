@@ -16,7 +16,7 @@ from utils import get_model_and_weights, extract_layer_info, parse_model_and_wei
 iterations = 100000
 num_layers = 500
 
-h = 6
+# h = 6
 
 
 finishup = """
