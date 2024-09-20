@@ -99,7 +99,7 @@ for entry in os.listdir('./../measurements'):
 
     iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule = process_log_file('current_temp.log', required_iterations)
 
-    print(input_size, time_per_iteration, energy_per_iteration_in_milli_joule)
+    print(1000*time_per_iteration, "[ms]", energy_per_iteration_in_milli_joule, "mJ")
 
 
 
