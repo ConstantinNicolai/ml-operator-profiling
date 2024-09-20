@@ -3,6 +3,7 @@ import os
 import yaml
 import lzma
 import pickle
+import math
 
 # Load the saved .pt file
 dataset = torch.load('dataset_history/dataset_20240918_145846.pt', map_location=torch.device('cpu'))
@@ -12,8 +13,7 @@ print("#########################################")
 print("type of dataset", type(dataset))
 print("tye of dataset entries", type(dataset[0]))
 
-# for item in dataset:
-#     print(item)
+
 
 
 dataset_list = [list(item) for item in dataset]
@@ -51,7 +51,7 @@ for entry in os.listdir('./../measurements'):
     # working_list = []
 
 
-    # # print(model_name)
+    print(model_name)
 
     # print(list_attemps[0][1][0])
     # print(list_attemps[0][1][1])
@@ -86,5 +86,26 @@ for entry in os.listdir('./../measurements'):
                         item.append(entry)
 
 
-    print(working_list[0])
+    # print(working_list[0])
+
+    time_sum = 0
+    energy_sum = 0
+
+    for item in working_list:
+        # print(item)
+        # print(item[1])
+        count_of_this_layer = item[1]
+        runtime = item[3]
+        energy = item[4]
+        if math.isnan(runtime) == False:
+            time_sum = time_sum + count_of_this_layer * runtime
+        else:
+            print("encountered nan value in runtime, incomplete sum")
+        if math.isnan(energy) == False:
+            energy_sum = energy_sum + count_of_this_layer * energy
+        else:
+            print("encountered nan value in energy, incomplete sum")
+
+    print(time_sum)
+    print(energy_sum)
 
