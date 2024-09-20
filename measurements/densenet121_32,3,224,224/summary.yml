@@ -1,0 +1,8 @@
+done: false
+input_size:
+- 32
+- 3
+- 224
+- 224
+model_name: densenet121
+weights_name: DenseNet121_Weights

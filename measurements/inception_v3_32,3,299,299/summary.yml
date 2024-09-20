@@ -1,0 +1,8 @@
+done: true
+input_size:
+- 32
+- 3
+- 299
+- 299
+model_name: inception_v3
+weights_name: Inception_V3_Weights

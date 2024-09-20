@@ -1,0 +1,8 @@
+done: false
+input_size:
+- 32
+- 3
+- 224
+- 224
+model_name: resnet50
+weights_name: ResNet50_Weights

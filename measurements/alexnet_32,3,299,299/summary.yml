@@ -1,0 +1,8 @@
+done: false
+input_size:
+- 32
+- 3
+- 299
+- 299
+model_name: alexnet
+weights_name: AlexNet_Weights

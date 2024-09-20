@@ -1,0 +1,8 @@
+done: false
+input_size:
+- 32
+- 3
+- 380
+- 380
+model_name: efficientnet_b4
+weights_name: EfficientNet_B4_Weights

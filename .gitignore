@@ -30,6 +30,4 @@ functional_general_benchmark/*.log
 
 functional_general_benchmark/*.out
 
-measurements/*
-
 functional_general_benchmark/dataset_history
