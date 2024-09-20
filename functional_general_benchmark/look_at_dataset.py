@@ -106,6 +106,6 @@ for entry in os.listdir('./../measurements'):
         else:
             print("encountered nan value in energy, incomplete sum")
 
-    print(time_sum)
-    print(energy_sum)
+    print(1000*time_sum, "[ms]")
+    print(energy_sum, "[mJ]")
 
