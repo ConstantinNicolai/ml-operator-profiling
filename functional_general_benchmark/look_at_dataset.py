@@ -69,7 +69,7 @@ for entry in os.listdir('./../measurements'):
     # print(type(working_list))
     # print(type(working_list[0]))
 
-    print(working_list[0])
+    # print(working_list[0])
 
     # print("len of working list", len(working_list[0]))
 
@@ -79,20 +79,12 @@ for entry in os.listdir('./../measurements'):
         for master_item in dataset_list:
             if item[0]._get_name() == master_item[0]._get_name() and item[0].extra_repr() == master_item[0].extra_repr() and item[2] == master_item[1] and len(item) == 3:    # module._get_name(), module.extra_repr()
                 # Check which items from master_item are missing in item and extend it
+                o = 0
                 for entry in master_item[1:]:
-                    # print(entry)
-                    item.append(entry)
-
-
-    for item in working_list:
-        item = item[:2] + item[3:]
-
-    # print(working_list[0][:2] + working_list[0][3:])
-    # print(type(working_list[0]))
+                    o = o +1
+                    if o != 1:
+                        item.append(entry)
 
 
     print(working_list[0])
 
-
-
-### Der Abgleich muss natürlich auch die Input sizes aus beiden lists abgleichen um sicher zu stellen, dass es sich um das gleiche operator tuple handelt
