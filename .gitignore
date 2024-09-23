@@ -31,3 +31,9 @@ functional_general_benchmark/*.log
 functional_general_benchmark/*.out
 
 functional_general_benchmark/dataset_history
+
+measurements/*.pkl.xz
+
+measurements/*.pkl.xz_filtered
+
+measurements/
