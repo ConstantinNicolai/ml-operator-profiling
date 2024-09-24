@@ -2,7 +2,7 @@
 
 #SBATCH --partition=all
 #SBATCH --job-name=operator_profiling
-#SBATCH --output=operator_profiling.out
+#SBATCH --output=init_tests.out
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:RTX2080TI:1
@@ -21,4 +21,4 @@ kill_background_jobs() {
 }
 
 
-srun python3 general_pipeline_block2.py
+srun python3 init_experiments.py
