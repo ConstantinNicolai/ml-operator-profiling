@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #SBATCH --partition=all
-#SBATCH --job-name=manual_run
-#SBATCH --output=manual_out.out
+#SBATCH --job-name=operator_profiling
+#SBATCH --output=operator_profiling_A30.out
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:RTX2080TI:1
+#SBATCH --gres=gpu:A30:1
 
 
 

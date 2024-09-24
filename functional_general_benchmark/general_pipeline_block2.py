@@ -68,7 +68,10 @@ for entry in os.listdir('./../measurements'):
                 for _ in range(num_layers):
                     layer = list_attemps[h][1][0].cuda()
                     if hasattr(example_layer, 'weight') and example_layer.weight is not None:
-                        init.xavier_uniform_(layer.weight)
+                        if example_layer.weight.ndim < 2:
+                            init.uniform_(layer.weight, a=-0.1, b=0.1)
+                        else:
+                            init.xavier_uniform_(layer.weight)
                     if hasattr(example_layer, 'bias') and example_layer.bias is not None:
                         #init.xavier_uniform_(layer.bias)
                         init.uniform_(layer.bias, a=-0.1, b=0.1)

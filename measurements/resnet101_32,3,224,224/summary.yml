@@ -1,8 +1,0 @@
-done: true
-input_size:
-- 32
-- 3
-- 224
-- 224
-model_name: resnet101
-weights_name: ResNet101_Weights

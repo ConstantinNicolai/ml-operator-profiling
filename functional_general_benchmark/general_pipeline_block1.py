@@ -9,7 +9,7 @@ import os
 from utils import get_model_and_weights, extract_layer_info, parse_model_and_weights, process_model, forward_hook_new
 
 
-filter_list = ['Conv2d','Linear','StochasticDepth'] #'Conv2d','Linear','StochasticDepth'
+filter_list = ['Conv2d','Linear','StochasticDepth', 'BatchNorm2d', 'AvgPool2d', 'AdaptiveAvgPool2d', 'ReLU', 'ConvTranspose2d'] #'Conv2d','Linear','StochasticDepth'
 
 for entry in os.listdir('./../measurements'):
     with open('./../measurements/' + entry + '/summary.yml', 'r') as file:

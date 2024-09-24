@@ -1,8 +1,0 @@
-done: true
-input_size:
-- 32
-- 3
-- 224
-- 224
-model_name: convnext_base
-weights_name: ConvNeXt_Base_Weights
