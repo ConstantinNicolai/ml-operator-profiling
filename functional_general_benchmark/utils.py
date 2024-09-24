@@ -317,6 +317,8 @@ def process_log_file(in_file, iterations):
         # Assign column names
         df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4']
 
+        df = df.dropna()
+
         # Convert the 'Timestamp' column to datetime, letting pandas infer the format
         df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
 
