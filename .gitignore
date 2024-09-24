@@ -41,3 +41,6 @@ measurements/inception_v3_32,3,299,299/inception_v3_32_3_299_299.pkl.xz_filtered
 measurements/resnet18_32,3,224,224/resnet18_32_3_224_224.pkl.xz_filtered
 measurements/resnet34_32,3,224,224/resnet34_32_3_224_224.pkl.xz_filtered
 measurements/resnet34_32,3,56,56/resnet34_32_3_56_56.pkl.xz_filtered
+
+
+functional_general_benchmark/plots/

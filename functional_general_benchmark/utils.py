@@ -309,18 +309,82 @@ DATASET_DIR = "dataset_history/"
 #     return iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule
 
 
+# def process_log_file(in_file, iterations):
+#     try:
+#         # Load the log file into a pandas DataFrame
+#         df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
+
+#         # Assign column names
+#         df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4']
+
+#         df = df.dropna()
+
+#         # Convert the 'Timestamp' column to datetime, letting pandas infer the format
+#         df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
+
+#         # Calculate the time difference between the first and last timestamp in seconds
+#         time_difference_seconds = (df['Timestamp'].iloc[-1] - df['Timestamp'].iloc[0]).total_seconds()
+
+#         # Exclude the last row for calculations
+#         df_without_last = df.iloc[:-1]
+
+#         # Calculate the standard deviation for Value2 before filtering
+#         std_value2 = df_without_last['Value2'].std()
+
+#         # Filter out values outside the 3 standard deviation range for Value2
+#         mean_value2 = df_without_last['Value2'].mean()
+#         filtered_df = df_without_last[
+#             (np.abs(df_without_last['Value2'] - mean_value2) <= 3 * std_value2)
+#         ]
+
+#         # Calculate the filtered mean for Value2
+#         filtered_mean_value2 = filtered_df['Value2'].mean()
+
+#         # Calculate the total energy in joules (energy = power * time)
+#         total_energy_joules = filtered_mean_value2 * time_difference_seconds
+
+#         # Calculate the energy per iteration
+#         energy_per_iteration = total_energy_joules / iterations
+
+#         energy_per_iteration_in_milli_joule = 1000 * energy_per_iteration
+
+#         time_per_iteration = time_difference_seconds / iterations
+
+#         # Return the values directly
+#         return iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule
+
+#     except Exception as e:
+#         print(f"Error processing the log file: {e}")
+#         return None
+
+
 def process_log_file(in_file, iterations):
     try:
         # Load the log file into a pandas DataFrame
         df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
 
+        print(df)
+
         # Assign column names
         df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4']
 
+        # Drop any rows that contain NaN values
         df = df.dropna()
 
-        # Convert the 'Timestamp' column to datetime, letting pandas infer the format
+        # Remove any leading/trailing whitespace
+        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+
+        # Convert the 'Timestamp' column to datetime
         df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
+
+        # Drop rows where 'Timestamp' could not be converted (still NaT after coercion)
+        df = df.dropna(subset=['Timestamp'])
+
+        # Convert the other columns to numeric, coercing errors into NaNs
+        df[['Value1', 'Value2', 'Value3', 'Value4']] = df[['Value1', 'Value2', 'Value3', 'Value4']].apply(pd.to_numeric, errors='coerce')
+
+        # Drop any rows that now contain NaN values
+        df = df.dropna()
 
         # Calculate the time difference between the first and last timestamp in seconds
         time_difference_seconds = (df['Timestamp'].iloc[-1] - df['Timestamp'].iloc[0]).total_seconds()
@@ -356,6 +420,8 @@ def process_log_file(in_file, iterations):
     except Exception as e:
         print(f"Error processing the log file: {e}")
         return None
+
+
 
 
 # Get the latest dataset file
