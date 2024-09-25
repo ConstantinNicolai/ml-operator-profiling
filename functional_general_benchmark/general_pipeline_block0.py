@@ -15,6 +15,7 @@ import pickle
 import lzma
 import yaml
 import os
+import glob
 from utils import get_model_and_weights, extract_layer_info, parse_model_and_weights, process_model
 
 
@@ -40,9 +41,15 @@ def forward_hook_new(module, input, output):
 
 
 
-for entry in os.listdir('./../measurements'):
-    with open('./../measurements/' + entry + '/summary.yml', 'r') as file:
+for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
+    HW_dir = os.path.dirname(summary_file)
+    with open(summary_file, 'r') as file:
         config = yaml.safe_load(file)
+
+
+# for entry in os.listdir('./../measurements/*'):
+#     with open('./../measurements/*/' + entry + '/summary.yml', 'r') as file:
+#         config = yaml.safe_load(file)
 
     config['input_size'] = tuple(config['input_size'])
 
@@ -89,16 +96,18 @@ for entry in os.listdir('./../measurements'):
 
         tuple_str = "_".join(map(str, input_size))
 
-        # Format the filename using both variables
+        # Format the filename using both variables 
         filename = f"{model_name}_{tuple_str}.pkl.xz"
 
-        with lzma.open('./../measurements/' + entry + '/' + filename, "wb") as file_:
+        print(HW_dir + '/' + filename)
+
+        with lzma.open(HW_dir + '/' + filename, "wb") as file_:
             pickle.dump(opus_magnum_dict, file_)
 
         config['done'] = False
         config['input_size'] = list(config['input_size'])
 
-        with open('./../measurements/' + entry + '/summary.yml', 'w') as file:
+        with open(summary_file, 'w') as file:
             yaml.safe_dump(config, file)
 
         
