@@ -27,8 +27,8 @@ done
 """
 
 
-for entry in os.listdir('./../measurements'):
-    with open('./../measurements/' + entry + '/summary.yml', 'r') as file:
+for entry in os.listdir('./../measurements/RTX2080TI'):
+    with open('./../measurements/RTX2080TI/' + entry + '/summary.yml', 'r') as file:
         config = yaml.safe_load(file)
 
     config['input_size'] = tuple(config['input_size'])
@@ -41,7 +41,7 @@ for entry in os.listdir('./../measurements'):
     filename = f"{model_name}_{tuple_str}.pkl.xz"
 
     if done == False:
-        with lzma.open('./../measurements/' + entry + '/' + filename + '_filtered') as file_:
+        with lzma.open('./../measurements/RTX2080TI/' + entry + '/' + filename + '_filtered') as file_:
             saved_dict = pickle.load(file_)
         
 
@@ -141,7 +141,7 @@ for entry in os.listdir('./../measurements'):
                 # os.system('head current_temp.log')
 
 
-            DATASET_DIR = "dataset_history_A30/"
+            DATASET_DIR = "dataset_history_RTX2080TI/"
 
             # Ensure the dataset directory exists
             os.makedirs(DATASET_DIR, exist_ok=True)
@@ -154,7 +154,7 @@ for entry in os.listdir('./../measurements'):
 
     config['done'] = True
 
-    with open('./../measurements/' + entry + '/summary.yml', 'w') as file:
+    with open('./../measurements/RTX2080TI/' + entry + '/summary.yml', 'w') as file:
         yaml.safe_dump(config, file)
 
 

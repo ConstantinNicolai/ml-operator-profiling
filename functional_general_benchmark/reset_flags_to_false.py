@@ -30,5 +30,5 @@ def update_yml_files(directory):
                     print(f"No 'done' key found in: {file_path}")
 
 # Replace with your directory path
-directory_path = "../measurements"
+directory_path = "../measurements/A30"
 update_yml_files(directory_path)

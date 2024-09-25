@@ -12,7 +12,7 @@ from utils import get_model_and_weights, extract_layer_info, parse_model_and_wei
 filter_list = ['Conv2d','Linear','StochasticDepth', 'BatchNorm2d', 'AvgPool2d', 'AdaptiveAvgPool2d', 'ReLU', 'ConvTranspose2d'] #'Conv2d','Linear','StochasticDepth'
 
 for entry in os.listdir('./../measurements'):
-    with open('./../measurements/' + entry + '/summary.yml', 'r') as file:
+    with open('./../measurements/*/' + entry + '/summary.yml', 'r') as file:
         config = yaml.safe_load(file)
 
     config['input_size'] = tuple(config['input_size'])
@@ -34,6 +34,6 @@ for entry in os.listdir('./../measurements'):
         result_list = [entry for entry in list_attemps if entry[0][0] in filter_list]
 
 
-        with lzma.open('./../measurements/' + entry + '/' + filename + '_filtered', "wb") as file_:
+        with lzma.open('./../measurements/*/' + entry + '/' + filename + '_filtered', "wb") as file_:
             pickle.dump(dict(result_list), file_)
 
