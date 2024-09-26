@@ -21,7 +21,6 @@ from utils import get_model_and_weights, extract_layer_info, parse_model_and_wei
 
 # Define the forward hook function
 def forward_hook_new(module, input, output):
-    # Check if the layer is a Conv2d and has no children
     if not len(list(module.children())):
         # Extract the input shape (assuming input is a tuple)
         input_shape = tuple(input[0].size())
@@ -46,10 +45,6 @@ for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
     with open(summary_file, 'r') as file:
         config = yaml.safe_load(file)
 
-
-# for entry in os.listdir('./../measurements/*'):
-#     with open('./../measurements/*/' + entry + '/summary.yml', 'r') as file:
-#         config = yaml.safe_load(file)
 
     config['input_size'] = tuple(config['input_size'])
 

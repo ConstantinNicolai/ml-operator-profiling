@@ -265,8 +265,6 @@ def forward_hook_new(module, input, output):
             opus_magnum_dict[key][1] += 1
 
 
-DATASET_DIR = "dataset_history/"
-
 # def process_log_file(in_file, iterations):
 #     # Load the log file into a pandas DataFrame
 #     df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
@@ -422,10 +420,10 @@ def process_log_file(in_file, iterations):
         return None
 
 
-
+# DATASET_DIR = "dataset_history/"
 
 # Get the latest dataset file
-def get_latest_dataset_file():
+def get_latest_dataset_file(DATASET_DIR):
     files = [f for f in os.listdir(DATASET_DIR) if f.startswith("dataset_") and f.endswith(".pt")]
     if not files:
         return None
@@ -433,8 +431,8 @@ def get_latest_dataset_file():
     return os.path.join(DATASET_DIR, latest_file)
 
 # Load the latest dataset
-def load_latest_dataset():
-    latest_file = get_latest_dataset_file()
+def load_latest_dataset(DATASET_DIR):
+    latest_file = get_latest_dataset_file(DATASET_DIR)
     if latest_file:
         print(f"Loading dataset from {latest_file}")
         return torch.load(latest_file)
@@ -443,7 +441,7 @@ def load_latest_dataset():
         return []
 
 # Save the dataset with a timestamp
-def save_dataset(dataset):
+def save_dataset(dataset, DATASET_DIR):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"dataset_{timestamp}.pt"
     filepath = os.path.join(DATASET_DIR, filename)

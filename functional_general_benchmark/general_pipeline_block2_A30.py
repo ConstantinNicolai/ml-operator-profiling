@@ -147,10 +147,10 @@ for entry in os.listdir('./../measurements/A30'):
             os.makedirs(DATASET_DIR, exist_ok=True)
 
             # Example: Load, append, and save the dataset
-            dataset = load_latest_dataset()
+            dataset = load_latest_dataset(DATASET_DIR)
 
             dataset.extend(new_measurements)  # Append new data
-            save_dataset(dataset)
+            save_dataset(dataset, DATASET_DIR)
 
     config['done'] = True
 
