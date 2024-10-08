@@ -26,6 +26,8 @@ conv2d_list = []
 linear_list = []
 stochasticdepth_list = []
 batchnorm2d_list = []
+relu_list = []
+adaptiveavgpool2d_list = []
 
 
 
@@ -39,6 +41,10 @@ for item in dataset_list:
         stochasticdepth_list.append(item)
     elif item[0]._get_name() == "BatchNorm2d":
         batchnorm2d_list.append(item)
+    elif item[0]._get_name() == "ReLU":
+        relu_list.append(item)
+    elif item[0]._get_name() == "AdaptiveAvgPool2d":
+        adaptiveavgpool2d_list.append(item)
     else:
         print(print(item[0]._get_name(), item[0].extra_repr(), type(item[0].extra_repr()), item[1]))
         # print("MACs = ",item[0].out_channels*item[1][1]*item[1][2]*item[1][3]*item[0].kernel_size[0]*item[0].kernel_size[1])
@@ -48,68 +54,20 @@ for item in dataset_list:
     # print(item)
 
 
-for item in conv2d_list:
-    print(item)
-    # print(item[0]._get_name(), item[0].extra_repr(), type(item[0].extra_repr()), item[1])
-    print("MACs = ",item[0].out_channels*item[1][1]*item[1][2]*item[1][3]*item[0].kernel_size[0]*item[0].kernel_size[1])
+# for item in conv2d_list:
+#     print(item)
+#     # print(item[0]._get_name(), item[0].extra_repr(), type(item[0].extra_repr()), item[1])
+#     print("MACs = ",item[0].out_channels*item[1][1]*item[1][2]*item[1][3]*item[0].kernel_size[0]*item[0].kernel_size[1])
 
-for item in linear_list:
-    print(item)
-    # print(item[0]._get_name(), item[0].extra_repr(), type(item[0].extra_repr()), item[1])
-    # print(item[0].bias is not None)
-    # print(dir(item[0]))
-    if item[0].bias is not None:
-        print("MACs = ", item[0].out_features*item[0].in_features+item[0].out_features)
-    else:
-        print("MACs = ", item[0].out_features*item[0].in_features)
-
-
-# for item in stochasticdepth_list:
-#     print(item[0].get_parameter)
-
-
-# # Create plots directory if it doesn't exist
-# os.makedirs('plots', exist_ok=True)
-
-# # Plot Conv2D
-# macs_conv2d = [
-#     item[0].out_channels * item[1][1] * item[1][2] * item[1][3] * item[0].kernel_size[0] * item[0].kernel_size[1] 
-#     for item in conv2d_list
-# ]
-# item3_conv2d = [item[3] for item in conv2d_list]
-
-# plt.figure(figsize=(10, 5))
-# plt.scatter(macs_conv2d, item3_conv2d, marker='o', label='Conv2D Item[3]', color='blue')
-# plt.title('Conv2D Item[3] vs MACs (Log Scale)')
-# plt.xlabel('MACs (Log Scale)')
-# plt.ylabel('Item[3]')
-# plt.xscale('log')  # Set x-axis to logarithmic scale
-# plt.grid()
-# plt.legend()
-# plt.savefig('plots/conv2d_item3_vs_macs_log.png')
-# plt.close()
-
-# # Plot Linear
-# macs_linear = [
-#     (item[0].out_features * item[0].in_features + item[0].out_features) if item[0].bias is not None 
-#     else (item[0].out_features * item[0].in_features) 
-#     for item in linear_list
-# ]
-# item3_linear = [item[3] for item in linear_list]
-
-# plt.figure(figsize=(10, 5))
-# plt.scatter(macs_linear, item3_linear, marker='o', label='Linear Item[3]', color='orange')
-# plt.title('Linear Item[3] vs MACs (Log Scale)')
-# plt.xlabel('MACs (Log Scale)')
-# plt.ylabel('Item[3]')
-# plt.xscale('log')  # Set x-axis to logarithmic scale
-# plt.grid()
-# plt.legend()
-# plt.savefig('plots/linear_item3_vs_macs_log.png')
-# plt.close()
-
-
-
+# for item in linear_list:
+#     print(item)
+#     # print(item[0]._get_name(), item[0].extra_repr(), type(item[0].extra_repr()), item[1])
+#     # print(item[0].bias is not None)
+#     # print(dir(item[0]))
+#     if item[0].bias is not None:
+#         print("MACs = ", item[0].out_features*item[0].in_features+item[0].out_features)
+#     else:
+#         print("MACs = ", item[0].out_features*item[0].in_features)
 
 
 # Create plots directory if it doesn't exist
@@ -196,36 +154,69 @@ bn2_energy = []
 bn2_cxwxh = []
 for item in batchnorm2d_list:
     bn2_energy.append(item[3])
-    # bn2_cxwxh.append()
+    bn2_cxwxh.append(item[1][1]*item[1][2]*item[1][3])
 
 
-# # Plot the filtered data
-# plt.figure(figsize=(20, 10), dpi=150)
-# plt.scatter(filtered_macs, filtered_item3, marker='o', s=14, label='Linear Item[3]', color='orange')
-# plt.title('Linear Energy vs MACs (Log-Log Scale)')
-# plt.xlabel('MACs (Log Scale)')
-# plt.ylabel('Item[3] (Log Scale)')
-# plt.xscale('log')  # Set x-axis to logarithmic scale
-# # plt.yscale('log')  # Set y-axis to logarithmic scale if needed
-# plt.xlim(None, x_limit)  # Set the upper limit for x-axis
-# plt.ylim(None, y_limit)  # Set the upper limit for y-axis
-# plt.grid()
-# plt.legend()
-# plt.savefig('plots/batchnorm2d_energy_CxHxW.png')
-# plt.close()
+# Plot the filtered data
+plt.figure(figsize=(20, 10), dpi=150)
+plt.scatter(bn2_cxwxh, bn2_energy, marker='o', s=14, label='BatchNorm2D Energe CxHxW', color='purple')
+plt.title('BatchNorm2D CxHxW Energy')
+plt.xlabel('CxHxW (Log Scale)')
+plt.ylabel('Energy [mJ]')
+plt.xscale('log')  # Set x-axis to logarithmic scale
+# plt.yscale('log')  # Set y-axis to logarithmic scale if needed
+plt.grid()
+plt.legend()
+plt.savefig('plots/batchnorm2d_energy_CxHxW.png')
+plt.close()
+
+
+
+
+relu_energy = []
+relu_cxwxh = []
+for item in relu_list:
+    relu_energy.append(item[3])
+    if len(item[1])<4:
+        relu_cxwxh.append(item[1][1])
+    else:
+        relu_cxwxh.append(item[1][1]*item[1][2]*item[1][3])
+
+
+# Plot the filtered data
+plt.figure(figsize=(20, 10), dpi=150)
+plt.scatter(relu_cxwxh, relu_energy, marker='o', s=14, label='ReLU Energe CxHxW', color='limegreen')
+plt.title('RELU CxHxW Energy')
+plt.xlabel('CxHxW (Log Scale)')
+plt.ylabel('Energy [mJ]')
+plt.xscale('log')  # Set x-axis to logarithmic scale
+# plt.yscale('log')  # Set y-axis to logarithmic scale if needed
+plt.grid()
+plt.legend()
+plt.savefig('plots/relu_energy_CxHxW.png')
+plt.close()
+
 
 
 print("#####################################")
 
-print(dir(batchnorm2d_list[0][0]))
+print(batchnorm2d_list[34])
+print(batchnorm2d_list[34][1])
+print(batchnorm2d_list[34][1][0])
+print(batchnorm2d_list[34][1][1]*batchnorm2d_list[34][1][2]*batchnorm2d_list[34][1][3])
+
+
+for item in relu_list:
+    if len(item[1])>4:
+        print(item)
 
 
 print("######################################")
 
 
-for item in linear_list:
-    if len(item[1])>2:
-        print(item)
+# for item in linear_list:
+#     if len(item[1])>2:
+#         print(item)
 
 
 
