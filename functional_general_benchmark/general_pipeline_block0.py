@@ -48,13 +48,13 @@ for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
 
     config['input_size'] = tuple(config['input_size'])
 
-    # Dynamically create variables
-    for key, value in config.items():
-        globals()[key] = value
+    # # Dynamically create variables
+    # for key, value in config.items():
+    #     globals()[key] = value
 
 
-    if done == False:
-        model = get_model_and_weights(model_name, weights_name)
+    if config['done'] == False:
+        model = get_model_and_weights(config['model_name'], config['weights_name'])
 
 
         ##########################################################################

@@ -191,27 +191,33 @@ plt.savefig('plots/linear_item3_vs_macs_loglog_zoomin.png')
 plt.close()
 
 
-# insize = []
-# enen = []
+
+bn2_energy = []
+bn2_cxwxh = []
+for item in batchnorm2d_list:
+    bn2_energy.append(item[3])
+    # bn2_cxwxh.append()
 
 
-# for item in linear_list:
-#     insize.append(item[1][1])
-#     enen.append(item[3])
-
-# # Plot Linear
-# plt.figure(figsize=(20, 10), dpi = 150)
-# plt.scatter(insize, enen, marker='o', s=14, label='Linear Item[3]', color='green')
-# plt.title('Linear Energy vs insize (Log-Log Scale)')
-# plt.xlabel('insize')
+# # Plot the filtered data
+# plt.figure(figsize=(20, 10), dpi=150)
+# plt.scatter(filtered_macs, filtered_item3, marker='o', s=14, label='Linear Item[3]', color='orange')
+# plt.title('Linear Energy vs MACs (Log-Log Scale)')
+# plt.xlabel('MACs (Log Scale)')
 # plt.ylabel('Item[3] (Log Scale)')
-# # plt.xscale('log')  # Set x-axis to logarithmic scale
-# # plt.yscale('log')  # Set y-axis to logarithmic scale
+# plt.xscale('log')  # Set x-axis to logarithmic scale
+# # plt.yscale('log')  # Set y-axis to logarithmic scale if needed
+# plt.xlim(None, x_limit)  # Set the upper limit for x-axis
+# plt.ylim(None, y_limit)  # Set the upper limit for y-axis
 # plt.grid()
 # plt.legend()
-# plt.savefig('plots/linear_item3_vs_insize_loglog.png')
+# plt.savefig('plots/batchnorm2d_energy_CxHxW.png')
 # plt.close()
 
+
+print("#####################################")
+
+print(dir(batchnorm2d_list[0][0]))
 
 
 print("######################################")

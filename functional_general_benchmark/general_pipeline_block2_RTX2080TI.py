@@ -17,7 +17,6 @@ from utils import get_model_and_weights, extract_layer_info, parse_model_and_wei
 iterations = 100000
 num_layers = 500
 
-# h = 6
 
 
 finishup = """
@@ -34,14 +33,16 @@ for entry in os.listdir('./../measurements/RTX2080TI'):
 
     config['input_size'] = tuple(config['input_size'])
 
-    # Dynamically create variables
-    for key, value in config.items():
-        globals()[key] = value
+    # # Dynamically create variables
+    # for key, value in config.items():
+    #     globals()[key] = value
         
-    tuple_str = "_".join(map(str, input_size))
-    filename = f"{model_name}_{tuple_str}.pkl.xz"
+    tuple_str = "_".join(map(str, config['input_size']))
+    filename = f"{config['model_name']}_{tuple_str}.pkl.xz"
 
-    if done == False:
+    if config['done'] == True:
+        print("done flag already set to true, for rerun reset to false")
+    if config['done'] == False:
         with lzma.open('./../measurements/RTX2080TI/' + entry + '/' + filename + '_filtered') as file_:
             saved_dict = pickle.load(file_)
         

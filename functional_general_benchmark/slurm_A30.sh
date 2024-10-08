@@ -3,6 +3,7 @@
 #SBATCH --partition=all
 #SBATCH --job-name=operator_profiling
 #SBATCH --output=operator_profiling_A30.out
+#SBATCH --error=operator_profiling_A30.er
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:A30:1
@@ -14,11 +15,10 @@ eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 conda activate constabass
 
 
-kill_background_jobs() {
-    for pid in $@; do
-        kill $pid
-    done
-}
+# kill_background_jobs() {
+#     for pid in $@; do
+#         kill $pid
+#     done
+# }
 
-
-srun python3 general_pipeline_block2_A30.py
+python3 general_pipeline_block2_A30.py
