@@ -25,6 +25,7 @@ dataset_list = [list(item) for item in dataset]
 conv2d_list = []
 linear_list = []
 stochasticdepth_list = []
+batchnorm2d_list = []
 
 
 
@@ -36,6 +37,8 @@ for item in dataset_list:
         linear_list.append(item)
     elif item[0]._get_name() == "StochasticDepth":
         stochasticdepth_list.append(item)
+    elif item[0]._get_name() == "BatchNorm2d":
+        batchnorm2d_list.append(item)
     else:
         print(print(item[0]._get_name(), item[0].extra_repr(), type(item[0].extra_repr()), item[1]))
         # print("MACs = ",item[0].out_channels*item[1][1]*item[1][2]*item[1][3]*item[0].kernel_size[0]*item[0].kernel_size[1])
@@ -135,14 +138,14 @@ macs_conv2d, item3_conv2d = prepare_data(conv2d_list)
 # Plot Conv2D
 plt.figure(figsize=(20, 10), dpi = 150)
 plt.scatter(macs_conv2d, item3_conv2d, marker='o',s=14, label='Conv2D Item[3]', color='blue')
-plt.title('Conv2D Energy vs MACs (Log-Log Scale)')
+plt.title('Conv2D Energy vs MACs (Linear-Log Scale)')
 plt.xlabel('MACs (Log Scale)')
-plt.ylabel('Item[3] (Log Scale)')
+plt.ylabel('Energy in mJ')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.yscale('log')  # Set y-axis to logarithmic scale
 plt.grid()
 plt.legend()
-plt.savefig('plots/conv2d_item3_vs_macs_loglog.png')
+plt.savefig('plots/conv2d_energy_vs_macs_lin_log.png')
 plt.close()
 
 # Prepare data for Linear
@@ -156,56 +159,59 @@ plt.title('Linear Energy vs MACs (Log-Log Scale)')
 plt.xlabel('MACs (Log Scale)')
 plt.ylabel('Item[3] (Log Scale)')
 plt.xscale('log')  # Set x-axis to logarithmic scale
-plt.yscale('log')  # Set y-axis to logarithmic scale
+# plt.yscale('log')  # Set y-axis to logarithmic scale
 plt.grid()
 plt.legend()
 plt.savefig('plots/linear_item3_vs_macs_loglog.png')
 plt.close()
 
 
-insize = []
-enen = []
 
+# Define the upper limits for x and y
+x_limit = 5e6  # Example: 1,000,000 MACs
+y_limit = 20  # Example: 1,000 for Item[3]
 
-for item in linear_list:
-    insize.append(item[1][1])
-    enen.append(item[3])
+# Filter the data to only include points within the specified limits
+filtered_macs = [x for x, y in zip(macs_linear, item3_linear) if x <= x_limit and y <= y_limit]
+filtered_item3 = [y for x, y in zip(macs_linear, item3_linear) if x <= x_limit and y <= y_limit]
 
-# Plot Linear
-plt.figure(figsize=(20, 10), dpi = 150)
-plt.scatter(insize, enen, marker='o', s=14, label='Linear Item[3]', color='green')
-plt.title('Linear Energy vs insize (Log-Log Scale)')
-plt.xlabel('insize')
+# Plot the filtered data
+plt.figure(figsize=(20, 10), dpi=150)
+plt.scatter(filtered_macs, filtered_item3, marker='o', s=14, label='Linear Item[3]', color='orange')
+plt.title('Linear Energy vs MACs (Log-Log Scale)')
+plt.xlabel('MACs (Log Scale)')
 plt.ylabel('Item[3] (Log Scale)')
-# plt.xscale('log')  # Set x-axis to logarithmic scale
-# plt.yscale('log')  # Set y-axis to logarithmic scale
+plt.xscale('log')  # Set x-axis to logarithmic scale
+# plt.yscale('log')  # Set y-axis to logarithmic scale if needed
+plt.xlim(None, x_limit)  # Set the upper limit for x-axis
+plt.ylim(None, y_limit)  # Set the upper limit for y-axis
 plt.grid()
 plt.legend()
-plt.savefig('plots/linear_item3_vs_insize_loglog.png')
+plt.savefig('plots/linear_item3_vs_macs_loglog_zoomin.png')
 plt.close()
 
 
+# insize = []
+# enen = []
 
-x = []
-y = []
-z = []
 
-for item in linear_list:
-    if len(item[1])<=2:
-        x.append(item[0].in_features)
-        y.append(item[0].out_features)
-        z.append(item[3])
+# for item in linear_list:
+#     insize.append(item[1][1])
+#     enen.append(item[3])
 
-# Create the scatter plot
+# # Plot Linear
+# plt.figure(figsize=(20, 10), dpi = 150)
+# plt.scatter(insize, enen, marker='o', s=14, label='Linear Item[3]', color='green')
+# plt.title('Linear Energy vs insize (Log-Log Scale)')
+# plt.xlabel('insize')
+# plt.ylabel('Item[3] (Log Scale)')
+# # plt.xscale('log')  # Set x-axis to logarithmic scale
+# # plt.yscale('log')  # Set y-axis to logarithmic scale
+# plt.grid()
+# plt.legend()
+# plt.savefig('plots/linear_item3_vs_insize_loglog.png')
+# plt.close()
 
-vmin = 0
-vmax = 80
-plt.figure(figsize=(20, 10), dpi = 150)
-sc = plt.scatter(x, y, c=z, cmap='coolwarm', marker='o', s=70 , edgecolor='k', vmin=vmin, vmax=vmax)
-# Adding a color bar to show the scale of z
-plt.colorbar(sc, label='z value (Color scale)')
-plt.savefig('plots/linear_in_out_energy.png')
-plt.close()
 
 
 print("######################################")

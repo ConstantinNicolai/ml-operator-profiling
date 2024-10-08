@@ -361,7 +361,7 @@ def process_log_file(in_file, iterations):
         # Load the log file into a pandas DataFrame
         df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
 
-        print(df)
+        # print(df)
 
         # Assign column names
         df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4']
@@ -370,7 +370,7 @@ def process_log_file(in_file, iterations):
         df = df.dropna()
 
         # Remove any leading/trailing whitespace
-        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+        df = df.map(lambda x: x.strip() if isinstance(x, str) else x)
 
         # Convert the 'Timestamp' column to datetime
         df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
