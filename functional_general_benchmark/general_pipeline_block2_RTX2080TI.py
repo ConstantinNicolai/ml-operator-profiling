@@ -10,6 +10,7 @@ import torch.nn.init as init
 import time
 import math
 from datetime import datetime
+import uncertainties
 from utils import get_model_and_weights, extract_layer_info, parse_model_and_weights, process_model, forward_hook_new, process_log_file,get_latest_dataset_file, load_latest_dataset, save_dataset
 
 
@@ -132,11 +133,11 @@ for entry in os.listdir('./../measurements/RTX2080TI'):
                 total_time = end_time - start_time
                 # print(f"Total time for {required_iterations} iterations: {total_time:.4f} seconds")
 
-                iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule = process_log_file('current_temp_RTX2080TI.log', required_iterations)
+                iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule, total_energy_joules_error, energy_per_iteration_in_milli_joule_error = process_log_file('current_temp_RTX2080TI.log', required_iterations)
 
-                print(example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule)
+                print(example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule, energy_per_iteration_in_milli_joule_error)
 
-                new_measurements.append((example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule))
+                new_measurements.append((example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule, energy_per_iteration_in_milli_joule_error))
 
                 # os.system('head current_temp.log')
 

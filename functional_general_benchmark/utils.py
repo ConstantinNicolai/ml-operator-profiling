@@ -53,37 +53,6 @@ def get_model_and_weights(model_name, weights_name):
     return model
 
 
-# def extract_layer_info(model):
-#     """
-#     Extracts layer information from the given PyTorch model and returns it as a pandas DataFrame.
-    
-#     Args:
-#         model: A PyTorch model (e.g., torchvision.models.ResNet50)
-    
-#     Returns:
-#         pd.DataFrame: A DataFrame containing the type and parameters of each layer.
-#     """
-
-#     # Initialize a list to store the layer information
-#     layer_info_list = []
-
-#     # Iterate through the model's layers
-#     for name, layer in model.named_modules():
-#         if len(list(layer.children())) == 0:  # Focus on individual layers, skip container layers
-#             # Get the string representation of the layer
-#             layer_repr = repr(layer)
-#             # Split by ':' and take everything after the first occurrence
-#             layer_details = layer_repr.split(':', 1)[-1].strip()
-#             # Extract the function type and parameters
-#             layer_type = layer.__class__.__name__
-#             layer_parameters = layer_details[len(layer_type)+1:-1]  # Remove the layer type and parentheses
-
-#             # Append the information to the list
-#             layer_info_list.append({
-#                 "Type": layer_type,
-#                 "Parameters": layer_parameters
-#             })
-
 def extract_layer_info(model):
     """
     Extracts layer information from the given PyTorch model and returns it as a pandas DataFrame.
@@ -135,21 +104,6 @@ def extract_layer_info(model):
     return df
 
 
-
-# def parse_model_and_weights():
-#     """
-#     Parse command-line arguments.
-    
-#     Returns:
-#         argparse.Namespace: Parsed arguments.
-#     """
-#     parser = argparse.ArgumentParser(description='Load a model and its weights.')
-#     parser.add_argument('--model', type=str, required=True,
-#                         help='Name of the model to load (e.g., "resnet50", "vgg16").')
-#     parser.add_argument('--weights', type=str, required=True,
-#                         help='Name of the weights class to load (e.g., "ResNet50_Weights", "VGG16_Weights").')
-
-#     return parser.parse_args()
 def parse_model_and_weights():
     """
     Parse command-line arguments.
@@ -265,97 +219,6 @@ def forward_hook_new(module, input, output):
             opus_magnum_dict[key][1] += 1
 
 
-# def process_log_file(in_file, iterations):
-#     # Load the log file into a pandas DataFrame
-#     df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
-
-#     # Assign column names
-#     df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4']
-
-#     # Convert the 'Timestamp' column to datetime, letting pandas infer the format
-#     df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
-
-#     # Calculate the time difference between the first and last timestamp in seconds
-#     time_difference_seconds = (df['Timestamp'].iloc[-1] - df['Timestamp'].iloc[0]).total_seconds()
-
-#     # Exclude the last row for calculations
-#     df_without_last = df.iloc[:-1]
-
-#     # Calculate the standard deviation for Value2 before filtering
-#     std_value2 = df_without_last['Value2'].std()
-
-#     # Filter out values outside the 3 standard deviation range for Value2
-#     mean_value2 = df_without_last['Value2'].mean()
-#     filtered_df = df_without_last[
-#         (np.abs(df_without_last['Value2'] - mean_value2) <= 3 * std_value2)
-#     ]
-
-#     # Calculate the filtered mean for Value2
-#     filtered_mean_value2 = filtered_df['Value2'].mean()
-
-#     # Calculate the total energy in joules (energy = power * time)
-#     total_energy_joules = filtered_mean_value2 * time_difference_seconds
-
-#     # Calculate the energy per iteration
-#     energy_per_iteration = total_energy_joules / iterations
-
-#     energy_per_iteration_in_milli_joule = 1000 * energy_per_iteration
-
-#     time_per_iteration = time_difference_seconds / iterations
-
-#     # Return the values directly
-#     return iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule
-
-
-# def process_log_file(in_file, iterations):
-#     try:
-#         # Load the log file into a pandas DataFrame
-#         df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
-
-#         # Assign column names
-#         df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4']
-
-#         df = df.dropna()
-
-#         # Convert the 'Timestamp' column to datetime, letting pandas infer the format
-#         df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
-
-#         # Calculate the time difference between the first and last timestamp in seconds
-#         time_difference_seconds = (df['Timestamp'].iloc[-1] - df['Timestamp'].iloc[0]).total_seconds()
-
-#         # Exclude the last row for calculations
-#         df_without_last = df.iloc[:-1]
-
-#         # Calculate the standard deviation for Value2 before filtering
-#         std_value2 = df_without_last['Value2'].std()
-
-#         # Filter out values outside the 3 standard deviation range for Value2
-#         mean_value2 = df_without_last['Value2'].mean()
-#         filtered_df = df_without_last[
-#             (np.abs(df_without_last['Value2'] - mean_value2) <= 3 * std_value2)
-#         ]
-
-#         # Calculate the filtered mean for Value2
-#         filtered_mean_value2 = filtered_df['Value2'].mean()
-
-#         # Calculate the total energy in joules (energy = power * time)
-#         total_energy_joules = filtered_mean_value2 * time_difference_seconds
-
-#         # Calculate the energy per iteration
-#         energy_per_iteration = total_energy_joules / iterations
-
-#         energy_per_iteration_in_milli_joule = 1000 * energy_per_iteration
-
-#         time_per_iteration = time_difference_seconds / iterations
-
-#         # Return the values directly
-#         return iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule
-
-#     except Exception as e:
-#         print(f"Error processing the log file: {e}")
-#         return None
-
-
 def process_log_file(in_file, iterations):
     try:
         # Load the log file into a pandas DataFrame
@@ -397,23 +260,75 @@ def process_log_file(in_file, iterations):
         mean_value2 = df_without_last['Value2'].mean()
         filtered_df = df_without_last[
             (np.abs(df_without_last['Value2'] - mean_value2) <= 3 * std_value2)
-        ]
+        ].copy()
 
         # Calculate the filtered mean for Value2
         filtered_mean_value2 = filtered_df['Value2'].mean()
 
+        filtered_mean_value2_error = 5 / math.sqrt(len(df))
+
         # Calculate the total energy in joules (energy = power * time)
         total_energy_joules = filtered_mean_value2 * time_difference_seconds
 
-        # Calculate the energy per iteration
-        energy_per_iteration = total_energy_joules / iterations
+        total_energy_joules_error = filtered_mean_value2_error * time_difference_seconds
 
-        energy_per_iteration_in_milli_joule = 1000 * energy_per_iteration
+        # Calculate the energy per iteration
+        energy_per_iteration_in_milli_joule = 1000 * (total_energy_joules / iterations)
+
+        energy_per_iteration_in_milli_joule_error = 1000 * (total_energy_joules_error / iterations)
 
         time_per_iteration = time_difference_seconds / iterations
 
-        # Return the values directly
-        return iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule
+        return (iterations, 
+                time_difference_seconds, 
+                time_per_iteration, 
+                filtered_mean_value2, 
+                std_value2, 
+                total_energy_joules, 
+                energy_per_iteration_in_milli_joule,
+                total_energy_joules_error,
+                energy_per_iteration_in_milli_joule_error)
+
+    except Exception as e:
+        print(f"Error processing the log file: {e}")
+        return None
+
+
+
+def process_log_file_with_time_jitter_uncertainty(in_file, iterations):
+    try:
+        # Load the log file
+        df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
+
+        # Assign column names
+        df.columns = ['Timestamp', 'Value1', 'Value2', 'Value3', 'Value4']
+        df = df.dropna()
+
+        # Convert the 'Timestamp' column to datetime
+        df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
+
+        df = df.dropna(subset=['Timestamp'])
+
+        # Calculate the total time difference between the first and last timestamps
+        time_difference_seconds = (df['Timestamp'].iloc[-1] - df['Timestamp'].iloc[0]).total_seconds()
+
+        # Add uncertainties to Value2 (±5 as per manufacturer)
+        df['Value2_with_uncertainty'] = df['Value2'].apply(lambda x: ufloat(x, 5))
+
+        # Calculate the mean of Value2 with uncertainty
+        mean_value2_with_uncertainty = df['Value2_with_uncertainty'].mean()
+
+        # Calculate total energy in joules (energy = power * time) with uncertainty
+        total_energy_joules_with_uncertainty = mean_value2_with_uncertainty * time_difference_seconds_with_uncertainty
+
+        # Calculate energy per iteration with uncertainty
+        energy_per_iteration_with_uncertainty = total_energy_joules_with_uncertainty / iterations
+
+        # Convert energy per iteration to millijoules with uncertainty
+        energy_per_iteration_in_milli_joule_with_uncertainty = 1000 * energy_per_iteration_with_uncertainty
+
+        # Return calculated values with uncertainty
+        return iterations, time_difference_seconds_with_uncertainty, mean_value2_with_uncertainty, total_energy_joules_with_uncertainty, energy_per_iteration_in_milli_joule_with_uncertainty
 
     except Exception as e:
         print(f"Error processing the log file: {e}")
