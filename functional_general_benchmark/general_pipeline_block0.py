@@ -48,11 +48,8 @@ for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
 
     config['input_size'] = tuple(config['input_size'])
 
-    # # Dynamically create variables
-    # for key, value in config.items():
-    #     globals()[key] = value
-
-
+    if config['done'] == True:
+        print("done flag already set to true, reset to false for rerun")
     if config['done'] == False:
         model = get_model_and_weights(config['model_name'], config['weights_name'])
 
@@ -92,7 +89,7 @@ for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
         tuple_str = "_".join(map(str, input_size))
 
         # Format the filename using both variables 
-        filename = f"{model_name}_{tuple_str}.pkl.xz"
+        filename = f"{config['model_name']}_{tuple_str}.pkl.xz"
 
         print(HW_dir + '/' + filename)
 

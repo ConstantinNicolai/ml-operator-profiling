@@ -24,15 +24,14 @@ for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
 #         config = yaml.safe_load(file)
 
     config['input_size'] = tuple(config['input_size'])
-
-    # Dynamically create variables
-    for key, value in config.items():
-        globals()[key] = value
         
-    tuple_str = "_".join(map(str, input_size))
-    filename = f"{model_name}_{tuple_str}.pkl.xz"
+    tuple_str = "_".join(map(str, config['input_size']))
+    filename = f"{config['model_name']}_{tuple_str}.pkl.xz"
 
-    if done == False:
+
+    if config['done'] == True:
+        print("done flag already set to true, reset to false for rerun")
+    if config['done'] == False:
 
         with lzma.open(HW_dir + '/' + filename) as file_:
             saved_dict = pickle.load(file_)
