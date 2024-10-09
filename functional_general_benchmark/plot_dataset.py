@@ -154,20 +154,20 @@ bn2_energy = []
 bn2_cxwxh = []
 for item in batchnorm2d_list:
     bn2_energy.append(item[3])
-    bn2_cxwxh.append(item[1][1]*item[1][2]*item[1][3])
+    bn2_cxwxh.append(2*item[1][1]+4*item[1][1]*item[1][2]*item[1][3])
 
 
 # Plot the filtered data
 plt.figure(figsize=(20, 10), dpi=150)
 plt.scatter(bn2_cxwxh, bn2_energy, marker='o', s=14, label='BatchNorm2D Energe CxHxW', color='purple')
-plt.title('BatchNorm2D CxHxW Energy')
-plt.xlabel('CxHxW (Log Scale)')
+plt.title('BatchNorm2D FLOPs Energy')
+plt.xlabel('FLOPs (Log Scale)')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.yscale('log')  # Set y-axis to logarithmic scale if needed
 plt.grid()
 plt.legend()
-plt.savefig('plots/batchnorm2d_energy_CxHxW.png')
+plt.savefig('plots/batchnorm2d_energy_FLOPs.png')
 plt.close()
 
 
@@ -185,15 +185,15 @@ for item in relu_list:
 
 # Plot the filtered data
 plt.figure(figsize=(20, 10), dpi=150)
-plt.scatter(relu_cxwxh, relu_energy, marker='o', s=14, label='ReLU Energe CxHxW', color='limegreen')
-plt.title('RELU CxHxW Energy')
-plt.xlabel('CxHxW (Log Scale)')
+plt.scatter(relu_cxwxh, relu_energy, marker='o', s=14, label='ReLU Energe FLOPs', color='limegreen')
+plt.title('RELU FLOPs Energy')
+plt.xlabel('FLOPs (Log Scale)')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.yscale('log')  # Set y-axis to logarithmic scale if needed
 plt.grid()
 plt.legend()
-plt.savefig('plots/relu_energy_CxHxW.png')
+plt.savefig('plots/relu_energy_FLOPs.png')
 plt.close()
 
 
@@ -206,8 +206,8 @@ print(batchnorm2d_list[34][1][0])
 print(batchnorm2d_list[34][1][1]*batchnorm2d_list[34][1][2]*batchnorm2d_list[34][1][3])
 
 
-for item in relu_list:
-    if len(item[1])>4:
+for item in adaptiveavgpool2d_list:
+    if len(item[1])<4:
         print(item)
 
 
