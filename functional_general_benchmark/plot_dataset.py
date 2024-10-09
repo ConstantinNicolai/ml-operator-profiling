@@ -131,12 +131,12 @@ macs_range_quad = quadratic.transform(macs_range)
 ransac_fit_line = ransac.predict(macs_range_quad)
 
 # Plot Conv2D with RANSAC quadratic fit and error bars
-plt.figure(figsize=(20, 10), dpi=150)
-plt.errorbar(macs_conv2d, item3_conv2d, yerr=item3_errors, fmt='o', 
-             markersize=8, label='Conv2D Energy in mJ', color='blue', alpha=0.7, 
+plt.figure(figsize=(6, 6))
+plt.errorbar(macs_conv2d, item3_conv2d, yerr=item3_errors, fmt='.', 
+             markersize=8, label='Conv2D Energy in mJ', color='darkblue', alpha=0.7, 
              capsize=5)  # Adding error bars
 plt.plot(macs_range, ransac_fit_line, color='red', label='RANSAC Quadratic Fit', linewidth=1)  # Adding RANSAC quadratic fit line
-plt.title('Conv2D Energy vs MACs (Quadratic Fit with Error Bars)' + gpu)
+plt.title('Conv2D Energy vs MACs (Quadratic Fit) ' + gpu)
 plt.xlabel('MACs (Log Scale)')
 plt.ylabel('Energy in mJ')
 plt.xscale('log')  # Set x-axis to logarithmic scale
@@ -144,6 +144,7 @@ plt.ylim(0, y_limit)  # Set the upper limit for y-axis
 plt.grid()
 plt.legend()
 plt.savefig('plots/conv2d_energy_vs_macs_ransac_quadratic_fit_with_errors_' + gpu + '.pdf', format='pdf')
+plt.savefig('plots/conv2d_energy_vs_macs_ransac_quadratic_fit_with_errors_' + gpu + '.png', format='png')
 plt.close()
 
 # # Plot Conv2D
@@ -163,18 +164,33 @@ plt.close()
 # Prepare data for Linear
 macs_linear, item3_linear = prepare_data(linear_list)
 
+item3_errors= [] 
+for item in linear_list:
+    if item[3] > 0:
+        item3_errors.append(item[4])
+
+item3_errors = np.array(item3_errors)
+
+# Define the upper limits for x and y
+y_limit = 30  # Example: 1,000 for Item[3]
+
 
 # Plot Linear
-plt.figure(figsize=(20, 10), dpi = 150)
-plt.scatter(macs_linear, item3_linear, marker='o', s=14, label='Linear Item[3]', color='orange')
-plt.title('Linear Energy vs MACs (Log-Log Scale)')
+plt.figure(figsize=(6, 6))
+plt.errorbar(macs_linear, item3_linear, yerr=item3_errors, fmt='.', 
+             markersize=8, label='Linear Energy in mJ', color='k', alpha=0.7, 
+             capsize=5)  # Adding error bars
+#plt.scatter(macs_linear, item3_linear, marker='o', s=14, label='Linear Item[3]', color='orange')
+plt.title('Linear Energy vs MACs '+gpu)
 plt.xlabel('MACs (Log Scale)')
-plt.ylabel('Item[3] (Log Scale)')
+plt.ylabel('Energy in mJ')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.yscale('log')  # Set y-axis to logarithmic scale
+plt.ylim(0, y_limit)  # Set the upper limit for y-axis
 plt.grid()
 plt.legend()
-plt.savefig('plots/linear_item3_vs_macs_loglog'+"_"+ gpu +'.png')
+plt.savefig('plots/linear_energy_vs_macs'+"_"+ gpu +'.png')
+plt.savefig('plots/linear_energy_vs_macs'+"_"+ gpu +'.pdf', format = 'pdf')
 plt.close()
 
 
@@ -206,22 +222,31 @@ plt.close()
 
 bn2_energy = []
 bn2_cxwxh = []
+bn2_error = []
 for item in batchnorm2d_list:
-    bn2_energy.append(item[3])
+    bn2_energy.append(np.abs(item[3]))
     bn2_cxwxh.append(2*item[1][1]+4*item[1][1]*item[1][2]*item[1][3])
+    bn2_error.append(np.abs(item[4]))
 
+
+y_limit = 25
 
 # Plot the filtered data
-plt.figure(figsize=(20, 10), dpi=150)
-plt.scatter(bn2_cxwxh, bn2_energy, marker='o', s=14, label='BatchNorm2D Energe CxHxW', color='purple')
+plt.figure(figsize=(6, 6))
+plt.errorbar(bn2_cxwxh, bn2_energy, yerr=bn2_error, fmt='.', 
+             markersize=8, label='BatchNorm2D FLOPs Energy', color='purple', alpha=0.7, 
+             capsize=5)
+#plt.scatter(bn2_cxwxh, bn2_energy, marker='o', s=14, label='BatchNorm2D Energe CxHxW', color='purple')
 plt.title('BatchNorm2D FLOPs Energy')
-plt.xlabel('FLOPs (Log Scale)')
+plt.xlabel('FLOPs')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.yscale('log')  # Set y-axis to logarithmic scale if needed
+plt.ylim(0, y_limit)
 plt.grid()
 plt.legend()
 plt.savefig('plots/batchnorm2d_energy_FLOPs'+"_"+ gpu +'.png')
+plt.savefig('plots/batchnorm2d_energy_FLOPs'+"_"+ gpu +'.pdf', format = 'pdf')
 plt.close()
 
 
@@ -229,8 +254,10 @@ plt.close()
 
 relu_energy = []
 relu_cxwxh = []
+relu_error = []
 for item in relu_list:
     relu_energy.append(item[3])
+    relu_error.append(np.abs(item[4]))
     if len(item[1])<4:
         relu_cxwxh.append(item[1][1])
     else:
@@ -238,16 +265,20 @@ for item in relu_list:
 
 
 # Plot the filtered data
-plt.figure(figsize=(20, 10), dpi=150)
-plt.scatter(relu_cxwxh, relu_energy, marker='o', s=14, label='ReLU Energe FLOPs', color='limegreen')
+plt.figure(figsize=(6, 6))
+plt.errorbar(relu_cxwxh, relu_energy, yerr=relu_error, fmt='.', 
+             markersize=8, label='ReLU Energe FLOPs', color='limegreen', alpha=0.7, 
+             capsize=5)
+#plt.scatter(relu_cxwxh, relu_energy, marker='o', s=14, label='ReLU Energe FLOPs', color='limegreen')
 plt.title('RELU FLOPs Energy')
-plt.xlabel('FLOPs (Log Scale)')
+plt.xlabel('FLOPs')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.yscale('log')  # Set y-axis to logarithmic scale if needed
 plt.grid()
 plt.legend()
 plt.savefig('plots/relu_energy_FLOPs'+"_"+ gpu +'.png')
+plt.savefig('plots/relu_energy_FLOPs'+"_"+ gpu +'.pdf', format = 'pdf')
 plt.close()
 
 
@@ -256,8 +287,10 @@ plt.close()
 
 adavpool2d_energy = []
 adavpool2d_flops = []
+adavpool2d_error = []
 for item in adaptiveavgpool2d_list:
     adavpool2d_energy.append(item[3])
+    adavpool2d_error.append(np.abs(item[4]))
     if isinstance(item[0].output_size, int):
         adavpool2d_flops.append(item[0].output_size*item[1][1]*item[1][2]*item[1][3])
     else:
@@ -265,15 +298,20 @@ for item in adaptiveavgpool2d_list:
 
 
 # Plot the filtered data
-plt.figure(figsize=(20, 10), dpi=150)
-plt.scatter(relu_cxwxh, relu_energy, marker='o', s=14, label='adaptiveavgpool2d Energe FLOPs', color='red')
-plt.title('adaptiveavgpool2d FLOPs Energy')
-plt.xlabel('FLOPs (Log Scale)')
+plt.figure(figsize=(6, 6))
+plt.errorbar(adavpool2d_flops, adavpool2d_energy, yerr=adavpool2d_error, fmt='.', 
+             markersize=8, label='adaptiveavgpool2d Energy FLOPs', color='red', alpha=0.7, 
+             capsize=5)
+#plt.scatter(relu_cxwxh, relu_energy, marker='o', s=14, label='adaptiveavgpool2d Energe FLOPs', color='red')
+plt.title('adaptiveavgpool2d FLOPs Energy '+gpu)
+plt.xlabel('FLOPs')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
+plt.ylim(0, 5)
 plt.grid()
 plt.legend()
 plt.savefig('plots/adaptiveavgpool2d_energy_FLOPs'+"_"+ gpu +'.png')
+plt.savefig('plots/adaptiveavgpool2d_energy_FLOPs'+"_"+ gpu +'.pdf', format = 'pdf')
 plt.close()
 
 
