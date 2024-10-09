@@ -6,7 +6,7 @@ import pickle
 import math
 
 # Load the saved .pt file
-dataset = torch.load('dataset_history/dataset_20240918_145846.pt', map_location=torch.device('cpu'))
+dataset = torch.load('dataset_history_A30/dataset_20241009_053805.pt', map_location=torch.device('cpu'))
 
 print("#########################################")
 
@@ -22,24 +22,39 @@ print("type of datase_list", type(dataset_list))
 print("tye of dataset list entries", type(dataset_list[0]))
 print(dataset_list[0])
 
-
-
-for entry in os.listdir('./../measurements'):
-    with open('./../measurements/' + entry + '/summary.yml', 'r') as file:
+for entry in os.listdir('./../measurements/A30'):
+    with open('./../measurements/A30/' + entry + '/summary.yml', 'r') as file:
         config = yaml.safe_load(file)
 
     config['input_size'] = tuple(config['input_size'])
 
-    # Dynamically create variables
-    for key, value in config.items():
-        globals()[key] = value
+    # # Dynamically create variables
+    # for key, value in config.items():
+    #     globals()[key] = value
         
-    tuple_str = "_".join(map(str, input_size))
-    filename = f"{model_name}_{tuple_str}.pkl.xz"
+    tuple_str = "_".join(map(str, config['input_size']))
+    filename = f"{config['model_name']}_{tuple_str}.pkl.xz"
 
 
-    with lzma.open('./../measurements/' + entry + '/' + filename + '_filtered') as file_:
+    with lzma.open('./../measurements/A30/' + entry + '/' + filename + '_filtered') as file_:
         saved_dict = pickle.load(file_)
+
+# for entry in os.listdir('./../measurements'):
+#     with open('./../measurements/' + entry + '/summary.yml', 'r') as file:
+#         config = yaml.safe_load(file)
+
+#     config['input_size'] = tuple(config['input_size'])
+
+#     # Dynamically create variables
+#     for key, value in config.items():
+#         globals()[key] = value
+        
+#     tuple_str = "_".join(map(str, input_size))
+#     filename = f"{model_name}_{tuple_str}.pkl.xz"
+
+
+#     with lzma.open('./../measurements/' + entry + '/' + filename + '_filtered') as file_:
+#         saved_dict = pickle.load(file_)
     
 
     list_attemps = list(saved_dict.items())
@@ -51,7 +66,7 @@ for entry in os.listdir('./../measurements'):
     # working_list = []
 
 
-    print(model_name)
+    print(config['model_name'], config['input_size'])
 
     # print(list_attemps[0][1][0])
     # print(list_attemps[0][1][1])
