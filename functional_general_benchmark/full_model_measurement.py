@@ -58,9 +58,10 @@ for entry in os.listdir('./../measurements/A30'):
     warmup_start_time = time.time()
 
     # Warmup iterations, to avoid measuring the cold start of the gpu
-    for i in range(math.ceil(iterations/4)):       
-        # Apply the convolution operation
-        output = model(ifmap)
+    with torch.no_grad():
+        for i in range(math.ceil(iterations/4)):       
+            # Apply the convolution operation
+            output = model(ifmap)
 
     warmup_stop_time = time.time()
 
@@ -87,9 +88,10 @@ for entry in os.listdir('./../measurements/A30'):
 
 
     # Run the convolution operation in a loop, accessing layers linearly
-    for i in range(required_iterations):
-        # Apply the convolution operation
-        output = model(ifmap)
+    with torch.no_grad():
+        for i in range(required_iterations):
+            # Apply the convolution operation
+            output = model(ifmap)
 
     # Stop the timer
     end_time = time.time()
