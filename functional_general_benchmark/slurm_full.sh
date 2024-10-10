@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #SBATCH --partition=all
-#SBATCH --job-name=full_model_A30
-#SBATCH --output=dataset_history_A30/full_model_measurements_A30.txt
+#SBATCH --job-name=full_model_RTX2080TI
+#SBATCH --output=dataset_history_RTX2080TI/full_model_measurements_RTX2080TI.txt
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:A30:1
+#SBATCH --gres=gpu:RTX2080TI:1
 
 
 

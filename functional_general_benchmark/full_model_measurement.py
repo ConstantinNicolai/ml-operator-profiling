@@ -33,8 +33,8 @@ done
 """
 
 
-for entry in os.listdir('./../measurements/A30'):
-    with open('./../measurements/A30/' + entry + '/summary.yml', 'r') as file:
+for entry in os.listdir('./../measurements/RTX2080TI'):
+    with open('./../measurements/RTX2080TI/' + entry + '/summary.yml', 'r') as file:
         config = yaml.safe_load(file)
 
 # for entry in os.listdir('./../measurements'):
@@ -75,7 +75,7 @@ for entry in os.listdir('./../measurements/A30'):
 
     # Create the startup command string with parameters
     startup = f"""
-    nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits > current_temp_full_A30.log &
+    nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits > current_temp_full_RTX2080TI.log &
     """
 
 
@@ -103,7 +103,7 @@ for entry in os.listdir('./../measurements/A30'):
     total_time = end_time - start_time
     # print(f"Total time for {required_iterations} iterations: {total_time:.4f} seconds")
 
-    iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule, total_energy_joules_error, energy_per_iteration_in_milli_joule_error = process_log_file('current_temp_full_A30.log', required_iterations)
+    iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule, total_energy_joules_error, energy_per_iteration_in_milli_joule_error = process_log_file('current_temp_full_RTX2080TI.log', required_iterations)
 
     print(1000*time_per_iteration, "[ms]", energy_per_iteration_in_milli_joule, "mJ", energy_per_iteration_in_milli_joule_error, "mJ")
 
