@@ -1,0 +1,415 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{array}
+\usepackage{subcaption} 
+\usepackage{smartdiagram}
+\usepackage{natbib}
+\usepackage{url}
+
+\usepackage{hyperref}
+%\usepackage{breakurl}
+\usepackage{xurl}
+
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+
+
+
+
+
+\begin{document}
+
+\title{PyTorch Operator Database}
+
+\author{\IEEEauthorblockN{Constantin Nicolai}
+Heidelberg, Germany \\
+constantin.nicolai@stud.uni-heidelberg.de}
+
+
+\maketitle
+
+\begin{abstract}
+With DNA sequencing at the heart of bioinformatics, the plurality of sequencing platforms and secondary analysis platforms has created an intricate network that can be hard to navigate for newcomers. To close this gap this report aims to provide a comprehensive introduction into the computational side of this field by giving a short introduction into sequencing techniques and then highlighting the most prevalent platforms and tools for sequence analysis. \\
+The report concludes with some qualitative comparisons and some food for thought concerning the future interplay of sequencing and computational analysis.
+\end{abstract}
+
+\begin{IEEEkeywords}
+secondary analysis dna, aligners, bwa-mem, gatk, parabricks, dragen, dragen-gatk
+\end{IEEEkeywords}
+
+\section{Introduction}
+This report aims to provide a reasonable overview of the most significant computing platforms in bio informatics to its reader. Due to format constraints it will be limited to DNA and RNA sequencing, which play a central role in bio informatics. 
+
+
+\subsection{Practical Scope}
+
+
+The general idea of what we are trying to achieve in this practical is to build up a database. This database is supposed to contain various machine learning operators and their corresponding execution time and power consumption. \\
+To be more precise, we are going to be studying operators within the PyTorch framework. Many of these operators have a few parameters that can be set differently depending on where they are used within a model. One such parameter is for example simply the number of in\_features and out\_features for a linear layer. In many cases these parameters can determine, or at least have a significant impact on the computational intensity of the operator. Therefore we will study each operator with its corresponding parameter setting individually. Furthermore, there are operators, which, for the same parameter settings, can ingest different sizes of input feature maps. One such example would be a Conv2d layer. Looking at this example we can see that the size of the input feature map can also be a strong influence on the computational intensity on the operator using this input. Therefore we also need to study each size of input feature map for a tuple of operator and parameters individually as well. \\
+Going through all of this we end up studying entities made up of operator, parameters and input size, hereinafter called operator tuples.  \\
+
+
+
+
+\subsection{Measurement Utility}
+There were multiple options available to choose from, in deciding which measurement utility to use to read out the power consumption of the Nvidia GPUs. While some seemed more fancy than plain nvidia-smi, we still settled on this one, because its interface seemed to most parsable and we could directly set the measurement frequency as high as supported by the hardware, while still getting back simple timestamps for each measurement allowing for a countercheck of that set frequency. 
+
+
+\section{Prove of Concept}
+
+\subsection{Approach}
+One advantage of the framework we are working in is, that it is rather easy to measure execution time and power consumption for whole models, especially since we can use a very similar measurement pipeline to the one used for operator tuples. This allows for a readily available sanity check for the general viability of our measurement approach. To do this we simply measure our execution time and power consumption for the most computationally intensive operator, in all the operator tuples it appears in, within a certain model and add these results up. Then we can compare them to the results for running the full model. Assuming we haven’t introduced a large overhead for the individual operator tuples benchmarked, we should expect to find a smaller runtime and power consumption for the summed up results than for the full model, since they do not contain all operators which are present in the model. Given that we have opted for the most computationally intensive operator and chosen a model that is mostly made up of the operator we should also not expect an orders of magnitude smaller result then for the full model. 
+
+\subsection{Methodology}
+The general idea for how to perform these measurements is, to have power consumption logging running continuously in the background while performing a benchmarking loop. This means the operator tuple is executed N times and the logging runs for that amount of time. Knowing the number or iterations N and having the log, it is possible to extrapolate the execution time and power consumption per iteration, ergo per operator tuple. \\
+In order to minimize the introduced errors a couple of measures were taken. In order to have the logging start as closely before the benchmark starts, it is called from within the python script performing the benchmark. Even then though, this call takes some time and leads to some non-representative behavior for continuous benchmarking in the first few lines of the measurement log. We will call this a startup effect for the measurement, similar effects can also be observed for the shutdown of said measurement. Two measures are taken to combat these effects. The first is a warm up run, simply running a considerable number of benchmark iterations before starting the measurement to get closer to a continuous measurement. The second is to ensure that each benchmark run, runs for 30s, not prohibitively long, when we want to measure many operators tuples, but also long enough to push the couple of milliseconds startup and shutdown effect into a realm of insignificance.
+
+\subsection{Experiment}
+The model chosen for this experiment is the ResNet34 with an input size of (3, 56, 36), and the operator in question is Conv2d. In order to measure what is needed to be summed up later it was necessary to find out how many individual operator tuples there are in a Resnet34 with and input size of (3, 56, 56), and how many occurrences of each individual one. With this information there is a basis to know which operator tuples need to be measured and how they need to be summed up later, more specifically how often each operator tuple counts towards the total runtime and power consumption. \\
+The first approach taken towards finding this information was to learn the operator and parameters present in the model from printing the model object in PyTorch. Unfortunately, while this does indeed yield the desired operator and parameters, it does nothing to help find the input sizes for each operator tuple. Furthermore it also only yields them in string form since they are being printed.  In the search for a tool to provide the input sizes, we used torchprofilingutils from Kevin Stehle, which was able to provide the input sizes that were needed. This way all the information needed was available and the measurements could commence. 
+
+\subsection{Results}
+Fortunately the results came in about where we would expect them. We measured 1375 mJ for the full model and ~ 1000 mJ for the sum of all Conv2d operator tuples according to their number of occurrences.
+This appears to be a promising prove of concept for the measurement approach and a good motivation for building out a more general measurement pipeline in order to build up the database on a larger scale of different models with their respective operator tuples. 
+
+\section{General Pipeline}
+
+\subsection{Scope}
+Moving on from the prove of concept onto towards a pipeline which can build up an actually useful dataset we need to broaden our scope enough to get the results we are trying to find, but not so much, that we keep on building a dataset until the end of time. 
+To set that outer boundary, we will be focusing on the models included in PyTorch Torchvision. The main challenge in this transition will be to rebuild our pipeline in a sufficiently operator agnostic way. The tasks it will have to be able to perform are as follows. \\
+In order to know which operator tuples we will want to profile, we need to extract all unique operator tuples from the models and track how often each one occurs per model. Since, at the present time, we don’t have a way to quantify the measurement overhead on an operator basis, our best bet is to focus on operators we know to have a significant impact on the computational and memory intensity of our models. This leads us into the filtering we are applying. After collecting all operator tuples occurring in a model, we filter this list for a set of human defined operators we want to take into consideration. These are the only ones actually taken into account for the remained of the pipeline. In theory, we can then iteratively add more and more operators to our selection, until we hit a sufficient prediction accuracy for the full model runtime and power consumption.  This way we avoid taking into account operators of negligible impact which otherwise may both overly complicate our analysis and maybe even negatively impact our prediction accuracy in case measurement overhead starts to dominate the actual operator computational costs. 
+
+\subsection{Preparation Pipeline Blocks}
+The task of extracting all unique operator tuples is achieved by two python scripts, aptly named general\_pipeline\_block0.py and general\_pipeline\_block1.py. \\
+The definition of which models, with which given input sizes are to be measured is implemented in a configuration as code style through per model configuration files in the “measurements” directory. In the first script these are read and the model and input tensor are defined according though them. A forward hook is registered to each layer which represents a leaf of the model tree, which is to say each actual layer, which is no longer made up of lower level layers. This forward hook ensures that the layer and its input size are stored to a defaultdict in order to find and all unique layers and count them on a per model basis. To ensure a similar layer and input size combination do not create a different operator tuple due to different weights or a different object id, a few of the layers attributes are compared to check whether the same operator tuple has already occurred. If that is the case, it is replaced, by the layer already present in the dict, which then in turn leads to the defaultdict counting another occurrence. The resulting dict is then pickled and stored.
+general\_pipeline\_block1.py then loads this dict and filters it according to a white list of operators defined within this script. The filtered list is then once again pickled and stored. At that point all the ingredients to start the actual profiling measurements are ready. \\
+Up to this point the pipeline is still hardware agnostic, though some configuration files and result directories may be replicated for different target hardware.
+
+\subsection{Benchmark Pipeline Block}
+The last and most important script is called general\_pipeline\_block2.py. It loads the filtered dict and goes through the operator tuples one by one. For each one it and runs the whole benchmark procedure including warmup before and evaluation of the data afterwards. The results of this evaluation are then stored in the database file. After a successful benchmark of all operator tuples from a single model, a “done” flag within the configuration file of said model is set to “true”. Due to this mechanism the configuration files work on a per hardware basis and are replicated for each target. \\
+In order to have a general sanity check, there is another script called “full\_model\_measurement.py”. This uses the configuration files to run the same benchmark routine on the full models. The results produced with this can then be compared with the output of the last important script. This last one uses both the pickled dicts which contain the information of how often each operator tuple occurs per model, as well as the database, to sum up both runtime and power consumption from the individual operator tuple measurements for a whole model. These results can then be compared to the full model measurements.
+
+
+\section{Results}
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{conv2d_energy_vs_macs_ransac_quadratic_fit_with_errors_A30.pdf}
+    \caption{The logo of the Genome Analysis Toolkit.}
+    \label{fig:your_label}
+    \includegraphics[width=0.5\textwidth]{linear_energy_vs_macs_A30.pdf}
+    \caption{The logo of the Genome Analysis Toolkit.}
+    \label{fig:your_label}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{batchnorm2d_energy_FLOPs_A30.pdf}
+    \caption{The logo of the Genome Analysis Toolkit.}
+    \label{fig:your_label}
+    \includegraphics[width=0.5\textwidth]{relu_energy_FLOPs_A30.pdf}
+    \caption{The logo of the Genome Analysis Toolkit.}
+    \label{fig:your_label}
+\end{figure}
+
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{adaptiveavgpool2d_energy_FLOPs_A30.pdf}
+    \caption{The logo of the Genome Analysis Toolkit.}
+    \label{fig:your_label}
+\end{figure}
+
+
+
+
+\section{THE END OF MY CURRENT WORK THE REST IS TEMPLATE}
+
+\subsection{File Types}
+In order to understand some of the latter namings within certain tools there is a short overview of file types in secondary analysis provided. Sequencing data mostly enters our pipeline in FASTQ format, which is raw sequence data with quality scores attached. Sometimes it is also in FAST5 format, which is raw signal data from nanopores. After alignment we get a binary alignment map in the BAM format. This is ingested by our variant caller which itself then outputs variant call format VCF. \\
+
+
+
+
+\smartdiagramset{
+    uniform color list=black!60 for 5 items,
+    back arrow disabled=true,
+    module minimum width=2cm,
+    module minimum height=1cm,
+    text width=1.8cm,
+    module x sep=2.4cm, % Adjust horizontal space between modules
+}
+    
+\begin{figure}
+    \centering
+    \smartdiagram[flow diagram]{
+    Raw data, Quality control, Alignment/ Mapping, Variant calling, Variant annotation
+    }
+    \smartdiagram[flow diagram]{
+        FASTQ, FASTQC, BWA-MEM, GATK, Variant Annotator
+    }
+    \caption{The gold standard open-source pipeline for secondary analysis in DNA sequencing. On the left are the abstract steps and on the right there are the most common open-source tools.}
+    \label{fig:enter-label}
+\end{figure}
+
+\section{Aligners}
+
+\subsection{Burrows-Wheeler Transform}
+The Burrows-Wheeler transform consists of two sub-algorithms. One for compression and one for decompression. Let us take a look at the compression algorithm first. It takes a string $S$ of $N$ characters from an ordered alphabet of $X$ characters. Now we write down all cyclic shifts below one another which results in an $N \cdot N$ matrix. We sort the rows of this matrix lexicographically, according to the ordering of our given alphabet of $X$ characters. \\
+Looking at the columns of our newly sorted matrix, this ordering results in a clustering of similar characters in the right-most column because the ordering of all other columns takes precedence in lexicographic ordering. Now this column is still $N$ characters long, but since we achieved clustering of similar characters these can be compressed now. This column is also the Burrows-Wheeler transform (BWT)\cite{burrows1994blocksorting}.
+
+
+\vspace{0.5cm}
+
+\begin{center}
+
+\begin{tabular}{|p{2.5cm}|}
+  \hline
+  Cyclic Rot. \\
+  \hline
+  \begin{tabular}{c}
+$banana\$ $\\
+$anana\$b $\\
+$nana\$ba $\\
+$ana\$ban $\\
+$na\$bana $\\
+$a\$banan  $\\
+$\$banana $\\
+  \end{tabular} \\
+  \hline
+\end{tabular}
+\hspace{1cm} % Adjust the horizontal space between tables
+\begin{tabular}{|p{2.5cm}|}
+  \hline
+  Lex. Ordered \\
+  \hline
+  \begin{tabular}{c}
+$ \$banana $\\
+$ a\$banan $\\
+$ ana\$ban $\\
+$ anana\$b $\\
+$ banana\$ $\\
+$ na\$bana $\\
+$ nana\$ba $\\
+  \end{tabular} \\
+  \hline
+\end{tabular}
+    
+\end{center}
+\vspace{0.5cm}
+The resulting Burrows-Wheeler transform is $ annb\$aa $. The decompression algorithm brings us back from the BWT to our original string. If we only take the characters from out BWT in lexicographic order as our left-most column and our BWT as our right-most column we can reconstruct it. We index each character in both columns individually for each character. Now we start at our termination character $ \$_{0} $ in the right-most column. We know the character after it has to be the one at the start cyclically. Then we look for that character in the right-most column and learn the next character after it. We repeat this until the string is completely reconstructed and it only took us linear time\cite{burrows1994blocksorting}. \\
+
+
+
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tabular}{|p{2.5cm}|}
+  \hline
+  Decompr. Start \\
+  \hline
+  \begin{tabular}{c}
+$ \$_{0}     \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore a_{0} $\\
+$ a_{0}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore n_{0} $\\
+$ a_{1}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore n_{1} $\\
+$ a_{2}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore b_{0} $\\
+$ b_{0}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore \$_{0} $\\
+$ n_{0}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore a_{1} $\\
+$ n_{1}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore a_{2} $\\
+  \end{tabular} \\
+  \hline
+\end{tabular}
+\hspace{1cm} % Adjust the horizontal space between tables
+\begin{tabular}{|p{2.5cm}|}
+  \hline
+  Decompr. Result \\
+  \hline
+  \begin{tabular}{c}
+$ \$_{0} b_{0} a_{2} n_{1} a_{1} n_{0}  a_{0} $\\
+$ a_{0}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore n_{0} $\\
+$ a_{1}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore n_{1} $\\
+$ a_{2}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore b_{0} $\\
+$ b_{0}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore \$_{0} $\\
+$ n_{0}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore a_{1} $\\
+$ n_{1}      \textunderscore\textunderscore\textunderscore\textunderscore\textunderscore a_{2} $\\
+  \end{tabular} \\
+  \hline
+\end{tabular}
+    
+\end{center}
+
+\vspace{0.5cm}
+
+
+
+
+\subsection{Burrows-Wheeler Aligner}
+
+The original Burrows-Wheeler-Aligner was introduced in the spring of 2009. BWA uses backward search with BWT to mimic the top-down traversal on the prefix trie of the genome. This allows it to count the number of exact hits for a string of length $N$ in linear time independent of the size of the genome. Since their algorithm would require a huge amount of memory otherwise, only fractions of the arrays are held in memory while the rest is calculated on the fly\cite{li_fast_2009}. \\
+In addition all BWT-based aligners support multi-threading which makes them a far more interesting platform in terms of scalability. 
+
+\subsection{BWA-MEM}
+
+In the summer of 2013 BWA-MEM superseded BWA. While next-generation sequencing data had historically been about 36 base pairs in read length, improvements has brought the read length up to 100 base pairs and more. And while the fundamental limitations that limit NGS read length are still in place and third generation produces much longer reads, this increase still impacted BWA, since an alignment that requires every base to be exactly aligned to a reference one (end-to-end alignment) became less and less feasible with increasing read length. This is where BWA-MEM came into the picture. And while it is neither the only aligner in use nor the only good one, it is the standard in the Genome Analysis Toolkit (GATK), which makes it very commonplace\cite{li_aligning_2013}\cite{noauthor_technical_nodate}. 
+
+\subsection{Architecture aware BWA-MEM }
+And with BWA-MEM being such a staple in the community developers are continuously working on improvements. But while smaller and smaller improvements of the algorithms and sub kernels themselves are still happening, the majority of improvements and speed-up are achieved by architecture and platform specific improvements and tuning. \\
+A 2019 publication by Vasimuddin et al. succeeded in speeding BWA-MEM up by 3.5x and 2.4x for single thread and single socket respectively on an Intel Skylake processor.\\
+There is also a CUDA accelerated version on BWA-MEM in Nvidias Clara Parabricks platform although there is no reliable open benchmark data available for BWA-MEM alone so a direct comparison is not feasible at this point. \\
+And when moving from GPUs to FPGAs there is DRAGMAP by Illumina, which runs on their proprietary FPGA-accelerated platform. This mapper is however no longer based on BWA-MEM. With the collaboration between the Broad Institute and Illumina DRAGEN that resulted in DRAGEN-GATK which will be mentioned later now also came a new genome mapper to the open-source world, since Illumina decided to rewrite DRAGMAP for CPU and publish it under a GPLv3 licence as a part of this collaboration. This mapper lags behind BWA-MEM in performance a little bit, but offer slightly better accuracy in return. \\
+
+
+\subsection{STAR}
+STAR which stand for spliced transcripts alignment to a reference is an RNA sequencing data aligner which employs an algorithm using sequential maximum mappable seed search in uncompressed suffix arrays followed by seed clustering and a stitching procedure. \\
+It is implemented at standalone C++ code and is available as open-source code under the GPLv3 license. It is well liked due to its multi-threading support and respectable speed, while maintaining compatibility with data generated form a plurality of sequencing platforms. It is one of the most widely adopted RNA sequencing aligners\cite{dobin_star_2013}. \\
+
+
+\subsection{Aligners Overview}
+Looking at the aligners we have already seen let us take a step back and summarize which ones we have and what their respective niches are. The three big ones we want to keep in mind in this report are BWA-MEM, DRAGMAP, and STAR, although there are also others that are very successful and provide good and reliable results. Our honorable mentions therefore are: Bowtie2, which is used for short read alignment and known for its speed, HISAT2 that was developed for RNA sequencing data and employs a graph based FM index and Minimap2 which can deal with both short read and long read data and is commonly used as the aligner of choice for long read length sequencing data from third generation sequencing platforms such as Oxford Nanopore or PacBio. \\
+But getting back to the ones we are interested in here, we have already looked at the development history of BWA-MEM, and it is a popular aligner even today. It has been the recommended aligner in GATK's best practices for many years by now and has only recently been superseded in that position by the newly open-sourced version of DRAGMAP which can provide slightly better accuracy. DRAGMAP itself is best known as Illumina DRAGEN's proprietary, very fast, FPGA-accelerated in house aligner, but is now also available on any other platform thanks to the later explained collaboration between GATK and DRAGEN, though it will not reach similar performance to the FPGA version. \\
+STAR appears to be the gold standard choice for RNA sequence alignment, at least outside Illumina's DRAGEN ecosystem, which has its own RNA sequencing pipeline the aptly named DRAGEN RNA-Seq spliced aligner. 
+
+\section{Computing Platforms}
+
+\subsection{Platform Performance comparison}
+
+Although step by step performance comparisons are hard to come by for integrated platforms such as Nvidia Parabricks and Illumina Dragen, there are comparisons of whole pipeline run times and running costs available for some cases. These cases tend to show very impressive improvements in both runtime and efficiency. Considering that a well optimized CUDA kernel for a nicely parallelizable task tends to outperform a traditional CPU implementation in both throughput and energy efficiency that does not surprise too much. It is however very difficult to evaluate how much cherry picking if any, is happening for the whole pipeline comparisons. In accordance with the current trend Nvidia Parabricks is also offering machine learning based tools for the variant calling step that bring their own specific advantages and disadvantages in a space that is so closely tied to medicine. \\
+In the following we are going to have a look at three platforms and in doing that we will try to gain some insight into their advantages, drawbacks and niches.
+
+
+
+
+
+\subsection{Genome Analysis Toolkit}
+The Genome Analysis Toolkit (GATK) is an open-source software package developed by the Broad Institute for analysis of high-throughput sequencing data. While it offers a wide variety of tools its primary focus is on genotyping and varient discovery. Since it cannot compete with GPU or FPGA accelerated platforms on speed it has a strong emphasis on data quality assurance. It also is remarkably flexible and can be utilized on a laptop in a single researcher scenario or in a high-performance computing setting running on a supercomputer. \\
+The Broad Institute also operates their own cloud platform for genome analysis called Terra.bio which offers cloud integration with their tool stack and only charges for the computational resources from  Google cloud which it is built upon, but offers free administration and support, since the Broad Institute itself is a non-profit\cite{noauthor_technical_nodate}.
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.3\textwidth]{gatk.png}
+    \caption{The logo of the Genome Analysis Toolkit.}
+    \label{fig:your_label}
+\end{figure}
+
+
+
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\linewidth]{para3.png}
+    \end{subfigure}
+    \hspace{0.1cm} % Adjust the horizontal space between the subfigures
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\linewidth]{para4.png}
+    \end{subfigure}
+    \caption{Overview of all aligners and preprocessing tools included in Nvidia Clara Parabricks. fq2bam is their name for BWA-MEM, STAR is the RNA aligner and MiniMap2 is especially suited for long read length sequencing systems.}
+\end{figure}
+
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\linewidth]{para1.png}
+    \end{subfigure}
+    \hspace{0.1cm} % Adjust the horizontal space between the subfigures
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\linewidth]{para2.png}
+    \end{subfigure}
+    \caption{Overview of all variant callers included in Nvidia Clara Parabricks. Note while there are general ones like deepvariant and haplotypecaller, there are also a few specialized ones like mutectcaller, starfusion and PacBio germaline, which are optimized for a certain application or sequencing system.}
+\end{figure}
+
+
+\subsection{Nvidia Clara Parabricks}
+Nvidia's Clara Parabricks platform is a closed-source software suite for acceleration of genomic analysis on Nvidia GPUs. It is supported on common cloud computing platforms such as Amazon Web Services, Google Cloud, Oracle Cloud Infrastructure and Microsoft Azure. Their software suite encompassed tools for alignment, preprocessing, variant calling, quality checking and GVCF processing. They have adapted many of the industry standard open-source tools and built closed-source CUDA-accelerated versions for Parabricks. A few of these we have already heard of are BWA-MEM, which they call fq2bam, because the input file type is FASTQ and the output file type is BAM (binary alignment map), STAR, our industry standard RNA aligner, haplotypcaller, GATK's default and generally well regarded variant caller, and quite a few other variant callers that are optimized for more specialized applications, such as starfusion for RNA data and mutectcaller for cancer research.\\
+In their blog post regarding the release of Parabricks version 4.0 they announce that the software suite will now be available completely licence-free for research and development. So now theoretically anyone can pull a fitting docker container and run Parabricks at home, provided the hardware and software requirements are met. This means a strong GPU, a generally very high end system and sufficiently recent GPU drivers. For commercial use there will still be a licence required\cite{says_democratizing_2022}. \\
+In their release of version 4.1 they focused of their improvement of their implementation of the DeepVariant variant caller, for which they achieved 35x speedup over some unspecified CPU version, but also more interestingly, a 12x speedup over their previous version in 4.0 on the same two A100 GPUs. They are also increasing their focus on better support for long read length data from third generation sequencing systems, in this case especially from PacBio\cite{noauthor_long-read_2023}.\\
+In independent case report from FormBio that was created in the last two years also shows the Parabricks software suite in a very good light. It describes the comparison of a full alignment and variant calling analysis pipeline, one built on open-source tools, the other one using Parabricks. Although they were running multiple steps in parallel when using the open source tools they still reported 88\% time saving using Parabricks. Additionally they also reported 52\% savings in cost, all while the results were within 3\% of one another, making the variants of comparable sensitivity\cite{cantarel_comparing_nodate}. 
+
+
+
+
+
+
+\smartdiagramset{
+    uniform color list=green!25 for 5 items,
+    back arrow disabled=true,
+    module minimum width=2cm,
+    module minimum height=1cm,
+    text width=1.8cm,
+    module x sep=2.4cm, % Adjust horizontal space between modules
+}
+
+
+\begin{figure}
+    \centering
+    \smartdiagram[flow diagram]{
+    Raw data, Quality control, Alignment/ Mapping, Variant calling, Variant annotation
+    }
+    \smartdiagram[flow diagram]{
+        FASTQ, FASTQC, FQ2BAM, DeepVariant, Variant Annotator
+    }
+    \caption{The standard DNA sequencing pipeline within Nvidia Clara Parabricks, with their CUDA accelerated versions for alignment and variant calling.}
+    \label{fig:enter-label}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{worflow_parabricks.png}
+    \caption{The workflow of the technical report on Parabricks performance with Parabricks.}
+    \label{fig:your_label}
+\end{figure}
+
+
+
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{workflow_opensource.png}
+    \caption{The workflow of the technical report on Parabricks performance with open-source tools.}
+    \label{fig:your_label}
+\end{figure}
+
+
+
+
+\subsection{DRAGEN}
+DRAGEN is a very fast and accurate proprietary secondary analysis platform owned by Illumina. When comparing DRAGEN version 4.2 with either BWA-MEM with GATK or BWA-MEM with Google's Deep Variant we can see that it offers at least 2x to 3x less false negatives and even higher improvements on false positives for single nucleotide polymorphisms and indels. This is an impressive lead in accuracy over these tools, although DRAGMAP could be used for the open-source alignment and might lead to closer results. It is also peculiar that Nvidia's Clara Parabricks is missing from the accuracy comparison graph in Illumina's blog post on the matter. \\
+The sequencing solution Illumina is highlighting in this post is called NovaSeq X Plus. It contains a dual socket system with two AMD EPYC 7552 CPUs and 1.5 TB of main memory. But the star of the show   are the four Xilinx Alveo U250 FPGA accelerator cards. Just one of these cards is listed for over 8.000 dollars on AMD's website at the time of writing. But considering pricing of an Nvidia A100 GPU that they are comparing themselves with at around 20.000 dollars at the time of writing perhaps that is not entirely unreasonable.\\
+In terms of speedup, they claim a 6x speedup over the closest non-DRAGEN competitor, which is an A100 GPU in their graph. That is indeed a respectable speedup and shows off the fruits of their successful development of mapping and variant calling algorithms for their FPGAs. \\
+Like in all other high-performance computing applications we are interested in efficiency, not only for environmental or economical reasons, but also because the power wall is becoming the main limiting factor for further speedup in the data center. In light of these circumstances Illumina has also shown off their energy efficiency advantage where they claim a 8x energy efficiency improvement over their closest non-DRAGEN competitor which in this case are T4 GPU cloud instances. This improvement is a testament to the promise of application specific computing in order to combat the power wall. \\
+Last but not least, Illumina shows a very impressive 60x cost advantage on processing a whole human genome with 30x coverage over their closest non-DRAGEN competitor, in this case again T4 GPU cloud instances. This jump in affordability by one to two orders of magnitude is certainly significant and most likely what cements Illumina's place the market in a rock solid manner\cite{noauthor_inside_nodate}. \\
+Without independent review of their claims it is difficult to judge how credible results they show in this blog post are and how well they generalize to other applications, but since their application example of processing a whole human genome with 30x coverage seems to be a reasonable balance between cost and precision and the study of human genetics is a very large field they do not seems to be entirely off base. \\
+
+
+\subsection{DRAGEN-GATK}
+DRAGEN-GATK is a collection and configuration of exiting tools which aims to combine some of the tools of Dragen with the ease of use and accessibility of GATK. which is known as the open-source industry standard in the space. DRAGEN-GATK itself is open source too, so it does not necessarily have to run on Illumina's proprietary FPGA-accelerated platform. DRAGEN and DRAGEN-GATK are developed on separate code bases, so we cannot expect to get the exact same results, there will always be slight differences in the outputs. The differences in outputs from both platforms should however be statistically indistinguishable from the expected background noise introduced by sample quality, library preparation and similar factors. In light of this functional equivalence it seems fair to say that this is a successful attempt at building a bridge out of and into Illumina's otherwise walled garden. This increased interoperability with the open-source ecosystem should allow for easier collaboration of researchers what work on the Illumona platform and researches that use the GATK tool stack which seems to be a positive outcome\cite{noauthor_dragen_nodate-2}. \\
+
+
+
+\section{Conclusion}
+After having seen the evolution of the BWA-MEM aligner over the years it is clear how much work and effort goes into the tools discussed. A similarly deep development history accompanies all of the algorithms used. \\
+In the pool of platform there are two main trends. Public, non-profit, open-source platforms developed by institutes and universities, and commercial platforms which offer higher integration and performance within a closed-source walled garden ecosystem. The public ones like GATK appear to be more closely intertwined within the academic research community and only projects with bigger funding budgets appear to gravitate towards the commercial offerings. Another sector which uses the commercial offering is the actual application which needs the improved performance and efficiency in less obscure and less cutting edge applications. \\
+In all of this the collaboration of the Broad Institute and Illumina is a very interesting one, because it seems to break up the concept of these two camps and it remains to be seen what this change is going to result in over the next few years. \\
+Another pattern that emerges over and over again is the pattern of application specific tools. In order to achieve the desired and required performance and efficiency the computationally intensive tools within the pipelines need to be tuned to the exact use case. The same goes for accuracy in specific applications, where in order to provide sufficiently useful results some tools of the pipeline are replaced with domain specific ones. \\
+Much like the hardware lottery, the effect that specific highly optimized processors have on which algorithms can flourish since they fit their architecture well enough, favours the success of only certain algorithmic approaches, I suspect we have similar and related effect in this field too. The frankly incredible level of optimization that allows for the reported performance results depends on a large stack of underlying tools and circumstances. For one of the Parabricks pipelines we not only need the tools themselves, we also need versions that are optimized for a specific sequencing technology, short read or long read, and the output format and specific error profiles that come with this implementation. Our tools further down the pipeline then again need to be sufficiently specialized for our application and as if that was not enough barrier to entry, if we want to have computing times that are affordable within our funding we need to have a CUDA accelerated version already provided. \\
+This dependence of such a narrowly branched but very high stack introduces a bias towards fields with more fleshed out support. It thereby favours more research within these fields and sets an incredibly high barrier to entry for different research approaches that try to find an angle off the trodden path. This effect appears to be a systemic one that crops up on almost any sufficiently integrated research field but nevertheless should not be disregarded. \\
+Gazing into the crystal ball of the future of this field, I personally believe that the most interesting developments will come from the intersection of the two rapidly evolving fields of sequencing technology and computational genomics when they succeed in compensating their weak points and amplifying there strong ones and I am exited to see what the future bring. 
+
+
+
+%\bibliographystyle{plain}
+\bibliographystyle{plainurl}
+\bibliography{zot_bioinfo}
+
+
+\end{document}
