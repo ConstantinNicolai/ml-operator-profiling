@@ -45,4 +45,6 @@ measurements/resnet34_32,3,56,56/resnet34_32_3_56_56.pkl.xz_filtered
 
 functional_general_benchmark/plots/
 
+functional_general_benchmark/misc_files/
+
 dataset*
