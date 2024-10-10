@@ -43,17 +43,17 @@ for entry in os.listdir('./../measurements/A30'):
 
     config['input_size'] = tuple(config['input_size'])
 
-    # Dynamically create variables
-    for key, value in config.items():
-        globals()[key] = value
+    # # Dynamically create variables
+    # for key, value in config.items():
+    #     globals()[key] = value
 
-    model = get_model_and_weights(model_name, weights_name)
+    model = get_model_and_weights(config['model_name'], config['weights_name'])
 
     model = model.to(device)
 
-    print(model_name, input_size)
+    print(config['model_name'], config['input_size'])
 
-    ifmap = torch.randn(input_size).cuda()
+    ifmap = torch.randn(config['input_size']).cuda()
 
     warmup_start_time = time.time()
 

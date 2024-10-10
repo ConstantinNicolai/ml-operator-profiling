@@ -14,11 +14,11 @@ eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
 conda activate constabass
 
 
-kill_background_jobs() {
-    for pid in $@; do
-        kill $pid
-    done
-}
+# kill_background_jobs() {
+#     for pid in $@; do
+#         kill $pid
+#     done
+# }
 
 
-srun python3 general_pipeline_block2_RTX2080TI.py
+python3 general_pipeline_block2_RTX2080TI.py
