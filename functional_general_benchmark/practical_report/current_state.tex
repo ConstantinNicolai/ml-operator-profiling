@@ -98,31 +98,92 @@ The last and most important script is called general\_pipeline\_block2.py. It lo
 In order to have a general sanity check, there is another script called “full\_model\_measurement.py”. This uses the configuration files to run the same benchmark routine on the full models. The results produced with this can then be compared with the output of the last important script. This last one uses both the pickled dicts which contain the information of how often each operator tuple occurs per model, as well as the database, to sum up both runtime and power consumption from the individual operator tuple measurements for a whole model. These results can then be compared to the full model measurements.
 
 
-\section{Results}
+\section{Measurement Validation}
+
+\subsection{Hardware Platforms}
+The two hardware platforms studied here are the Nvidia RTX 2080 TI and the Nvidia A30. The Nvidia RTX 2080 TI, furthermore referred to as 2080TI, is based upon the Turing architecture from 2018 and features 4352 CUDA cores and 544 first generation tensor cores with FP16 support. The Nvidia A30, futhermore referred to as A30, is based upon the Ampere architecture form 2020 and features 3584 CUDA cores and 224 second generation tensor cores with TF32 support.\\
+
+\subsection{Validation Method}
+The approach to validating the sensibility of our collected datasets is the same one utilized in the prove of concept. The measured energy for full model runs will be compared to the energy predicted by summing up the individual operators energies. If these predictions result in reasonably close values to the ones measured the validity of the dataset is demonstrated. If this sanity check brings up unexpected results we will dig deeper and figure out the root cause.
+
 
 \begin{figure}
-    \includegraphics[width=0.5\textwidth]{conv2d_energy_vs_macs_ransac_quadratic_fit_with_errors_A30.pdf}
-    \caption{The logo of the Genome Analysis Toolkit.}
-    \label{fig:your_label}
-    \includegraphics[width=0.5\textwidth]{linear_energy_vs_macs_A30.pdf}
-    \caption{The logo of the Genome Analysis Toolkit.}
-    \label{fig:your_label}
+    \includegraphics[width=0.5\textwidth]{comparison_RTX2080TI_small.pdf}
+    \caption{Comparison of measured and predicted energy on the 2080TI. This graph shows the results for smaller energies. This sanity check helps us understand the validity of our measured dataset.}
+    \label{fig:rtx2080tismall}
+    \includegraphics[width=0.5\textwidth]{comparison_RTX2080TI_large.pdf}
+    \caption{Comparison of measured and predicted energy on the 2080TI. This graph shows the results for larger energies. This sanity check helps us understand the validity of our measured dataset.}
+    \label{fig:rtx2080tilarge}
+\end{figure}
+
+\subsection{RTX 2080 TI}
+The results for the 2080TI look very promising. Figure \ref{fig:rtx2080tismall}, Figure \ref{fig:rtx2080tilarge}. Apart from two models with a very low computational intensity all predicted energies lie below the measured ones. While the predictions are not spot on, they do capture the trend very well. Excluding the mentioned two measurements, all predictions lie within 75\% to 100\% of the measured full model energy.
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{comparison_A30_small.pdf}
+    \caption{Comparison of measured and predicted energy on the A30. This graph shows the results for smaller energies. As is obvious from the graph there is some systematic error at play here. Most all predictions are about an order of magnitude to small.}
+    \label{fig:a30small}
+    \includegraphics[width=0.5\textwidth]{comparison_A30_large.pdf}
+    \caption{Comparison of measured and predicted energy on the A30. This graph shows the results for larger energies. As is obvious from the graph there is some systematic error at play here. Most all predictions are about an order of magnitude to small.}
+    \label{fig:a30large}
+\end{figure}
+
+\subsection{A30}
+The results for the A30 on the other hand look very disheartening. Figure \ref{fig:a30small}, Figure \ref{fig:a30large}. Only two to three of the models are yielding any somewhat close predictions. The dominating trend though is that the predictions grossly underestimate the energy costs by at least an order of magnitude. 
+
+\subsection{Hypothesis On The A30s Efficiency Discrepancy}
+All models and benchmarks are running on FP32 input feature maps. The Ampere architecture second generation tensor cores support FP32 by PyTorch automatically converting to TF32 when deemed sensible by the Pytorch backend, which then can be run on these tensor cores. The artificial load of 
+benchmarking a single layer at a time without further model dependencies appears to be especially beneficial for the use of application specific hardware tensor cores. Therefore their performance increase will be significantly more drastic in the operator tuple benchmarks then it is for full model runs.
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{comparison_A30_no_tc_small.pdf}
+    \caption{Comparison of measured and predicted energy on the A30. This graph shows the results for smaller energies. In contrast to the results captured with tensor cores enabled, these are much better predictions. It would seems that our methodology is not suited to predicting tensor core performance.}
+    \label{fig:a30notcsmall}
+    \includegraphics[width=0.5\textwidth]{comparison_A30_no_tc_large.pdf}
+    \caption{Comparison of measured and predicted energy on the A30. This graph shows the results for larger energies. In contrast to the results captured with tensor cores enabled, these are much better predictions. It would seems that our methodology is not suited to predicting tensor core performance.}
+    \label{fig:a30notclarge}
+\end{figure}
+
+\subsection{A30 Tensor Cores Disabled}
+The results for the A30 with its tensor cores disabled look much more promising. Figure \ref{fig:a30notcsmall}, Figure \ref{fig:a30notclarge}. Most predictions lie a little higher than the measured energy, but while the trend observed on the 2080TI is reversed here the results are an order of magnitude more precise then with the tensor cores disabled. All predictions appear to lie within 90\% to 130\%.
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{tc_no_tc_small.pdf}
+    \caption{Comparison of the measured energy with and without the tensor cores enabled on the A30. This graph shows the results for smaller energies. For these smaller model input combinations the performance difference is quite pronounced.}
+    \label{fig:tcnotcsmall}
+    \includegraphics[width=0.5\textwidth]{tc_no_tc_large.pdf}
+    \caption{Comparison of the measured energy with and without the tensor cores enabled on the A30. This graph shows the results for larger energies. With these larger model input combinations the effect of the tensor cores is less pronounced. But the difference does not appear to only depend on the models energy cost. More regular models appear to make better use of the tensor cores than more complex architectures.}
+    \label{fig:tcnotclarge}
+\end{figure}
+
+
+\subsection{Tensor Core Real-World Impact}
+As can be seen in the comparative bar plots, Figure \ref{fig:tcnotcsmall}, Figure \ref{fig:tcnotclarge}, between the measured energy for the models with tensor cores enabled and with them disabled, they do have a significant impact on model performance even in full model inference scenarios. The performance difference is more pronounced for smaller model input combinations and appears to tend towards zero for larger more complex tasks. But the difference does not appear to only depend on the models energy cost. More regular models seem to make better use of the tensor cores than more complex architectures. \\
+In order to keep the scope under control at the current time we will not look into a second pipeline able to predict tensor core performance characteristics but instead move forward with the results from the dataset obtained with disabled tensor cores.
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{conv2d_energy_vs_macs_A30_wo_TC.pdf}
+    \caption{Measured energy plotted against theoretical number of MACs for all Conv2D operator tuples. This is the dataset for the A30 with its tensor cores disabled.}
+    \label{fig:conv2da30notc}
+    \includegraphics[width=0.5\textwidth]{linear_energy_vs_macs_A30_wo_TC.pdf}
+    \caption{Measured energy plotted against theoretical number of FLOPs for all Linear operator tuples. This is the dataset for the A30 with its tensor cores disabled.}
+    \label{fig:lina30notc}
 \end{figure}
 
 \begin{figure}
-    \includegraphics[width=0.5\textwidth]{batchnorm2d_energy_FLOPs_A30.pdf}
-    \caption{The logo of the Genome Analysis Toolkit.}
-    \label{fig:your_label}
-    \includegraphics[width=0.5\textwidth]{relu_energy_FLOPs_A30.pdf}
-    \caption{The logo of the Genome Analysis Toolkit.}
-    \label{fig:your_label}
+    \includegraphics[width=0.5\textwidth]{batchnorm2d_energy_FLOPs_A30_wo_TC.pdf}
+    \caption{Measured energy plotted against theoretical number of FLOPs for all Batchnorm2D operator tuples. This is the dataset for the A30 with its tensor cores disabled.}
+    \label{fig:batchnorm2da30notc}
+    \includegraphics[width=0.5\textwidth]{relu_energy_FLOPs_A30_wo_TC.pdf}
+    \caption{Measured energy plotted against theoretical number of FLOPs for all ReLU operator tuples. This is the dataset for the A30 with its tensor cores disabled.}
+    \label{fig:relua30notc}
 \end{figure}
 
 
 \begin{figure}
-    \includegraphics[width=0.5\textwidth]{adaptiveavgpool2d_energy_FLOPs_A30.pdf}
-    \caption{The logo of the Genome Analysis Toolkit.}
-    \label{fig:your_label}
+    \includegraphics[width=0.5\textwidth]{adaptiveavgpool2d_energy_FLOPs_A30_wo_TC.pdf}
+    \caption{Measured energy plotted against theoretical number of FLOPs for all AdaptiveAvgPool2D operator tuples. This is the dataset for the A30 with its tensor cores disabled.}
+    \label{fig:adavgpool2da30notc}
 \end{figure}
 
 

@@ -17,9 +17,9 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 
 # Load the saved .pt file
-dataset = torch.load('dataset_history_A30/dataset_20241009_053805.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
-gpu = "A30"
-
+dataset = torch.load('dataset_history_A30_no_tc/dataset_20241011_093614.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
+gpu = "A30_wo_TC"
+gpu_title = 'A30 w/o TC'
 
 dataset_list = [list(item) for item in dataset]
 
@@ -106,7 +106,7 @@ for item in conv2d_list:
 
 
 # Define the upper limits for x and y
-y_limit = 20  # Example: 1,000 for Item[3]
+y_limit = 700  # Example: 1,000 for Item[3]
 
 # Assuming macs_conv2d, item3_conv2d, and item3_errors are numpy arrays or lists
 macs_conv2d = np.array(macs_conv2d).reshape(-1, 1)  # Reshaping for sklearn (expects 2D input)
@@ -135,16 +135,16 @@ plt.figure(figsize=(6, 6))
 plt.errorbar(macs_conv2d, item3_conv2d, yerr=item3_errors, fmt='.', 
              markersize=8, label='Conv2D Energy in mJ', color='darkblue', alpha=0.7, 
              capsize=5)  # Adding error bars
-plt.plot(macs_range, ransac_fit_line, color='red', label='RANSAC Quadratic Fit', linewidth=1)  # Adding RANSAC quadratic fit line
-plt.title('Conv2D Energy vs MACs (Quadratic Fit) ' + gpu)
+#plt.plot(macs_range, ransac_fit_line, color='red', label='RANSAC Quadratic Fit', linewidth=1)  # Adding RANSAC quadratic fit line
+plt.title('Conv2D Energy vs MACs ' + gpu_title)
 plt.xlabel('MACs (Log Scale)')
 plt.ylabel('Energy in mJ')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 plt.ylim(0, y_limit)  # Set the upper limit for y-axis
 plt.grid()
 plt.legend()
-plt.savefig('plots/conv2d_energy_vs_macs_ransac_quadratic_fit_with_errors_' + gpu + '.pdf', format='pdf')
-plt.savefig('plots/conv2d_energy_vs_macs_ransac_quadratic_fit_with_errors_' + gpu + '.png', format='png')
+plt.savefig('plots/conv2d_energy_vs_macs_' + gpu + '.pdf', format='pdf')
+plt.savefig('plots/conv2d_energy_vs_macs_' + gpu + '.png', format='png')
 plt.close()
 
 # # Plot Conv2D
@@ -172,7 +172,7 @@ for item in linear_list:
 item3_errors = np.array(item3_errors)
 
 # Define the upper limits for x and y
-y_limit = 30  # Example: 1,000 for Item[3]
+# y_limit = 30  # Example: 1,000 for Item[3]
 
 
 # Plot Linear
@@ -181,12 +181,12 @@ plt.errorbar(macs_linear, item3_linear, yerr=item3_errors, fmt='.',
              markersize=8, label='Linear Energy in mJ', color='k', alpha=0.7, 
              capsize=5)  # Adding error bars
 #plt.scatter(macs_linear, item3_linear, marker='o', s=14, label='Linear Item[3]', color='orange')
-plt.title('Linear Energy vs MACs '+gpu)
+plt.title('Linear Energy vs MACs '+gpu_title)
 plt.xlabel('MACs (Log Scale)')
 plt.ylabel('Energy in mJ')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.yscale('log')  # Set y-axis to logarithmic scale
-plt.ylim(0, y_limit)  # Set the upper limit for y-axis
+# plt.ylim(0, y_limit)  # Set the upper limit for y-axis
 plt.grid()
 plt.legend()
 plt.savefig('plots/linear_energy_vs_macs'+"_"+ gpu +'.png')
@@ -196,12 +196,12 @@ plt.close()
 
 
 # Define the upper limits for x and y
-x_limit = 5e6  # Example: 1,000,000 MACs
-y_limit = 20  # Example: 1,000 for Item[3]
+# x_limit = 5e6  # Example: 1,000,000 MACs
+# y_limit = 20  # Example: 1,000 for Item[3]
 
 # Filter the data to only include points within the specified limits
-filtered_macs = [x for x, y in zip(macs_linear, item3_linear) if x <= x_limit and y <= y_limit]
-filtered_item3 = [y for x, y in zip(macs_linear, item3_linear) if x <= x_limit and y <= y_limit]
+filtered_macs = [x for x, y in zip(macs_linear, item3_linear)] #if x <= x_limit and y <= y_limit]
+filtered_item3 = [y for x, y in zip(macs_linear, item3_linear)] #if x <= x_limit and y <= y_limit]
 
 # Plot the filtered data
 plt.figure(figsize=(20, 10), dpi=150)
@@ -211,8 +211,8 @@ plt.xlabel('MACs (Log Scale)')
 plt.ylabel('Item[3] (Log Scale)')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.yscale('log')  # Set y-axis to logarithmic scale if needed
-plt.xlim(None, x_limit)  # Set the upper limit for x-axis
-plt.ylim(None, y_limit)  # Set the upper limit for y-axis
+# plt.xlim(None, x_limit)  # Set the upper limit for x-axis
+# plt.ylim(None, y_limit)  # Set the upper limit for y-axis
 plt.grid()
 plt.legend()
 plt.savefig('plots/linear_item3_vs_macs_loglog_zoomin'+"_"+ gpu +'.png')
@@ -229,7 +229,7 @@ for item in batchnorm2d_list:
     bn2_error.append(np.abs(item[4]))
 
 
-y_limit = 25
+y_limit = 300
 
 # Plot the filtered data
 plt.figure(figsize=(6, 6))
@@ -237,7 +237,7 @@ plt.errorbar(bn2_cxwxh, bn2_energy, yerr=bn2_error, fmt='.',
              markersize=8, label='BatchNorm2D FLOPs Energy', color='purple', alpha=0.7, 
              capsize=5)
 #plt.scatter(bn2_cxwxh, bn2_energy, marker='o', s=14, label='BatchNorm2D Energe CxHxW', color='purple')
-plt.title('BatchNorm2D FLOPs Energy')
+plt.title('BatchNorm2D FLOPs Energy '+ gpu_title)
 plt.xlabel('FLOPs')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
@@ -270,7 +270,7 @@ plt.errorbar(relu_cxwxh, relu_energy, yerr=relu_error, fmt='.',
              markersize=8, label='ReLU Energe FLOPs', color='limegreen', alpha=0.7, 
              capsize=5)
 #plt.scatter(relu_cxwxh, relu_energy, marker='o', s=14, label='ReLU Energe FLOPs', color='limegreen')
-plt.title('RELU FLOPs Energy')
+plt.title('RELU FLOPs Energy '+ gpu_title)
 plt.xlabel('FLOPs')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
@@ -303,7 +303,7 @@ plt.errorbar(adavpool2d_flops, adavpool2d_energy, yerr=adavpool2d_error, fmt='.'
              markersize=8, label='adaptiveavgpool2d Energy FLOPs', color='red', alpha=0.7, 
              capsize=5)
 #plt.scatter(relu_cxwxh, relu_energy, marker='o', s=14, label='adaptiveavgpool2d Energe FLOPs', color='red')
-plt.title('adaptiveavgpool2d FLOPs Energy '+gpu)
+plt.title('adaptiveavgpool2d FLOPs Energy '+gpu_title)
 plt.xlabel('FLOPs')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
