@@ -3,6 +3,7 @@ import numpy as np
 
 turquoise_color = '#2598be'
 maroon_color = '#BE254D'
+fontsize = 11
 
 
 # Function to read the measurement file
@@ -21,15 +22,15 @@ def read_prediction_file(filename):
     predictions = {}
     with open(filename, 'r') as file:
         lines = file.readlines()
-        for i in range(0, len(lines), 3):  # Every 4 lines form a single entry
+        for i in range(0, len(lines), 4):  # Every 4 lines form a single entry
             model_input_size = lines[i].strip()  # Read the whole line as a key (model + input size)
-            energy_mJ = float(lines[i+2].split()[0])  # The energy value (ignore units)
+            energy_mJ = float(lines[i+3].split()[0])  # The energy value (ignore units)
             predictions[model_input_size] = energy_mJ / 1000  # Convert mJ to J
     return predictions
 
 # Example usage
-measurement_file = 'dataset_history_A30/full_model_measurements_A30.txt'
-prediction_file = 'dataset_history_A30/sum_results_dataset_20241009_053805.txt'
+measurement_file = 'dataset_history_RTX2080TI/full_model_measurements_RTX2080TI.txt'
+prediction_file = 'dataset_history_RTX2080TI/sum_results_dataset_20241010_123823.txt'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_prediction_file(prediction_file)
@@ -65,14 +66,14 @@ if small_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Comparison of Measured and Predicted Energy')
+    ax.set_title(f'Measured and Predicted Energy RTX2080TI', fontsize = fontsize)
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(small_models, rotation=45, ha='right')
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/comparison_A30_small.png', format='png')
-    plt.savefig('plots/comparison_A30_small.pdf', format='pdf')
+    plt.savefig('plots/comparison_RTX2080TI_small.png', format='png')
+    plt.savefig('plots/comparison_RTX2080TI_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values
 if large_indices:
@@ -90,11 +91,11 @@ if large_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Comparison of Measured and Predicted Energy')
+    ax.set_title(f'Measured and Predicted Energy RTX2080TI', fontsize = fontsize)
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(large_models, rotation=45, ha='right')
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/comparison_A30_large.png', format='png')
-    plt.savefig('plots/comparison_A30_large.pdf', format='pdf')
+    plt.savefig('plots/comparison_RTX2080TI_large.png', format='png')
+    plt.savefig('plots/comparison_RTX2080TI_large.pdf', format='pdf')

@@ -6,24 +6,24 @@ import pickle
 import math
 
 # Load the saved .pt file
-dataset = torch.load('dataset_history_RTX2080TI/dataset_20241010_123823.pt', map_location=torch.device('cpu'))
+dataset = torch.load('dataset_history_A30_no_tc/dataset_20241011_093614.pt', map_location=torch.device('cpu'))
 
-print("#########################################")
+# print("#########################################")
 
-print("type of dataset", type(dataset))
-print("tye of dataset entries", type(dataset[0]))
+# print("type of dataset", type(dataset))
+# print("tye of dataset entries", type(dataset[0]))
 
 
 
 
 dataset_list = [list(item) for item in dataset]
 
-print("type of datase_list", type(dataset_list))
-print("tye of dataset list entries", type(dataset_list[0]))
-print(dataset_list[0])
+# print("type of datase_list", type(dataset_list))
+# print("tye of dataset list entries", type(dataset_list[0]))
+# print(dataset_list[0])
 
-for entry in os.listdir('./../measurements/RTX2080TI'):
-    with open('./../measurements/RTX2080TI/' + entry + '/summary.yml', 'r') as file:
+for entry in os.listdir('./../measurements/A30'):
+    with open('./../measurements/A30/' + entry + '/summary.yml', 'r') as file:
         config = yaml.safe_load(file)
 
     config['input_size'] = tuple(config['input_size'])
@@ -38,7 +38,7 @@ for entry in os.listdir('./../measurements/RTX2080TI'):
     print(config['model_name'], config['input_size'])
 
 
-    with lzma.open('./../measurements/RTX2080TI/' + entry + '/' + filename + '_filtered') as file_:
+    with lzma.open('./../measurements/A30/' + entry + '/' + filename + '_filtered') as file_:
         saved_dict = pickle.load(file_)
 
 # for entry in os.listdir('./../measurements'):
