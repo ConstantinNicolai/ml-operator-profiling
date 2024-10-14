@@ -2,7 +2,7 @@
 
 #SBATCH --partition=all
 #SBATCH --job-name=full_model_A30
-#SBATCH --output=dataset_history_A30_no_tc/full_model_measurements_A30_no_tc.txt
+#SBATCH --output=dataset_history_A30/full_model_measurements_A30_std.txt
 #SBATCH --nodes=1 
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:A30:1

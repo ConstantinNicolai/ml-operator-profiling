@@ -17,9 +17,9 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 
 # Load the saved .pt file
-dataset = torch.load('dataset_history_A30_no_tc/dataset_20241011_093614.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
-gpu = "A30_wo_TC"
-gpu_title = 'A30 w/o TC'
+dataset = torch.load('dataset_history_RTX2080TI/dataset_20241010_123823.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
+gpu = "RTX2080TI"
+gpu_title = 'RTX2080TI'
 
 dataset_list = [list(item) for item in dataset]
 

@@ -34,8 +34,8 @@ done
 
 ###########################################################
 #   BE AWARE OF THIS SETTING
-torch.backends.cuda.matmul.allow_tf32 = False
-torch.backends.cudnn.allow_tf32 = False
+# torch.backends.cuda.matmul.allow_tf32 = False
+# torch.backends.cudnn.allow_tf32 = False
 #   PRETTY PLEASE !!!!
 ###########################################################
 
@@ -113,7 +113,7 @@ for entry in os.listdir('./../measurements/A30'):
 
     iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule, total_energy_joules_error, energy_per_iteration_in_milli_joule_error = process_log_file('current_temp_full_A30.log', required_iterations)
 
-    print(1000*time_per_iteration, "[ms]", energy_per_iteration_in_milli_joule, "mJ", energy_per_iteration_in_milli_joule_error, "mJ")
+    print(1000*time_per_iteration, "[ms]", energy_per_iteration_in_milli_joule, "mJ", energy_per_iteration_in_milli_joule_error, "mJ", std_value2)
 
 
 
