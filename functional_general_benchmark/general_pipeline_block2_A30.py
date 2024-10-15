@@ -143,7 +143,7 @@ for entry in os.listdir('./../measurements/A30'):
                 # os.system('head current_temp.log')
 
 
-            DATASET_DIR = "dataset_history_A30_round2/"
+            DATASET_DIR = "dataset_history_A30/"
 
             # Ensure the dataset directory exists
             os.makedirs(DATASET_DIR, exist_ok=True)

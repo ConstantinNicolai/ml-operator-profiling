@@ -136,9 +136,9 @@ for entry in os.listdir('./../measurements/RTX2080TI'):
 
                 iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule, total_energy_joules_error, energy_per_iteration_in_milli_joule_error = process_log_file('current_temp_RTX2080TI.log', required_iterations)
 
-                print(example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule, energy_per_iteration_in_milli_joule_error)
+                print(example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule, energy_per_iteration_in_milli_joule_error, std_value2)
 
-                new_measurements.append((example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule, energy_per_iteration_in_milli_joule_error))
+                new_measurements.append((example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule, energy_per_iteration_in_milli_joule_error, std_value2))
 
                 # os.system('head current_temp.log')
 
