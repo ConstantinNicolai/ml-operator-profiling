@@ -6,7 +6,7 @@ import pickle
 import math
 
 # Load the saved .pt file
-dataset = torch.load('dataset_history_A30_no_tc/dataset_20241011_093614.pt', map_location=torch.device('cpu'))
+dataset = torch.load('datset_history_A30_round2/dataset_20241015_101343.pt', map_location=torch.device('cpu'))
 
 # print("#########################################")
 
@@ -35,7 +35,7 @@ for entry in os.listdir('./../measurements/A30'):
     tuple_str = "_".join(map(str, config['input_size']))
     filename = f"{config['model_name']}_{tuple_str}.pkl.xz"
 
-    print(config['model_name'], config['input_size'])
+    # print(config['model_name'], config['input_size'])
 
 
     with lzma.open('./../measurements/A30/' + entry + '/' + filename + '_filtered') as file_:
