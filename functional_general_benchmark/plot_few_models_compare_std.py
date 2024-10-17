@@ -33,8 +33,8 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'dataset_history_A30/full_model_measurements_few_models.txt'
-prediction_file = 'dataset_history_A30_std/sum_results_dataset_20241014_163602.txt'
+measurement_file = 'dataset_history_A30/full_model_measurements_A30_std.txt'
+prediction_file = 'dataset_history_A30/summed_up_dataset_20241016_092308.txt'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_prediction_file(prediction_file)
@@ -49,8 +49,8 @@ predicted_values = [predictions[key][0] for key in common_keys]
 measured_errors = [measurements[key][1]/1000 for key in common_keys]
 predicted_errors = [predictions[key][1] for key in common_keys]
 
-print(measured_values)
-print(predicted_values)
+# print(measured_values)
+# print(predicted_values)
 
 # Set threshold for splitting the y-axis (you can adjust this based on your data)
 threshold = 5  # Now in Joules (since mJ to J conversion is done)
@@ -70,11 +70,14 @@ if small_indices:
     index = np.arange(len(small_models))
     bar_width = 0.35
 
+    # Define error bar styles
+    error_kw = {'capsize': bar_width * 10}
+
     fig, ax = plt.subplots(figsize=(6, 6))
     # bar1 = ax.bar(index, small_measured, yerr=small_measured_errors , bar_width, label='Measured', color=turquoise_color)
     # bar2 = ax.bar(index + bar_width, small_predicted, yerr=small_predicted_errors, bar_width, label='Summed', color=maroon_color)
-    bar1 = ax.bar(index, small_measured, bar_width, yerr=small_measured_errors, label='Measured', color=turquoise_color)
-    bar2 = ax.bar(index + bar_width, small_predicted, bar_width, yerr=small_predicted_errors, label='Summed', color=maroon_color)
+    bar1 = ax.bar(index, small_measured, bar_width, yerr=small_measured_errors, label='Measured', color=turquoise_color, error_kw=error_kw)
+    bar2 = ax.bar(index + bar_width, small_predicted, bar_width, yerr=small_predicted_errors, label='Summed', color=maroon_color, error_kw=error_kw)
 
     
 
@@ -87,21 +90,33 @@ if small_indices:
     ax.legend()
 
     plt.tight_layout()
+    plt.savefig('plots/FINDANDDELETEME.png', format='png')
     plt.savefig('plots/comparison_A30_std_small.png', format='png')
     plt.savefig('plots/comparison_A30_std_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values
 if large_indices:
+    # large_models = [models[i] for i in large_indices]
+    # large_measured = [measured_values[i] for i in large_indices]
+    # large_predicted = [predicted_values[i] for i in large_indices]
     large_models = [models[i] for i in large_indices]
     large_measured = [measured_values[i] for i in large_indices]
     large_predicted = [predicted_values[i] for i in large_indices]
+    large_measured_errors = [measured_errors[i] for i in large_indices]
+    large_predicted_errors = [predicted_errors[i] for i in large_indices]
 
     index = np.arange(len(large_models))
     bar_width = 0.35
 
+    # Define error bar styles
+    error_kw = {'capsize': bar_width * 17}
+
     fig, ax = plt.subplots(figsize=(6, 6))
-    bar1 = ax.bar(index, large_measured, bar_width, label='Measured', color=turquoise_color)
-    bar2 = ax.bar(index + bar_width, large_predicted, bar_width, label='Summed', color=maroon_color)
+    # bar1 = ax.bar(index, large_measured, bar_width, label='Measured', color=turquoise_color)
+    # bar2 = ax.bar(index + bar_width, large_predicted, bar_width, label='Summed', color=maroon_color)
+    bar1 = ax.bar(index, large_measured, bar_width, yerr=large_measured_errors, label='Measured', color=turquoise_color, error_kw=error_kw)
+    bar2 = ax.bar(index + bar_width, large_predicted, bar_width, yerr=large_predicted_errors, label='Summed', color=maroon_color, error_kw=error_kw)
+
 
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')

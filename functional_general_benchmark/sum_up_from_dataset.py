@@ -6,7 +6,7 @@ import pickle
 import math
 
 # Load the saved .pt file
-dataset = torch.load('datset_history_A30_round2/dataset_20241015_101343.pt', map_location=torch.device('cpu'))
+dataset = torch.load('dataset_history_A30/dataset_20241016_092308.pt', map_location=torch.device('cpu'))
 
 # print("#########################################")
 
@@ -107,6 +107,7 @@ for entry in os.listdir('./../measurements/A30'):
 
     time_sum = 0
     energy_sum = 0
+    energy_error_squared_sum = 0
 
     for item in working_list:
         # print(item)
@@ -114,6 +115,7 @@ for entry in os.listdir('./../measurements/A30'):
         count_of_this_layer = item[1]
         runtime = item[3]
         energy = item[4]
+        energy_error = item[6]
         if math.isnan(runtime) == False:
             time_sum = time_sum + count_of_this_layer * runtime
         else:
@@ -122,7 +124,12 @@ for entry in os.listdir('./../measurements/A30'):
             energy_sum = energy_sum + count_of_this_layer * energy
         else:
             print("encountered nan value in energy, incomplete sum")
+        if math.isnan(energy_error) == False:
+            energy_error_squared_sum = energy_error_squared_sum + count_of_this_layer * energy_error * energy_error
+        else:
+            print("encountered nan value in energy, incomplete sum")
 
     print(1000*time_sum, "[ms]")
     print(energy_sum, "[mJ]")
+    print(math.sqrt(energy_error_squared_sum), '[mJ]')
 

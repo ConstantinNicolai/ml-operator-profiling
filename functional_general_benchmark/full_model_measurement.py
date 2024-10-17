@@ -34,8 +34,8 @@ done
 
 ###########################################################
 #   BE AWARE OF THIS SETTING
-# torch.backends.cuda.matmul.allow_tf32 = False
-# torch.backends.cudnn.allow_tf32 = False
+torch.backends.cuda.matmul.allow_tf32 = False
+torch.backends.cudnn.allow_tf32 = False
 #   PRETTY PLEASE !!!!
 ###########################################################
 

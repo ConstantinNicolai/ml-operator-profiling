@@ -37,7 +37,7 @@ constantin.nicolai@stud.uni-heidelberg.de}
 \maketitle
 
 \begin{abstract}
-With DNA sequencing at the heart of bioinformatics, the plurality of sequencing platforms and secondary analysis platforms has created an intricate network that can be hard to navigate for newcomers. To close this gap this report aims to provide a comprehensive introduction into the computational side of this field by giving a short introduction into sequencing techniques and then highlighting the most prevalent platforms and tools for sequence analysis. \\
+This is stil the abstract form the template, CHANGEME. With DNA sequencing at the heart of bioinformatics, the plurality of sequencing platforms and secondary analysis platforms has created an intricate network that can be hard to navigate for newcomers. To close this gap this report aims to provide a comprehensive introduction into the computational side of this field by giving a short introduction into sequencing techniques and then highlighting the most prevalent platforms and tools for sequence analysis. \\
 The report concludes with some qualitative comparisons and some food for thought concerning the future interplay of sequencing and computational analysis.
 \end{abstract}
 
@@ -46,46 +46,49 @@ secondary analysis dna, aligners, bwa-mem, gatk, parabricks, dragen, dragen-gatk
 \end{IEEEkeywords}
 
 \section{Introduction}
-This report aims to provide a reasonable overview of the most significant computing platforms in bio informatics to its reader. Due to format constraints it will be limited to DNA and RNA sequencing, which play a central role in bio informatics. 
+% This report aims to provide a reasonable overview of the most significant computing platforms in bio informatics to its reader. Due to format constraints it will be limited to DNA and RNA sequencing, which play a central role in bio informatics. 
+Here be dragons
 
 
-\subsection{Practical Scope}
-
-
-The general idea of what we are trying to achieve in this practical is to build up a database. This database is supposed to contain various machine learning operators and their corresponding execution time and power consumption. \\
-To be more precise, we are going to be studying operators within the PyTorch framework. Many of these operators have a few parameters that can be set differently depending on where they are used within a model. One such parameter is for example simply the number of in\_features and out\_features for a linear layer. In many cases these parameters can determine, or at least have a significant impact on the computational intensity of the operator. Therefore we will study each operator with its corresponding parameter setting individually. Furthermore, there are operators, which, for the same parameter settings, can ingest different sizes of input feature maps. One such example would be a Conv2d layer. Looking at this example we can see that the size of the input feature map can also be a strong influence on the computational intensity on the operator using this input. Therefore we also need to study each size of input feature map for a tuple of operator and parameters individually as well. \\
-Going through all of this we end up studying entities made up of operator, parameters and input size, hereinafter called operator tuples.  \\
+\subsection{Scope}
+The goal of this work is to create database of machine learning operators within the Pytorch Framework containing measurements of their respective energy consumption and execution time. \\
+Most operators have parameters that can be set depending on where they are used within a model, e.g. the number of in\_features and out\_features for a linear layer.
+These parameters can determine, or at least have a significant impact on the computational intensity of the operator. Therefore we will study each operator with its corresponding parameter setting individually. \\
+Furthermore, there are operators, which, for the same parameter settings, can ingest different sizes of input feature maps e.g. Conv2d. The size of the input feature map can be a strong influence on the computational intensity of the operation. Therefore we need to study each size of input feature map for a tuple of operator and parameters individually as well. \\
+In summary, we are studying entities consisting of an operator, its parameters and its input size, hereinafter called operator tuples.  \\
 
 
 
 
 \subsection{Measurement Utility}
-There were multiple options available to choose from, in deciding which measurement utility to use to read out the power consumption of the Nvidia GPUs. While some seemed more fancy than plain nvidia-smi, we still settled on this one, because its interface seemed to most parsable and we could directly set the measurement frequency as high as supported by the hardware, while still getting back simple timestamps for each measurement allowing for a countercheck of that set frequency. 
+In terms of the measurement utility to use, there were multiple options available to choose from to read out the energy consumption of Nvidia GPUs. While some different options also looked interesting, we still settled on nvidia-smi, for its nicely parsable interface and its ability to set the measurement frequency to the highest value supported by the hardware directly.
 
 
 \section{Prove of Concept}
+
+In order to find out whether the experimental approach we have in mind yields generally reasonable results we opted to build a very limited prove of concept pipeline before moving onto a more generalized build-out. The following section described the pipeline and evaluation for the prove of concept.
 
 \subsection{Approach}
 One advantage of the framework we are working in is, that it is rather easy to measure execution time and power consumption for whole models, especially since we can use a very similar measurement pipeline to the one used for operator tuples. This allows for a readily available sanity check for the general viability of our measurement approach. To do this we simply measure our execution time and power consumption for the most computationally intensive operator, in all the operator tuples it appears in, within a certain model and add these results up. Then we can compare them to the results for running the full model. Assuming we haven’t introduced a large overhead for the individual operator tuples benchmarked, we should expect to find a smaller runtime and power consumption for the summed up results than for the full model, since they do not contain all operators which are present in the model. Given that we have opted for the most computationally intensive operator and chosen a model that is mostly made up of the operator we should also not expect an orders of magnitude smaller result then for the full model. 
 
 \subsection{Methodology}
-The general idea for how to perform these measurements is, to have power consumption logging running continuously in the background while performing a benchmarking loop. This means the operator tuple is executed N times and the logging runs for that amount of time. Knowing the number or iterations N and having the log, it is possible to extrapolate the execution time and power consumption per iteration, ergo per operator tuple. \\
-In order to minimize the introduced errors a couple of measures were taken. In order to have the logging start as closely before the benchmark starts, it is called from within the python script performing the benchmark. Even then though, this call takes some time and leads to some non-representative behavior for continuous benchmarking in the first few lines of the measurement log. We will call this a startup effect for the measurement, similar effects can also be observed for the shutdown of said measurement. Two measures are taken to combat these effects. The first is a warm up run, simply running a considerable number of benchmark iterations before starting the measurement to get closer to a continuous measurement. The second is to ensure that each benchmark run, runs for 30s, not prohibitively long, when we want to measure many operators tuples, but also long enough to push the couple of milliseconds startup and shutdown effect into a realm of insignificance.
+The general idea for how to perform these measurements is, to have power consumption logging running continuously in the background while performing a benchmarking loop. This means the operator tuple is executed N times and the logging runs for that amount of time. Knowing the number of iterations N and having the log containing timestamps, it is possible to extrapolate the execution time and power consumption per iteration, ergo per operator tuple. \\
+In order to minimize the introduced errors a couple of measures were taken. In order to have the logging start as closely before the benchmark starts, it is called from within the python script performing the benchmark. Even then though, this logging call takes some time and leads to behavior not representative of a continuous benchmarking scenario for the first few lines of the measurement log. We will call this a startup effect, similar effects can also be observed for the shutdown of said measurement. Two measures are taken to combat these effects. The first is a warm up run, simply running a considerable number of benchmark iterations before starting the measurement to get closer to a continuous measurement. The second is ensuring each benchmark taking 30s. Not prohibitively long for when we want to measure many operators tuples, but also long enough to push the couple of milliseconds startup and shutdown effect into a realm of insignificance.
 
 \subsection{Experiment}
-The model chosen for this experiment is the ResNet34 with an input size of (3, 56, 36), and the operator in question is Conv2d. In order to measure what is needed to be summed up later it was necessary to find out how many individual operator tuples there are in a Resnet34 with and input size of (3, 56, 56), and how many occurrences of each individual one. With this information there is a basis to know which operator tuples need to be measured and how they need to be summed up later, more specifically how often each operator tuple counts towards the total runtime and power consumption. \\
-The first approach taken towards finding this information was to learn the operator and parameters present in the model from printing the model object in PyTorch. Unfortunately, while this does indeed yield the desired operator and parameters, it does nothing to help find the input sizes for each operator tuple. Furthermore it also only yields them in string form since they are being printed.  In the search for a tool to provide the input sizes, we used torchprofilingutils from Kevin Stehle, which was able to provide the input sizes that were needed. This way all the information needed was available and the measurements could commence. 
+The model input combination chosen for this experiment is the ResNet34 with an input size of (3, 56, 36), and the operator in question is Conv2d. In order to measure what is needed to be summed up later it was necessary to find out how many individual operator tuples there are in a Resnet34 with and input size of (3, 56, 56), and how many occurrences of each individual one. With this information we are able to know which operator tuples need to be measured and which weighting they will get in the summation later, the weighting being how often each operator tuple counts towards the total runtime and power consumption. \\
+The first approach taken towards finding this information was to learn the operators and parameters present in the model from printing the model object in PyTorch. Unfortunately, while this does indeed yield the desired operator and parameters, it does nothing to help us find the input sizes for each operator tuple. Furthermore it only yields them in string format since they are being printed. In the search for a tool to provide the input sizes, we used torchprofilingutils recommended by Kevin Stehle, which was able to provide the input sizes that were needed.
 
 \subsection{Results}
-Fortunately the results came in about where we would expect them. We measured 1375 mJ for the full model and ~ 1000 mJ for the sum of all Conv2d operator tuples according to their number of occurrences.
-This appears to be a promising prove of concept for the measurement approach and a good motivation for building out a more general measurement pipeline in order to build up the database on a larger scale of different models with their respective operator tuples. 
+Fortunately the results were in line with our expectations. We measured 1375 mJ for the full model and around 1000 mJ for the sum of all Conv2d operator tuples according to their number of occurrences. \\
+This looks like a promising prove of concept for the measurement approach and provides a good motivation for building a more general measurement pipeline in order to build up the database on a larger scale for different models with their respective operator tuples. 
 
 \section{General Pipeline}
 
 \subsection{Scope}
-Moving on from the prove of concept onto towards a pipeline which can build up an actually useful dataset we need to broaden our scope enough to get the results we are trying to find, but not so much, that we keep on building a dataset until the end of time. 
+Moving on from the prove of concept on towards a pipeline which can build up an actually useful dataset, we need to broaden our scope enough to encompass a sufficient portion of the machine learning model and hardware options at our disposal, but not so much we keep on building our dataset until the end of time.
 To set that outer boundary, we will be focusing on the models included in PyTorch Torchvision. The main challenge in this transition will be to rebuild our pipeline in a sufficiently operator agnostic way. The tasks it will have to be able to perform are as follows. \\
-In order to know which operator tuples we will want to profile, we need to extract all unique operator tuples from the models and track how often each one occurs per model. Since, at the present time, we don’t have a way to quantify the measurement overhead on an operator basis, our best bet is to focus on operators we know to have a significant impact on the computational and memory intensity of our models. This leads us into the filtering we are applying. After collecting all operator tuples occurring in a model, we filter this list for a set of human defined operators we want to take into consideration. These are the only ones actually taken into account for the remained of the pipeline. In theory, we can then iteratively add more and more operators to our selection, until we hit a sufficient prediction accuracy for the full model runtime and power consumption.  This way we avoid taking into account operators of negligible impact which otherwise may both overly complicate our analysis and maybe even negatively impact our prediction accuracy in case measurement overhead starts to dominate the actual operator computational costs. 
+In order to know which operator tuples we will want to profile, we need to extract all unique operator tuples from the models and track how often each one occurs per model. Since, at the present time, we don’t have a way to quantify the measurement overhead on an operator basis, our best bet is to focus on operators we know to have a significant impact on the computational and memory intensity of our models. This leads us into the filtering we are applying. After collecting all operator tuples occurring in a model, we filter this list for a set of human defined operators we want to take into consideration. These are the only ones actually taken into account for the remained of the pipeline. This allows us to iteratively add more and more operators to our selection, until we hit a sufficient prediction accuracy for the full model runtime and power consumption.  This way we avoid taking into account operators of negligible impact which otherwise may both overly complicate our analysis and maybe even negatively impact our prediction accuracy in case measurement overhead starts to dominate the actual operator computational costs. 
 
 \subsection{Preparation Pipeline Blocks}
 The task of extracting all unique operator tuples is achieved by two python scripts, aptly named general\_pipeline\_block0.py and general\_pipeline\_block1.py. \\
@@ -104,43 +107,43 @@ In order to have a general sanity check, there is another script called “full\
 The two hardware platforms studied here are the Nvidia RTX 2080 TI and the Nvidia A30. The Nvidia RTX 2080 TI, furthermore referred to as 2080TI, is based upon the Turing architecture from 2018 and features 4352 CUDA cores and 544 first generation tensor cores with FP16 support. The Nvidia A30, futhermore referred to as A30, is based upon the Ampere architecture form 2020 and features 3584 CUDA cores and 224 second generation tensor cores with TF32 support.\\
 
 \subsection{Validation Method}
-The approach to validating the sensibility of our collected datasets is the same one utilized in the prove of concept. The measured energy for full model runs will be compared to the energy predicted by summing up the individual operators energies. If these predictions result in reasonably close values to the ones measured the validity of the dataset is demonstrated. If this sanity check brings up unexpected results we will dig deeper and figure out the root cause.
+The approach to validating the sensibility of our collected datasets is the same one utilized in the prove of concept. The measured energy for full model runs will be compared to the energy yielded by summing up the individual operators energies. If this results in reasonably close values to the ones measured the validity of the dataset is demonstrated. If this sanity check brings up unexpected results we will dig deeper and figure out the root cause.
 
 
 \begin{figure}
     \includegraphics[width=0.5\textwidth]{comparison_RTX2080TI_small.pdf}
-    \caption{Comparison of measured and predicted energy on the 2080TI. This graph shows the results for smaller energies. This sanity check helps us understand the validity of our measured dataset.}
+    \caption{Comparison of measured and summed up energy on the 2080TI. This graph shows the results for smaller energies. This sanity check helps us understand the validity of our measured dataset.}
     \label{fig:rtx2080tismall}
     \includegraphics[width=0.5\textwidth]{comparison_RTX2080TI_large.pdf}
-    \caption{Comparison of measured and predicted energy on the 2080TI. This graph shows the results for larger energies. This sanity check helps us understand the validity of our measured dataset.}
+    \caption{Comparison of measured and summed up energy on the 2080TI. This graph shows the results for larger energies. This sanity check helps us understand the validity of our measured dataset.}
     \label{fig:rtx2080tilarge}
 \end{figure}
 
 \subsection{RTX 2080 TI}
-The results for the 2080TI look very promising. Figure \ref{fig:rtx2080tismall}, Figure \ref{fig:rtx2080tilarge}. Apart from two models with a very low computational intensity all predicted energies lie below the measured ones. While the predictions are not spot on, they do capture the trend very well. Excluding the mentioned two measurements, all predictions lie within 75\% to 100\% of the measured full model energy.
+The results for the 2080TI look very promising. Figure \ref{fig:rtx2080tismall}, Figure \ref{fig:rtx2080tilarge}. Apart from two models with a very low computational intensity all summed up energies lie below the measured ones. While the summations are not spot on, they do capture the trend very well. Excluding the mentioned two measurements, all summations lie within 75\% to 100\% of the measured full model energy.
 
 \begin{figure}
-    \includegraphics[width=0.5\textwidth]{comparison_A30_small.pdf}
-    \caption{Comparison of measured and predicted energy on the A30. This graph shows the results for smaller energies. As is obvious from the graph there is some systematic error at play here. Most all predictions are about an order of magnitude to small.}
+    \includegraphics[width=0.5\textwidth]{comparison_A30_std_small.pdf}
+    \caption{Comparison of measured and summed up energy on the A30. This graph shows the results for smaller energies. Considering the standard deviation derived from the wattage measurement the results look downright reasonable.}
     \label{fig:a30small}
-    \includegraphics[width=0.5\textwidth]{comparison_A30_large.pdf}
-    \caption{Comparison of measured and predicted energy on the A30. This graph shows the results for larger energies. As is obvious from the graph there is some systematic error at play here. Most all predictions are about an order of magnitude to small.}
+    \includegraphics[width=0.5\textwidth]{comparison_A30_std_large.pdf}
+    \caption{Comparison of measured and summed up energy on the A30. This graph shows the results for larger energies. Considering the standard deviation derived from the wattage measurement the results look downright reasonable.}
     \label{fig:a30large}
 \end{figure}
 
-\subsection{A30}
-The results for the A30 on the other hand look very disheartening. Figure \ref{fig:a30small}, Figure \ref{fig:a30large}. Only two to three of the models are yielding any somewhat close predictions. The dominating trend though is that the predictions grossly underestimate the energy costs by at least an order of magnitude. 
+% \subsection{A30}
+% The results for the A30 on the other hand look very disheartening. Figure \ref{fig:a30small}, Figure \ref{fig:a30large}. Only two to three of the models are yielding any somewhat close predictions. The dominating trend though is that the predictions grossly underestimate the energy costs by at least an order of magnitude. 
 
-\subsection{Hypothesis On The A30s Efficiency Discrepancy}
-All models and benchmarks are running on FP32 input feature maps. The Ampere architecture second generation tensor cores support FP32 by PyTorch automatically converting to TF32 when deemed sensible by the Pytorch backend, which then can be run on these tensor cores. The artificial load of 
-benchmarking a single layer at a time without further model dependencies appears to be especially beneficial for the use of application specific hardware tensor cores. Therefore their performance increase will be significantly more drastic in the operator tuple benchmarks then it is for full model runs.
+% \subsection{Hypothesis On The A30s Efficiency Discrepancy}
+% All models and benchmarks are running on FP32 input feature maps. The Ampere architecture second generation tensor cores support FP32 by PyTorch automatically converting to TF32 when deemed sensible by the Pytorch backend, which then can be run on these tensor cores. The artificial load of 
+% benchmarking a single layer at a time without further model dependencies appears to be especially beneficial for the use of application specific hardware tensor cores. Therefore their performance increase will be significantly more drastic in the operator tuple benchmarks then it is for full model runs.
 
 \begin{figure}
     \includegraphics[width=0.5\textwidth]{comparison_A30_no_tc_small.pdf}
-    \caption{Comparison of measured and predicted energy on the A30. This graph shows the results for smaller energies. In contrast to the results captured with tensor cores enabled, these are much better predictions. It would seems that our methodology is not suited to predicting tensor core performance.}
+    \caption{Comparison of measured and summed up energy on the A30. This graph shows the results for smaller energies. In contrast to the results captured with tensor cores enabled, these are much better predictions. It would seems that our methodology is not suited to predicting tensor core performance.}
     \label{fig:a30notcsmall}
     \includegraphics[width=0.5\textwidth]{comparison_A30_no_tc_large.pdf}
-    \caption{Comparison of measured and predicted energy on the A30. This graph shows the results for larger energies. In contrast to the results captured with tensor cores enabled, these are much better predictions. It would seems that our methodology is not suited to predicting tensor core performance.}
+    \caption{Comparison of measured and summed up energy on the A30. This graph shows the results for larger energies. In contrast to the results captured with tensor cores enabled, these are much better predictions. It would seems that our methodology is not suited to predicting tensor core performance.}
     \label{fig:a30notclarge}
 \end{figure}
 
@@ -158,8 +161,8 @@ The results for the A30 with its tensor cores disabled look much more promising.
 
 
 \subsection{Tensor Core Real-World Impact}
-As can be seen in the comparative bar plots, Figure \ref{fig:tcnotcsmall}, Figure \ref{fig:tcnotclarge}, between the measured energy for the models with tensor cores enabled and with them disabled, they do have a significant impact on model performance even in full model inference scenarios. The performance difference is more pronounced for smaller model input combinations and appears to tend towards zero for larger more complex tasks. But the difference does not appear to only depend on the models energy cost. More regular models seem to make better use of the tensor cores than more complex architectures. \\
-In order to keep the scope under control at the current time we will not look into a second pipeline able to predict tensor core performance characteristics but instead move forward with the results from the dataset obtained with disabled tensor cores.
+As can be seen in these comparative bar plots, Figure \ref{fig:tcnotcsmall}, Figure \ref{fig:tcnotclarge}, between the measured energy for the models with tensor cores enabled and disabled, they do have a significant impact on energy efficiency in running models. This difference is more pronounced for smaller model input combinations and appears to tend towards zero for larger, more complex tasks. But the difference does not appear to simple be proportional to the models energy cost. From a very birds eye point of view and without studying the individual model architectures in detail, it would appear that the difference increases with the model architecture's dependency complexity as well as its input size. This appears to be due to the dependency complexity also scaling with the feature map size.
+% In order to keep the scope under control at the current time we will not look into a second pipeline able to predict tensor core performance characteristics but instead move forward with the results from the dataset obtained with disabled tensor cores.
 
 \begin{figure}
     \includegraphics[width=0.5\textwidth]{conv2d_energy_vs_macs_A30_wo_TC.pdf}
