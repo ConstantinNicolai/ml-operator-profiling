@@ -28,8 +28,8 @@ done
 """
 
 
-for entry in os.listdir('./../measurements/A30'):
-    with open('./../measurements/A30/' + entry + '/summary.yml', 'r') as file:
+for entry in os.listdir('./../measurements/A30_no_tc'):
+    with open('./../measurements/A30_no_tc/' + entry + '/summary.yml', 'r') as file:
         config = yaml.safe_load(file)
 
     config['input_size'] = tuple(config['input_size'])
@@ -44,7 +44,7 @@ for entry in os.listdir('./../measurements/A30'):
     if config['done'] == True:
         print("done flag already set to true, for rerun reset to false")
     if config['done'] == False:
-        with lzma.open('./../measurements/A30/' + entry + '/' + filename + '_filtered') as file_:
+        with lzma.open('./../measurements/A30_no_tc/' + entry + '/' + filename + '_filtered') as file_:
             saved_dict = pickle.load(file_)
         
 
@@ -194,7 +194,7 @@ for entry in os.listdir('./../measurements/A30'):
             
     config['done'] = True
 
-    with open('./../measurements/A30/' + entry + '/summary.yml', 'w') as file:
+    with open('./../measurements/A30_no_tc/' + entry + '/summary.yml', 'w') as file:
         yaml.safe_dump(config, file)
 
 

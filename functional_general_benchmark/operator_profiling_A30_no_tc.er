@@ -206,3 +206,4 @@
   df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
 /csghome/kx225/ml-operator-profiling/functional_general_benchmark/utils.py:225: DtypeWarning: Columns (2) have mixed types. Specify dtype option on import or set low_memory=False.
   df = pd.read_csv(in_file, delimiter=',', on_bad_lines='skip', header=None)
+slurmstepd-csg-rivulet01: error: *** JOB 25533 ON csg-rivulet01 CANCELLED AT 2024-10-17T17:43:01 ***

@@ -139,7 +139,7 @@ for entry in os.listdir('./../measurements/RTX2080TI'):
                     time_difference_seconds, 
                     time_per_iteration,
                     filtered_mean_value2, 
-                    std_value2, 
+                    filtered_std_value2, 
                     total_energy_joules,
                     energy_per_iteration_in_milli_joule, 
                     total_energy_joules_error,

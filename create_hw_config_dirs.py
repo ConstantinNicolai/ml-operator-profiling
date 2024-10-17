@@ -32,5 +32,5 @@ def copy_datasets_to_hardware(hardware_name):
             print(f"Dataset '{dataset}' already exists in hardware folder '{hardware_name}', skipping.")
 
 # Example usage:
-copy_datasets_to_hardware("A30")
+copy_datasets_to_hardware("A30_no_tc")
 
