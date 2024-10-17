@@ -84,7 +84,7 @@ if small_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Measured and Summed Energy A30_std', fontsize = fontsize)
+    ax.set_title(f'Measured and Summed Energy A30', fontsize = fontsize)
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(small_models, rotation=45, ha='right')
     ax.legend()
@@ -121,7 +121,7 @@ if large_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Measured and Summed Energy A30_std', fontsize = fontsize)
+    ax.set_title(f'Measured and Summed Energy A30', fontsize = fontsize)
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(large_models, rotation=45, ha='right')
     ax.legend()

@@ -16,10 +16,14 @@ from sklearn.linear_model import RANSACRegressor
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 
+
+turquoise_color = '#25be48'
+maroon_color = '#be259b'
+
 # Load the saved .pt file
-dataset = torch.load('dataset_history_RTX2080TI/dataset_20241010_123823.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
-gpu = "RTX2080TI"
-gpu_title = 'RTX2080TI'
+dataset = torch.load('dataset_history_A30/dataset_20241016_092308.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
+gpu = "A30"
+gpu_title = 'A30'
 
 dataset_list = [list(item) for item in dataset]
 
@@ -42,6 +46,7 @@ adaptiveavgpool2d_list = []
 for item in dataset_list:
     if item[0]._get_name() == "Conv2d":
         conv2d_list.append(item)
+        print(item)
     elif item[0]._get_name() == "Linear":
         linear_list.append(item)
     elif item[0]._get_name() == "StochasticDepth":
@@ -54,6 +59,7 @@ for item in dataset_list:
         adaptiveavgpool2d_list.append(item)
     else:
         print(print(item[0]._get_name(), item[0].extra_repr(), type(item[0].extra_repr()), item[1]))
+        print(item)
         # print("MACs = ",item[0].out_channels*item[1][1]*item[1][2]*item[1][3]*item[0].kernel_size[0]*item[0].kernel_size[1])
         # print(item[0].kernel_size[0],item[0].kernel_size[1])
         # print(" yes, yes , yes !")

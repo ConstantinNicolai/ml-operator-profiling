@@ -119,7 +119,7 @@ for entry in custom_selected_models_list:
     energy_error_squared_sum = 0
 
     for item in working_list:
-        # print(item)
+        print(item)
         # print(item[1])
         count_of_this_layer = item[1]
         runtime = item[3]

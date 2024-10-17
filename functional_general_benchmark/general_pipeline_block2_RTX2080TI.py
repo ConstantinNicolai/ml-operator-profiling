@@ -134,16 +134,56 @@ for entry in os.listdir('./../measurements/RTX2080TI'):
                 total_time = end_time - start_time
                 # print(f"Total time for {required_iterations} iterations: {total_time:.4f} seconds")
 
-                iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule, total_energy_joules_error, energy_per_iteration_in_milli_joule_error = process_log_file('current_temp_RTX2080TI.log', required_iterations)
+                (
+                    iterations, 
+                    time_difference_seconds, 
+                    time_per_iteration,
+                    filtered_mean_value2, 
+                    std_value2, 
+                    total_energy_joules,
+                    energy_per_iteration_in_milli_joule, 
+                    total_energy_joules_error,
+                    energy_per_iteration_in_milli_joule_error,
+                    energy_per_iteration_in_milli_joule_std
+                ) = process_log_file('current_temp_RTX2080TI.log', required_iterations)
 
-                print(example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule, energy_per_iteration_in_milli_joule_error, std_value2)
 
-                new_measurements.append((example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule, energy_per_iteration_in_milli_joule_error, std_value2))
+                print(
+                    example_layer,
+                    input_size,
+                    time_per_iteration,
+                    energy_per_iteration_in_milli_joule,
+                    energy_per_iteration_in_milli_joule_error,
+                    energy_per_iteration_in_milli_joule_std,
+                    iterations, 
+                    time_difference_seconds, 
+                    filtered_mean_value2, 
+                    filtered_std_value2, 
+                    total_energy_joules, 
+                    total_energy_joules_error
+                )
+
+                new_measurements.append((
+                    example_layer,
+                    input_size,
+                    time_per_iteration,
+                    energy_per_iteration_in_milli_joule,
+                    energy_per_iteration_in_milli_joule_error,
+                    energy_per_iteration_in_milli_joule_std,
+                    iterations, 
+                    time_difference_seconds, 
+                    filtered_mean_value2, 
+                    filtered_std_value2, 
+                    total_energy_joules, 
+                    total_energy_joules_error
+                ))
+
+                #new_measurements.append((example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule, energy_per_iteration_in_milli_joule_error, std_value2))
 
                 # os.system('head current_temp.log')
 
 
-            DATASET_DIR = "dataset_history_RTX2080TI/"
+            DATASET_DIR = "datasets/dataset_history_RTX2080TI/"
 
             # Ensure the dataset directory exists
             os.makedirs(DATASET_DIR, exist_ok=True)

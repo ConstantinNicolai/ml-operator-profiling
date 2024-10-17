@@ -264,11 +264,14 @@ def process_log_file(in_file, iterations):
 
         # Calculate the filtered mean for Value2
         filtered_mean_value2 = filtered_df['Value2'].mean()
+        filtered_std_value2 = filtered_df['Value2'].std()
 
         filtered_mean_value2_error = 5 / math.sqrt(len(df))
 
         # Calculate the total energy in joules (energy = power * time)
         total_energy_joules = filtered_mean_value2 * time_difference_seconds
+
+        total_energy_joules_std = filtered_std_value2 * time_difference_seconds
 
         total_energy_joules_error = filtered_mean_value2_error * time_difference_seconds
 
@@ -277,17 +280,20 @@ def process_log_file(in_file, iterations):
 
         energy_per_iteration_in_milli_joule_error = 1000 * (total_energy_joules_error / iterations)
 
+        energy_per_iteration_in_milli_joule_std = 1000 * (total_energy_joules_std / iterations)
+
         time_per_iteration = time_difference_seconds / iterations
 
         return (iterations, 
                 time_difference_seconds, 
                 time_per_iteration, 
                 filtered_mean_value2, 
-                std_value2, 
+                filtered_std_value2, 
                 total_energy_joules, 
                 energy_per_iteration_in_milli_joule,
                 total_energy_joules_error,
-                energy_per_iteration_in_milli_joule_error)
+                energy_per_iteration_in_milli_joule_error,
+                energy_per_iteration_in_milli_joule_std)
 
     except Exception as e:
         print(f"Error processing the log file: {e}")

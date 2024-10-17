@@ -110,7 +110,9 @@ for entry in os.listdir('./../measurements/A30'):
     energy_error_squared_sum = 0
 
     for item in working_list:
-        # print(item)
+        print(item)
+        print(item[4])
+        print(item[6])
         # print(item[1])
         count_of_this_layer = item[1]
         runtime = item[3]
