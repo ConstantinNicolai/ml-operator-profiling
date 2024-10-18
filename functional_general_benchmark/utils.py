@@ -297,15 +297,17 @@ def process_log_file(in_file, iterations):
 
     except Exception as e:
         print(f"Error processing the log file: {e}")
-        return (float('nan'),
-        float('nan'),
-        float('nan'),
-        float('nan'),
-        float('nan'),
-        float('nan'),
-        float('nan'),
-        float('nan'),
-        float('nan'))
+        return (
+            float('nan'),
+            float('nan'),
+            float('nan'),
+            float('nan'),
+            float('nan'),
+            float('nan'),
+            float('nan'),
+            float('nan'),
+            float('nan'),
+            float('nan'))
 
 
 

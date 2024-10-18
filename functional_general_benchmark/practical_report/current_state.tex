@@ -12,6 +12,8 @@
 \usepackage{natbib}
 \usepackage{url}
 
+\usepackage{verbatim}
+
 \usepackage{hyperref}
 %\usepackage{breakurl}
 \usepackage{xurl}
@@ -86,28 +88,93 @@ This looks like a promising prove of concept for the measurement approach and pr
 \section{General Pipeline}
 
 \subsection{Scope}
-Moving on from the prove of concept on towards a pipeline which can build up an actually useful dataset, we need to broaden our scope enough to encompass a sufficient portion of the machine learning model and hardware options at our disposal, but not so much we keep on building our dataset until the end of time.
-To set that outer boundary, we will be focusing on the models included in PyTorch Torchvision. The main challenge in this transition will be to rebuild our pipeline in a sufficiently operator agnostic way. The tasks it will have to be able to perform are as follows. \\
-In order to know which operator tuples we will want to profile, we need to extract all unique operator tuples from the models and track how often each one occurs per model. Since, at the present time, we don’t have a way to quantify the measurement overhead on an operator basis, our best bet is to focus on operators we know to have a significant impact on the computational and memory intensity of our models. This leads us into the filtering we are applying. After collecting all operator tuples occurring in a model, we filter this list for a set of human defined operators we want to take into consideration. These are the only ones actually taken into account for the remained of the pipeline. This allows us to iteratively add more and more operators to our selection, until we hit a sufficient prediction accuracy for the full model runtime and power consumption.  This way we avoid taking into account operators of negligible impact which otherwise may both overly complicate our analysis and maybe even negatively impact our prediction accuracy in case measurement overhead starts to dominate the actual operator computational costs. 
+Moving on from the prove of concept on towards a pipeline which can build up our full dataset, we need to broaden our scope enough to encompass a sufficient portion of the machine learning model and hardware options at our disposal, but not so much we keep on building our dataset until the end of time.
+To set that outer boundary, we will be focusing on the models included in PyTorch Torchvision. In terms of hardware we have chosen the Nvidia RTX2080TI as a representative for a high end consumer card and the Nvidia A30 as a server card. The main challenge in this transition will be to rebuild our pipeline in a sufficiently operator and hardware platform agnostic way. \\
+In order to know which operator tuples we will want to profile, we first need to extract all unique operator tuples from the models and track how often each one occurs per model. Since we do not have a reliable way to quantify measurement overhead on an operator basis, our best bet is to focus on operators we know to have a significant impact on the computational and memory intensity. This leads us into filtering. After collecting all operator tuples occurring in a model, we filter this list for a set of human defined operators, which will be the only ones taken into consideration for the remainder of the pipeline. This allows us to iteratively add more and more operators to our selection, until we hit a sufficient prediction accuracy for the full model runtime and power consumption. This approach helps us to avoid taking into account operators of negligible impact that otherwise may both overly complicate our analysis and may even negatively impact our prediction accuracy due to potential measurement overhead. 
 
 \subsection{Preparation Pipeline Blocks}
-The task of extracting all unique operator tuples is achieved by two python scripts, aptly named general\_pipeline\_block0.py and general\_pipeline\_block1.py. \\
-The definition of which models, with which given input sizes are to be measured is implemented in a configuration as code style through per model configuration files in the “measurements” directory. In the first script these are read and the model and input tensor are defined according though them. A forward hook is registered to each layer which represents a leaf of the model tree, which is to say each actual layer, which is no longer made up of lower level layers. This forward hook ensures that the layer and its input size are stored to a defaultdict in order to find and all unique layers and count them on a per model basis. To ensure a similar layer and input size combination do not create a different operator tuple due to different weights or a different object id, a few of the layers attributes are compared to check whether the same operator tuple has already occurred. If that is the case, it is replaced, by the layer already present in the dict, which then in turn leads to the defaultdict counting another occurrence. The resulting dict is then pickled and stored.
-general\_pipeline\_block1.py then loads this dict and filters it according to a white list of operators defined within this script. The filtered list is then once again pickled and stored. At that point all the ingredients to start the actual profiling measurements are ready. \\
+The task of extracting all unique operator tuples is achieved via two python scripts:  general\_pipeline\_block0.py and general\_pipeline\_block1.py. \\
+The definitions for which models given which specific input sizes measurements are to be performed, is implemented in a configuration as code style using per model-input-tuple configuration files in the “measurements” directory. The configureations files are replicated on a per hardware-target basis.\\
+A forward hook is registered to each layer which represents a leaf of the model tree, which is to say each layer, no longer made up of lower level layers. This forward hook ensures that the layer and its input size are stored to a defaultdict in order to find all unique layers and count them on a per model basis. To ensure similar layer-input-size combinations do not create different operator tuples each time they occur, non object-specific attributes are used to check whether the same operator tuple has already occurred in a previous measurement. Should they have occurred before they are replaced by an equivalent layer already present in the defaultdict, which then in turn leads to the defaultdict counting another occurrence of said layer, ergo counting the number of occurrences for the model in question. The resulting dict is then pickled and stored. \\
+general\_pipeline\_block1.py then loads the dict and filters it using a white list of operators which is defined within the script. The filtered list is then once again pickled and stored. At that point everything is ready to start the actual profiling measurements. \\
 Up to this point the pipeline is still hardware agnostic, though some configuration files and result directories may be replicated for different target hardware.
 
 \subsection{Benchmark Pipeline Block}
-The last and most important script is called general\_pipeline\_block2.py. It loads the filtered dict and goes through the operator tuples one by one. For each one it and runs the whole benchmark procedure including warmup before and evaluation of the data afterwards. The results of this evaluation are then stored in the database file. After a successful benchmark of all operator tuples from a single model, a “done” flag within the configuration file of said model is set to “true”. Due to this mechanism the configuration files work on a per hardware basis and are replicated for each target. \\
-In order to have a general sanity check, there is another script called “full\_model\_measurement.py”. This uses the configuration files to run the same benchmark routine on the full models. The results produced with this can then be compared with the output of the last important script. This last one uses both the pickled dicts which contain the information of how often each operator tuple occurs per model, as well as the database, to sum up both runtime and power consumption from the individual operator tuple measurements for a whole model. These results can then be compared to the full model measurements.
+The script starting the actual profiling measurements is general\_pipeline\_block2.py. It loads the filtered dict and iterates through the operator tuples one by one. For each one the whole benchmark procedure including warmup before and evaluation of the data afterwards is run. The results are stored in a database file, utilizing a checkpointing approach due to the considerable runtime of the benchmark sequence. After a successful run for all operator tuples if one model-input-tuple, a “done” flag within the configuration file is set to “true”. This is meant to prevent accidental benchmark runs clogging up the server infrastructure. This mechanism is responsible for the necessity of the configuration file replication. \\
 
+\subsection{Validation Block}
+In order to perform a general sanity check, there is the “full\_model\_measurement.py” script. This also uses the configuration files to run the same benchmark routine used on the operator tuples on the model-input-tuples, measuring the full model energy and runtime in an identical manner. \\
+The results of the full model-input validation run can then be compared to the weighted summation of our operator tuple results. In an ideal world these would yield the exact same energy and runtime. \\
+The summation script both the dicts containing the number of operator tuple occurrences as well as the database with the measurement results for said tuples to perform the summation.
+% The results produced with this can then be compared with the output of the last important script. This last one uses both the pickled dicts which contain the information of how often each operator tuple occurs per model, as well as the database, to sum up both runtime and power consumption from the individual operator tuple measurements for a whole model. These results can then be compared to the full model measurements.
+
+\subsection{Methodology for Measurement Data Evaluation}
+
+We have configured our nvidia-smi logging to output timestamp, utilization, wattage, memory usage and maximum available memory. A typical extract from the log looks as follows.
+
+
+\begin{footnotesize} % Change to \footnotesize or \scriptsize for even smaller text
+\begin{verbatim}
+2024/10/10 13:18:58.369, 81, 145.99, 4396, 11264
+2024/10/10 13:18:58.407, 81, 182.11, 4396, 11264
+2024/10/10 13:18:58.428, 81, 182.11, 4396, 11264
+2024/10/10 13:18:58.439, 81, 182.11, 4396, 11264
+2024/10/10 13:18:58.490, 81, 178.50, 4396, 11264
+2024/10/10 13:18:58.514, 81, 178.50, 4396, 11264
+2024/10/10 13:18:58.538, 81, 178.50, 4396, 11264
+\end{verbatim}
+\end{footnotesize}
+
+This csv data is read in via pandas and all rows containing not a number values are dropped from the dataset. \\
+We begin by finding the complete runtime of the benchmark $t_{tot}$ which is given by the difference between the first and last timestamp. \\
+We find the standard deviation for the wattage and drop all rows containing a wattage outside a $3 \: \sigma $ ball.
+
+\[
+\overline{W} = \frac{1}{n} \sum_{i=1}^{n} W_i
+\]
+
+\[
+\sigma_W = \sqrt{\frac{1}{n - 1} \sum_{i=1}^{n} (W_i - \overline{W})^2}
+\]
+
+
+\[
+W_{filtered} = W \; \forall \, |W - \overline{W})| < 3 \sigma
+\]
+
+With $n$ being the number of timestamps and $W$ being the wattage. The same two formulae are used to find the mean $ \overline{W}_{filtered}$ and standard deviation $\sigma_{\overline{W}_{filtered}}$ for the filtered wattage. With this we find the total run energy $ E_{tot}$ and its error $\sigma_{E_{tot}}$.
+ \[
+ E_{tot} = \overline{W}_{filtered} \cdot t_{tot}
+ \]
+
+  \[
+ \sigma_{E_{tot}} = \sigma_{\overline{W}_{filtered}} \cdot t_{tot}
+ \]
+
+From this we find the time per iteration $t$ and the energy per iteration $e$, as well as the error for the energy per iteration $\sigma_e$ with the number of iterations as $N$.
+
+\[
+t = \frac{t_{tot}}{N}
+\]
+
+
+\[
+e = \frac{E_{tot}}{N}
+\]
+
+\[
+\sigma_e = \frac{\sigma_{E_{tot}}}{N}
+\]
+
+Given the nature of the time measurement being a difference and the very large number of operator tuple iterations per benchmark we will not assign an error to the time measurement as it would be insignificantly small.
 
 \section{Measurement Validation}
 
 \subsection{Hardware Platforms}
-The two hardware platforms studied here are the Nvidia RTX 2080 TI and the Nvidia A30. The Nvidia RTX 2080 TI, furthermore referred to as 2080TI, is based upon the Turing architecture from 2018 and features 4352 CUDA cores and 544 first generation tensor cores with FP16 support. The Nvidia A30, futhermore referred to as A30, is based upon the Ampere architecture form 2020 and features 3584 CUDA cores and 224 second generation tensor cores with TF32 support.\\
+The two hardware platforms studied here are the Nvidia RTX 2080 TI and the Nvidia A30. The Nvidia RTX 2080 TI, furthermore referred to as 2080TI, is based upon the Turing architecture from the year 2018 and features 4352 CUDA cores and 544 first generation tensor cores with FP16 support. The Nvidia A30, futhermore referred to as A30, is based upon the Ampere architecture form the year 2020 and features 3584 CUDA cores and 224 second generation tensor cores with TF32 support.\\
 
 \subsection{Validation Method}
-The approach to validating the sensibility of our collected datasets is the same one utilized in the prove of concept. The measured energy for full model runs will be compared to the energy yielded by summing up the individual operators energies. If this results in reasonably close values to the ones measured the validity of the dataset is demonstrated. If this sanity check brings up unexpected results we will dig deeper and figure out the root cause.
+The approach to validating the sensibility of our collected datasets is the same one utilized in the prove of concept. The measured energy for full model-input runs will be compared to the energy yielded by summing up the appropriate individual operator energies. If this results in reasonably close agreement the validity of the dataset is demonstrated. If this sanity check brings up any unexpected results we know where to dig deeper.
 
 
 \begin{figure}
@@ -124,10 +191,20 @@ The results for the 2080TI look very promising. Figure \ref{fig:rtx2080tismall},
 
 \begin{figure}
     \includegraphics[width=0.5\textwidth]{comparison_A30_std_small.pdf}
-    \caption{Comparison of measured and summed up energy on the A30. This graph shows the results for smaller energies. Considering the standard deviation derived from the wattage measurement the results look downright reasonable.}
+    \caption{Comparison of measured and summed up energy on the A30. This graph shows the results for smaller energies. Considering the standard deviation derived from the wattage measurement the results look downright reasonable, but we have one outlier in the densenet121 (32, 3, 224, 224) measurement which is severely overestimated.}
     \label{fig:a30small}
     \includegraphics[width=0.5\textwidth]{comparison_A30_std_large.pdf}
     \caption{Comparison of measured and summed up energy on the A30. This graph shows the results for larger energies. Considering the standard deviation derived from the wattage measurement the results look downright reasonable.}
+    \label{fig:a30large}
+\end{figure}
+
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{timetimecomparison_A30_small.pdf}
+    \caption{Comparison of measured and summed up runtime on the A30. This graph shows the results for smaller energies. The summation results from the dataset are generally in line with the measured runtimes.}
+    \label{fig:a30small}
+    \includegraphics[width=0.5\textwidth]{timecomparison_A30_large.pdf}
+    \caption{Comparison of measured and summed up runtime on the A30. This graph shows the results for larger energies. Overall the summation results do line up nicely with the measured runtimes, but we have one outlier in the densenet121 (32, 3, 224, 224) measurement which is severely overestimated.}
     \label{fig:a30large}
 \end{figure}
 
