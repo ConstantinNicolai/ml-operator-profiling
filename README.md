@@ -1,14 +1,14 @@
 # ml-operator-profiling
 
 ## Report Structure
-Abstract - still to do
-Theory section - introduction - maybe ?
-introduction otherwise - done
-prove of concept - done
-general pipeline - done
-results 1 - measurement validation - almost done - waiting for data/ cluster down'
-results 2 - operator tuple visualization - basics there, more to do
-discussion - still to do - requires results done
+Abstract - still to do \
+Theory section - introduction - maybe ?\
+introduction otherwise - done\
+prove of concept - done\
+general pipeline - done\
+results 1 - measurement validation - almost done - waiting for data/ cluster down\
+results 2 - operator tuple visualization - basics there, more to do\
+discussion - still to do - requires results done\
 outlook - still to do - start plotting, finish after meeting with holger, take notes in meeting
 
 ## Today's To do's
