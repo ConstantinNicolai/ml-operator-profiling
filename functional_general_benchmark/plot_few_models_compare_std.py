@@ -33,8 +33,9 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'dataset_history_A30/full_model_measurements_A30_std.txt'
-prediction_file = 'dataset_history_A30/summed_up_dataset_20241016_092308.txt'
+measurement_file = 'datasets/dataset_history_A30_no_tc/full_model_measurements_A30_no_tc.txt'
+prediction_file = 'datasets/dataset_history_A30_no_tc/summed_up_dataset_20241023_094928.txt'
+
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_prediction_file(prediction_file)
@@ -84,15 +85,15 @@ if small_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Measured and Summed Energy A30', fontsize = fontsize)
+    ax.set_title(f'Measured and Summed Energy A30 no tc', fontsize = fontsize)
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(small_models, rotation=45, ha='right')
     ax.legend()
 
     plt.tight_layout()
     plt.savefig('plots/FINDANDDELETEME.png', format='png')
-    plt.savefig('plots/comparison_A30_std_small.png', format='png')
-    plt.savefig('plots/comparison_A30_std_small.pdf', format='pdf')
+    plt.savefig('plots/comparison_A30_no_tc_std_small.png', format='png')
+    plt.savefig('plots/comparison_A30_no_tc_std_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values
 if large_indices:
@@ -121,11 +122,11 @@ if large_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Measured and Summed Energy A30', fontsize = fontsize)
+    ax.set_title(f'Measured and Summed Energy A30 no tc', fontsize = fontsize)
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(large_models, rotation=45, ha='right')
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/comparison_A30_std_large.png', format='png')
-    plt.savefig('plots/comparison_A30_std_large.pdf', format='pdf')
+    plt.savefig('plots/comparison_A30_no_tc_std_large.png', format='png')
+    plt.savefig('plots/comparison_A30_no_tc_std_large.pdf', format='pdf')

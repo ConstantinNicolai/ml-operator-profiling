@@ -6,7 +6,7 @@ import pickle
 import math
 
 # Load the saved .pt file
-dataset = torch.load('dataset_history_A30/dataset_20241016_092308.pt', map_location=torch.device('cpu'))
+dataset = torch.load('datasets/dataset_history_A30_no_tc/dataset_20241023_094928.pt', map_location=torch.device('cpu'))
 
 # print("#########################################")
 
@@ -110,9 +110,9 @@ for entry in os.listdir('./../measurements/A30'):
     energy_error_squared_sum = 0
 
     for item in working_list:
-        print(item)
-        print(item[4])
-        print(item[6])
+        # print(item)
+        # print(item[4])
+        # print(item[6])
         # print(item[1])
         count_of_this_layer = item[1]
         runtime = item[3]
