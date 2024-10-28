@@ -21,9 +21,9 @@ turquoise_color = '#25be48'
 maroon_color = '#be259b'
 
 # Load the saved .pt file
-dataset = torch.load('dataset_history_A30/dataset_20241016_092308.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
-gpu = "A30"
-gpu_title = 'A30'
+dataset = torch.load('datasets/dataset_history_RTX2080TI/dataset_20241025_220117.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
+gpu = "RTX2080TI"
+gpu_title = 'RTX2080TI'
 
 dataset_list = [list(item) for item in dataset]
 
@@ -46,7 +46,6 @@ adaptiveavgpool2d_list = []
 for item in dataset_list:
     if item[0]._get_name() == "Conv2d":
         conv2d_list.append(item)
-        print(item)
     elif item[0]._get_name() == "Linear":
         linear_list.append(item)
     elif item[0]._get_name() == "StochasticDepth":
@@ -55,6 +54,7 @@ for item in dataset_list:
         batchnorm2d_list.append(item)
     elif item[0]._get_name() == "ReLU":
         relu_list.append(item)
+        print(item)
     elif item[0]._get_name() == "AdaptiveAvgPool2d":
         adaptiveavgpool2d_list.append(item)
     else:
@@ -108,11 +108,11 @@ macs_conv2d, item3_conv2d = prepare_data(conv2d_list)
 item3_errors= [] 
 for item in conv2d_list:
     if item[3] > 0:
-        item3_errors.append(item[4])
+        item3_errors.append(item[5])
 
 
 # Define the upper limits for x and y
-y_limit = 700  # Example: 1,000 for Item[3]
+y_limit = 650  # Example: 1,000 for Item[3]
 
 # Assuming macs_conv2d, item3_conv2d, and item3_errors are numpy arrays or lists
 macs_conv2d = np.array(macs_conv2d).reshape(-1, 1)  # Reshaping for sklearn (expects 2D input)
@@ -149,8 +149,8 @@ plt.xscale('log')  # Set x-axis to logarithmic scale
 plt.ylim(0, y_limit)  # Set the upper limit for y-axis
 plt.grid()
 plt.legend()
-plt.savefig('plots/conv2d_energy_vs_macs_' + gpu + '.pdf', format='pdf')
-plt.savefig('plots/conv2d_energy_vs_macs_' + gpu + '.png', format='png')
+plt.savefig('plots/illu/conv2d_energy_vs_macs_' + gpu + '.pdf', format='pdf')
+plt.savefig('plots/illu/conv2d_energy_vs_macs_' + gpu + '.png', format='png')
 plt.close()
 
 # # Plot Conv2D
@@ -164,7 +164,7 @@ plt.close()
 # plt.ylim(0, y_limit)  # Set the upper limit for y-axis
 # plt.grid()
 # plt.legend()
-# plt.savefig('plots/conv2d_energy_vs_macs_lin_log'+"_"+ gpu +'.png')
+# plt.savefig('plots/illu/conv2d_energy_vs_macs_lin_log'+"_"+ gpu +'.png')
 # plt.close()
 
 # Prepare data for Linear
@@ -173,7 +173,7 @@ macs_linear, item3_linear = prepare_data(linear_list)
 item3_errors= [] 
 for item in linear_list:
     if item[3] > 0:
-        item3_errors.append(item[4])
+        item3_errors.append(item[5])
 
 item3_errors = np.array(item3_errors)
 
@@ -195,8 +195,8 @@ plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.ylim(0, y_limit)  # Set the upper limit for y-axis
 plt.grid()
 plt.legend()
-plt.savefig('plots/linear_energy_vs_macs'+"_"+ gpu +'.png')
-plt.savefig('plots/linear_energy_vs_macs'+"_"+ gpu +'.pdf', format = 'pdf')
+plt.savefig('plots/illu/linear_energy_vs_macs'+"_"+ gpu +'.png')
+plt.savefig('plots/illu/linear_energy_vs_macs'+"_"+ gpu +'.pdf', format = 'pdf')
 plt.close()
 
 
@@ -221,7 +221,7 @@ plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.ylim(None, y_limit)  # Set the upper limit for y-axis
 plt.grid()
 plt.legend()
-plt.savefig('plots/linear_item3_vs_macs_loglog_zoomin'+"_"+ gpu +'.png')
+plt.savefig('plots/illu/linear_item3_vs_macs_loglog_zoomin'+"_"+ gpu +'.png')
 plt.close()
 
 
@@ -232,7 +232,7 @@ bn2_error = []
 for item in batchnorm2d_list:
     bn2_energy.append(np.abs(item[3]))
     bn2_cxwxh.append(2*item[1][1]+4*item[1][1]*item[1][2]*item[1][3])
-    bn2_error.append(np.abs(item[4]))
+    bn2_error.append(np.abs(item[5]))
 
 
 y_limit = 300
@@ -248,11 +248,11 @@ plt.xlabel('FLOPs')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
 # plt.yscale('log')  # Set y-axis to logarithmic scale if needed
-plt.ylim(0, y_limit)
+# plt.ylim(0, y_limit)
 plt.grid()
 plt.legend()
-plt.savefig('plots/batchnorm2d_energy_FLOPs'+"_"+ gpu +'.png')
-plt.savefig('plots/batchnorm2d_energy_FLOPs'+"_"+ gpu +'.pdf', format = 'pdf')
+plt.savefig('plots/illu/batchnorm2d_energy_FLOPs'+"_"+ gpu +'.png')
+plt.savefig('plots/illu/batchnorm2d_energy_FLOPs'+"_"+ gpu +'.pdf', format = 'pdf')
 plt.close()
 
 
@@ -263,7 +263,7 @@ relu_cxwxh = []
 relu_error = []
 for item in relu_list:
     relu_energy.append(item[3])
-    relu_error.append(np.abs(item[4]))
+    relu_error.append(np.abs(item[5]))
     if len(item[1])<4:
         relu_cxwxh.append(item[1][1])
     else:
@@ -280,11 +280,12 @@ plt.title('RELU FLOPs Energy '+ gpu_title)
 plt.xlabel('FLOPs')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
+plt.ylim(0, 150)
 # plt.yscale('log')  # Set y-axis to logarithmic scale if needed
 plt.grid()
 plt.legend()
-plt.savefig('plots/relu_energy_FLOPs'+"_"+ gpu +'.png')
-plt.savefig('plots/relu_energy_FLOPs'+"_"+ gpu +'.pdf', format = 'pdf')
+plt.savefig('plots/illu/relu_energy_FLOPs'+"_"+ gpu +'.png')
+plt.savefig('plots/illu/relu_energy_FLOPs'+"_"+ gpu +'.pdf', format = 'pdf')
 plt.close()
 
 
@@ -296,7 +297,7 @@ adavpool2d_flops = []
 adavpool2d_error = []
 for item in adaptiveavgpool2d_list:
     adavpool2d_energy.append(item[3])
-    adavpool2d_error.append(np.abs(item[4]))
+    adavpool2d_error.append(np.abs(item[5]))
     if isinstance(item[0].output_size, int):
         adavpool2d_flops.append(item[0].output_size*item[1][1]*item[1][2]*item[1][3])
     else:
@@ -313,11 +314,11 @@ plt.title('adaptiveavgpool2d FLOPs Energy '+gpu_title)
 plt.xlabel('FLOPs')
 plt.ylabel('Energy [mJ]')
 plt.xscale('log')  # Set x-axis to logarithmic scale
-plt.ylim(0, 5)
+# plt.ylim(0, 20)
 plt.grid()
 plt.legend()
-plt.savefig('plots/adaptiveavgpool2d_energy_FLOPs'+"_"+ gpu +'.png')
-plt.savefig('plots/adaptiveavgpool2d_energy_FLOPs'+"_"+ gpu +'.pdf', format = 'pdf')
+plt.savefig('plots/illu/adaptiveavgpool2d_energy_FLOPs'+"_"+ gpu +'.png')
+plt.savefig('plots/illu/adaptiveavgpool2d_energy_FLOPs'+"_"+ gpu +'.pdf', format = 'pdf')
 plt.close()
 
 

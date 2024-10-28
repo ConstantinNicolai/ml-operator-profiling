@@ -28,8 +28,8 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'dataset_history_A30/full_model_measurements_A30_std.txt'
-prediction_file = 'dataset_history_A30/summed_up_dataset_20241016_092308.txt'
+measurement_file = 'datasets/dataset_history_RTX2080TI/full_model_measurements_RTX2080TI.txt'
+prediction_file = 'datasets/dataset_history_RTX2080TI/summed_up_dataset_20241025_220117.txt'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_prediction_file(prediction_file)
@@ -65,14 +65,13 @@ if small_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Time (ms)')
-    ax.set_title(f'Comparison of Measured and Summed Runtime')
+    ax.set_title(f'Comparison of Measured and Summed Runtime RTX2080TI')
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(small_models, rotation=45, ha='right')
     ax.legend()
-
     plt.tight_layout()
-    plt.savefig('plots/timecomparison_A30_small.png', format='png')
-    plt.savefig('plots/timetimecomparison_A30_small.pdf', format='pdf')
+    plt.savefig('plots/timecomparison_RTX2080TI_small.png', format='png')
+    plt.savefig('plots/timecomparison_RTX2080TI_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values
 if large_indices:
@@ -90,11 +89,11 @@ if large_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Time (ms)')
-    ax.set_title(f'Comparison of Measured and Summed Runtime')
+    ax.set_title(f'Comparison of Measured and Summed Runtime RTX2080TI')
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(large_models, rotation=45, ha='right')
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/timecomparison_A30_large.png', format='png')
-    plt.savefig('plots/timecomparison_A30_large.pdf', format='pdf')
+    plt.savefig('plots/timecomparison_RTX2080TI_large.png', format='png')
+    plt.savefig('plots/timecomparison_RTX2080TI_large.pdf', format='pdf')

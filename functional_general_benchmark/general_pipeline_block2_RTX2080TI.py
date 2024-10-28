@@ -85,7 +85,7 @@ for entry in os.listdir('./../measurements/RTX2080TI'):
                 warmup_start_time = time.time()
 
                 # Warmup iterations, to avoid measuring the cold start of the gpu
-                for i in range(math.ceil(iterations/4)):
+                for i in range(25000):
                     # Linearly access the convolutional layer from the pre-created list
                     operator = operators[i % num_layers]
                     
@@ -96,7 +96,7 @@ for entry in os.listdir('./../measurements/RTX2080TI'):
 
                 warmup_time = warmup_stop_time - warmup_start_time
 
-                time_per_iteration = warmup_time / math.ceil(iterations/4)
+                time_per_iteration = warmup_time / 25000
 
                 required_iterations = int(30 / time_per_iteration)
 

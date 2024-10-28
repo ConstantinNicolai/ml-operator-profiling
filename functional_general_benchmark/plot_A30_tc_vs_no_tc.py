@@ -29,8 +29,8 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'dataset_history_A30/full_model_measurements_A30.txt'
-prediction_file = 'dataset_history_A30_no_tc/full_model_measurements_A30_no_tc.txt'
+measurement_file = 'datasets/dataset_history_A30/full_model_measurements_A30.txt'
+prediction_file = 'datasets/dataset_history_A30_no_tc/full_model_measurements_A30_no_tc.txt'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_measurement_file(prediction_file)
