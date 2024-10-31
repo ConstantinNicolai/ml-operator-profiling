@@ -46,4 +46,3 @@ for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
 
         with lzma.open(HW_dir + '/' + filename + '_filtered', "wb") as file_:
             pickle.dump(dict(result_list), file_)
-
