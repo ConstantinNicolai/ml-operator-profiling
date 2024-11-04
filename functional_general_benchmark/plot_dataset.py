@@ -21,17 +21,17 @@ turquoise_color = '#25be48'
 maroon_color = '#be259b'
 
 # Load the saved .pt file
-dataset = torch.load('datasets/dataset_history_A30_no_tc/dataset_20241023_094928.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
-gpu = "A30_no_tc"
-gpu_title = 'A30 no TC'
+dataset = torch.load('datasets/dataset_history_RTX2080TI/dataset_20241025_220117.pt', map_location=torch.device('cpu'))  #dataset_20240926_075625.pt
+gpu = "RTX2080TI"
+gpu_title = 'RTX2080TI'
 
 dataset_list = [list(item) for item in dataset]
 
 #if we want to be able to plot anything right here, we need to lower the problems dimensionality
 
+outliers_reran = torch.load('datasets/outliers_RTX2080TI/dataset_20241104_171527.pt', map_location=torch.device('cpu'))
 
-# print(dir(dataset_list[345][0]))
-# print(type(dataset_list[345][0].out_channels))
+outliers_list = [list(item) for item in outliers_reran]
 
 conv2d_list = []
 linear_list = []
@@ -40,11 +40,12 @@ batchnorm2d_list = []
 relu_list = []
 adaptiveavgpool2d_list = []
 
-
+outlier_list = []
 
 
 for item in dataset_list:
     if item[0]._get_name() == "Conv2d":
+        # if (np.abs(item[3]) < 1000):
         conv2d_list.append(item)
     elif item[0]._get_name() == "Linear":
         linear_list.append(item)
@@ -52,9 +53,11 @@ for item in dataset_list:
     elif item[0]._get_name() == "StochasticDepth":
         stochasticdepth_list.append(item)
     elif item[0]._get_name() == "BatchNorm2d":
+        # if (np.abs(item[3]) < 1000):
         batchnorm2d_list.append(item)
     elif item[0]._get_name() == "ReLU":
-        relu_list.append(item)
+        if (np.abs(item[3]) < 120):
+            relu_list.append(item)
         # print(item)
     elif item[0]._get_name() == "AdaptiveAvgPool2d":
         adaptiveavgpool2d_list.append(item)
@@ -66,6 +69,15 @@ for item in dataset_list:
         # print(" yes, yes , yes !")
     # print(item[0]._get_name(), item[0].extra_repr(), type(item[0].extra_repr()), item[1])
     # print(item)
+
+for item in outliers_list:
+    if item[0]._get_name() == "Conv2d":
+        conv2d_list.append(item)
+    elif item[0]._get_name() == "BatchNorm2d":
+        batchnorm2d_list.append(item)
+    elif item[0]._get_name() == "ReLU":
+        relu_list.append(item)
+
 
 print("conv2d ", len(conv2d_list))
 print("linerar ", len(linear_list))
@@ -153,8 +165,16 @@ for item in conv2d_list:
     conv2d_error.append(np.abs(item[5]))
     if len(item[1])<4:
         conv2d_cxwxh.append(item[1][1])
+        if (np.abs(item[3]) > 1000):
+            print(item)
+            outlier_list.append((item[0],item[1]))
     else:
         conv2d_cxwxh.append(item[1][1]*item[1][2]*item[1][3])
+        if (np.abs(item[3]) > 1000):
+            print(item)
+            outlier_list.append((item[0],item[1]))
+
+
 
 
 
@@ -269,10 +289,11 @@ for item in batchnorm2d_list:
     bn2_energy.append(np.abs(item[3]))
     bn2_cxwxh.append(item[1][1]*item[1][2]*item[1][3])#bn2_cxwxh.append(2*item[1][1]+4*item[1][1]*item[1][2]*item[1][3])
     bn2_error.append(np.abs(item[5]))
-    if (np.abs(item[3]) > 1000):
-        print(item)
+    # if (np.abs(item[3]) > 1000):
+    #     print(item)
+    #     outlier_list.append((item[0],item[1]))
 
-print(batchnorm2d_list[32])
+#print(batchnorm2d_list[32])
 
 y_limit = 300
 
@@ -302,6 +323,9 @@ relu_cxwxh = []
 relu_error = []
 for item in relu_list:
     relu_energy.append(item[3])
+    if (np.abs(item[3]) > 17):
+        print(item)
+        outlier_list.append((item[0],item[1]))
     relu_error.append(np.abs(item[5]))
     if len(item[1])<4:
         relu_cxwxh.append(item[1][1])
@@ -390,7 +414,8 @@ print("######################################")
 
 
 
-
+with lzma.open('outlier_rerun_'+gpu, "wb") as file_:
+            pickle.dump(dict(outlier_list), file_)
 
 # # Sample list
 # my_list = [20, 3,1,1, 6]

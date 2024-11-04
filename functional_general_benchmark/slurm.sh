@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #SBATCH --partition=all
+#SBATCH --nodelist=csg-brook02
 #SBATCH --job-name=operator_profiling
-#SBATCH --output=proportionality_test_A30.out
-#SBATCH --nodes=1 
+#SBATCH --output=outlier_rerun_RTX2080TI.out
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:A30:1
+#SBATCH --gres=gpu:RTX2080TI:1
 
 
 
@@ -15,4 +15,4 @@ conda activate constabass
 
 
 
-python3 time_iter_proportion.py
+python3 outlier_rerun.py
