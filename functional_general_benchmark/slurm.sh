@@ -3,7 +3,7 @@
 #SBATCH --partition=all
 #SBATCH --nodelist=csg-brook02
 #SBATCH --job-name=operator_profiling
-#SBATCH --output=outlier_rerun_RTX2080TI.out
+#SBATCH --output=logging_consistency.out
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:RTX2080TI:1
 
@@ -15,4 +15,4 @@ conda activate constabass
 
 
 
-python3 outlier_rerun.py
+python3 logging_consistency_test.py

@@ -29,7 +29,7 @@ dataset_list = [list(item) for item in dataset]
 
 #if we want to be able to plot anything right here, we need to lower the problems dimensionality
 
-outliers_reran = torch.load('datasets/outliers_RTX2080TI/dataset_20241104_171527.pt', map_location=torch.device('cpu'))
+outliers_reran = torch.load('datasets/outliers_RTX2080TI_RELU/dataset_20241105_145959.pt', map_location=torch.device('cpu'))
 
 outliers_list = [list(item) for item in outliers_reran]
 
@@ -55,10 +55,10 @@ for item in dataset_list:
     elif item[0]._get_name() == "BatchNorm2d":
         # if (np.abs(item[3]) < 1000):
         batchnorm2d_list.append(item)
-    elif item[0]._get_name() == "ReLU":
-        if (np.abs(item[3]) < 120):
-            relu_list.append(item)
-        # print(item)
+    # elif item[0]._get_name() == "ReLU":
+    #     # if (np.abs(item[3]) < 17):
+    #     relu_list.append(item)
+    #     # print(item)
     elif item[0]._get_name() == "AdaptiveAvgPool2d":
         adaptiveavgpool2d_list.append(item)
     # else:
@@ -71,11 +71,11 @@ for item in dataset_list:
     # print(item)
 
 for item in outliers_list:
-    if item[0]._get_name() == "Conv2d":
-        conv2d_list.append(item)
-    elif item[0]._get_name() == "BatchNorm2d":
-        batchnorm2d_list.append(item)
-    elif item[0]._get_name() == "ReLU":
+    # if item[0]._get_name() == "Conv2d":
+    #     conv2d_list.append(item)
+    # elif item[0]._get_name() == "BatchNorm2d":
+    #     batchnorm2d_list.append(item)
+    if item[0]._get_name() == "ReLU":
         relu_list.append(item)
 
 
@@ -323,9 +323,7 @@ relu_cxwxh = []
 relu_error = []
 for item in relu_list:
     relu_energy.append(item[3])
-    if (np.abs(item[3]) > 17):
-        print(item)
-        outlier_list.append((item[0],item[1]))
+    outlier_list.append((item[0],item[1]))
     relu_error.append(np.abs(item[5]))
     if len(item[1])<4:
         relu_cxwxh.append(item[1][1])

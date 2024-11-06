@@ -9,7 +9,16 @@ general pipeline - done\
 results 1 - measurement validation - almost done - waiting for data/ cluster down\
 results 2 - operator tuple visualization - basics there, more to do\
 discussion - still to do - requires results done\
-outlook - still to do - start plotting, finish after meeting with holger, take notes in meeting
+outlook - still to do - start plotting, finish after meeting with holger, take notes in meeting\
+continous log\
+
+example for one operation\
+
+derivative of my timestamps\
+
+time side rigour\
+
+Shijie MACs and FLOPs per Kernel\
 
 ## Today's To do's
 Read this paper: Inspired by: Lorenz Braun, Sotirios Nikas, Chen Song, Vincent Heuveline and Holger Fröning, A Simple Model for Portable and Fast Prediction of Execution Time and Power Consumption of GPU Kernels - see website \
