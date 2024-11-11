@@ -29,8 +29,8 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'datasets/dataset_history_A30/full_model_measurements_A30.txt'
-prediction_file = 'datasets/dataset_history_A30_no_tc/full_model_measurements_A30_no_tc.txt'
+measurement_file = 'A30_full_model'
+prediction_file = 'A30_no_tc_full_model'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_measurement_file(prediction_file)
@@ -72,8 +72,8 @@ if small_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/tc_no_tc_small.png', format='png')
-    plt.savefig('plots/tc_no_tc_small.pdf', format='pdf')
+    plt.savefig('plots/tc_compare/tc_no_tc_small.png', format='png')
+    plt.savefig('plots/tc_compare/tc_no_tc_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values
 if large_indices:
@@ -97,5 +97,5 @@ if large_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/tc_no_tc_large.png', format='png')
-    plt.savefig('plots/tc_no_tc_large.pdf', format='pdf')
+    plt.savefig('plots/tc_compare/tc_no_tc_large.png', format='png')
+    plt.savefig('plots/tc_compare/tc_no_tc_large.pdf', format='pdf')

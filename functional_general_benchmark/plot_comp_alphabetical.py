@@ -29,8 +29,8 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'datasets/dataset_history_RTX2080TI/full_model_measurements_RTX2080TI.txt'
-prediction_file = 'datasets/dataset_history_RTX2080TI/summed_up_dataset_20241025_220117.txt'
+measurement_file = 'RTX2080TI_full_model'
+prediction_file = 'datasets_newbench/dataset_history_RTX2080TI/summed_up.txt'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_prediction_file(prediction_file)
@@ -80,8 +80,8 @@ if small_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/comparison_RTX2080TI_std_small.png', format='png')
-    plt.savefig('plots/comparison_RTX2080TI_std_small.pdf', format='pdf')
+    plt.savefig('plots/newbench/comparison_RTX2080TI_std_small.png', format='png')
+    plt.savefig('plots/newbench/comparison_RTX2080TI_std_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values, sorted alphabetically by model
 if large_indices:
@@ -111,5 +111,5 @@ if large_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/comparison_RTX2080TI_std_large.png', format='png')
-    plt.savefig('plots/comparison_RTX2080TI_std_large.pdf', format='pdf')
+    plt.savefig('plots/newbench/comparison_RTX2080TI_std_large.png', format='png')
+    plt.savefig('plots/newbench/comparison_RTX2080TI_std_large.pdf', format='pdf')
