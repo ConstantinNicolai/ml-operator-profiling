@@ -60,7 +60,7 @@ outside_log = subprocess.Popen(outside_logging_command, shell=True, preexec_fn=o
 warmup_start_time = time.time()
 
 # Warmup iterations, to avoid measuring the cold start of the gpu
-for i in range(25000):
+for i in range(10000):
     # Linearly access the convolutional layer from the pre-created list
     operator = operators[i % num_layers]
     
@@ -71,13 +71,13 @@ warmup_stop_time = time.time()
 
 warmup_time = warmup_stop_time - warmup_start_time
 
-time_per_iteration = warmup_time / 25000
+time_per_iteration = warmup_time / 10000
 
-required_iterations = int(20 / time_per_iteration)
+required_iterations = int(3 / time_per_iteration)
 
 print(required_iterations)
 
-for i in range(2):
+for i in range(3):
 
     # Start GPU stats logging and save the process
     startup_command = (
@@ -86,10 +86,10 @@ for i in range(2):
         f"> current_temp_A30_sleep{i}.log"
     )
 
-    time.sleep(10)
+    # time.sleep(3)
 
     # PyTorch Benchmark Timer
-    # num_repeats = 1  # Number of times to repeat the measurement
+    num_repeats = 1  # Number of times to repeat the measurement
     timer = benchmark.Timer(
         stmt="run_inference(operators, num_layers,required_iterations, ifmap)",  # Statement to benchmark  # Setup the function and variables
         setup="from __main__ import run_inference",
@@ -109,16 +109,15 @@ for i in range(2):
     process = subprocess.Popen(startup_command, shell=True, preexec_fn=os.setsid)
     processes.append(process)
 
-    profile_result = timer.blocked_autorange(min_run_time=0)
+    profile_result = timer.timeit(num_repeats)
 
     # Stop GPU stats logging for the latest process
-    os.killpg(os.getpgid(processes[i].pid), signal.SIGTERM)  # Use processes[-1] to get the last process
+    os.killpg(os.getpgid(processes[-1].pid), signal.SIGTERM)  # Use processes[-1] to get the last process
 
     end_sub = time.time()
 
     subprocess_outside_time= end_sub-start_sub
 
-    print("subprocess outside measured time: ", subprocess_outside_time)
     print(f"Elapsed time subprocess: {subprocess_outside_time} seconds")
 
     # # Run the benchmark and output the result
@@ -142,12 +141,15 @@ for i in range(2):
         total_energy_joules_error,
         energy_per_iteration_in_milli_joule_error,
         energy_per_iteration_in_milli_joule_std
-    ) = process_log_file(log_filename, required_iterations)
+    ) = process_log_file(log_filename, 3*required_iterations)
 
     
     print(
         time_per_iteration,
-        time_difference_seconds, 
+        energy_per_iteration_in_milli_joule,
+        energy_per_iteration_in_milli_joule_std,
+        time_difference_seconds
     )
+
 
 os.killpg(os.getpgid(outside_log.pid), signal.SIGTERM)

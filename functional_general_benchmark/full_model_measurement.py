@@ -34,8 +34,8 @@ done
 
 ###########################################################
 #   BE AWARE OF THIS SETTING
-torch.backends.cuda.matmul.allow_tf32 = False
-torch.backends.cudnn.allow_tf32 = False
+# torch.backends.cuda.matmul.allow_tf32 = False
+# torch.backends.cudnn.allow_tf32 = False
 #   PRETTY PLEASE !!!!
 ###########################################################
 
@@ -132,15 +132,3 @@ for entry in os.listdir('./../measurements/A30_no_tc'):
         energy_per_iteration_in_milli_joule, "mJ",
         energy_per_iteration_in_milli_joule_error, "mJ",
         energy_per_iteration_in_milli_joule_std, "mJ")
-
-
-
-
-# inception_v3 (32, 3, 299, 299)
-# (32, 3, 299, 299) 53.677364864864865 12414.93041224118
-# resnet18 (32, 3, 224, 224)
-# (32, 3, 224, 224) 13.419096209912537 3130.5669179301585
-# resnet34 (32, 3, 224, 224)
-# (32, 3, 224, 224) 19.704928664072634 4631.017081406672
-# resnet34 (32, 3, 56, 56)
-# (32, 3, 56, 56) 12.805813234384664 1175.2894863482675

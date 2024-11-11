@@ -6,42 +6,69 @@ import pickle
 import lzma
 import yaml
 import os
-import torch.nn.init as init
 import time
-import math
+import subprocess
+import signal
+import argparse
 from datetime import datetime
+import torch.utils.benchmark as benchmark
 from utils import get_model_and_weights, extract_layer_info, parse_model_and_weights, process_model, forward_hook_new, process_log_file,get_latest_dataset_file, load_latest_dataset, save_dataset
 
 
-iterations = 100000
+# Set up command-line argument parsing
+parser = argparse.ArgumentParser(description="Set GPU type for benchmarking.")
+parser.add_argument("--gpu", type=str, required=True, help="Specify the GPU type (e.g., A30, V100, etc.)")
+
+# Parse arguments
+args = parser.parse_args()
+gpu = args.gpu
+
+if gpu == "A30_no_tc":
+    torch.backends.cuda.matmul.allow_tf32 = False
+    torch.backends.cudnn.allow_tf32 = False
+
+
+
+
+# Define the kernel for benchmarking
+def run_inference(operators, num_layers: int, required_iterations: int , input_tensor: torch.Tensor) -> torch.Tensor:
+    for k in range(required_iterations):
+        # Linearly access the convolutional layer from the pre-created list
+        operator = operators[k % num_layers]
+        
+        # Apply the convolution operation
+        output = operator(input_tensor)
+    return output
+
+outside_log_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+outside_logging_command = (
+    f"nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,"
+    f"power.draw,memory.used,memory.total --format=csv,noheader,nounits "
+    f"> continous_logs/current_continuous_{gpu}_{outside_log_timestamp}.log"
+)
+
 num_layers = 500
+processes = []
 
-# h = 6
-
-
-finishup = """
-bg_pids=$(jobs -p)
-for pid in $bg_pids; do
-    kill $pid
-done
-"""
+outside_log = subprocess.Popen(outside_logging_command, shell=True, preexec_fn=os.setsid)
 
 
-for entry in os.listdir('./../measurements'):
-    with open('./../measurements/' + entry + '/summary.yml', 'r') as file:
+meas_dir_path = f"./../measurements/{gpu}"
+meas_dir_path_to_be_added = f"./../measurements/{gpu}/"
+
+for entry in os.listdir(meas_dir_path):
+    with open(meas_dir_path_to_be_added + entry + '/summary.yml', 'r') as file:
         config = yaml.safe_load(file)
 
     config['input_size'] = tuple(config['input_size'])
-
-    # Dynamically create variables
-    for key, value in config.items():
-        globals()[key] = value
         
-    tuple_str = "_".join(map(str, input_size))
-    filename = f"{model_name}_{tuple_str}.pkl.xz"
+    tuple_str = "_".join(map(str, config['input_size']))
+    filename = f"{config['model_name']}_{tuple_str}.pkl.xz"
 
-    if done == False:
-        with lzma.open('./../measurements/' + entry + '/' + filename + '_filtered') as file_:
+    if config['done'] == True:
+        print("done flag already set to true, for rerun reset to false")
+    if config['done'] == False:
+        with lzma.open(meas_dir_path_to_be_added + entry + '/' + filename + '_filtered') as file_:
             saved_dict = pickle.load(file_)
         
 
@@ -54,6 +81,12 @@ for entry in os.listdir('./../measurements'):
             number_of_unique_operators_in_model = len(list_attemps)
 
             for h in range(number_of_unique_operators_in_model):
+
+                startup_command = (
+                    f"nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,"
+                    f"power.draw,memory.used,memory.total --format=csv,noheader,nounits "
+                    f"> current_{gpu}.log"
+                )
 
 
                 input_size = list_attemps[h][0][2]
@@ -83,7 +116,7 @@ for entry in os.listdir('./../measurements'):
                 warmup_start_time = time.time()
 
                 # Warmup iterations, to avoid measuring the cold start of the gpu
-                for i in range(math.ceil(iterations/4)):
+                for i in range(10000):
                     # Linearly access the convolutional layer from the pre-created list
                     operator = operators[i % num_layers]
                     
@@ -94,68 +127,120 @@ for entry in os.listdir('./../measurements'):
 
                 warmup_time = warmup_stop_time - warmup_start_time
 
-                time_per_iteration = warmup_time / math.ceil(iterations/4)
+                time_per_iteration = warmup_time / 10000
 
-                required_iterations = int(30 / time_per_iteration)
+                required_iterations = int(3 / time_per_iteration)
 
-                # print(required_iterations)
-
-                # Create the startup command string with parameters
-                startup = f"""
-                nvidia-smi -lms=1 --query-gpu=timestamp,utilization.gpu,power.draw,memory.used,memory.total --format=csv,noheader,nounits > current_temp.log &
-                """
-
-
-                # Starting the gpu stats logging in the background
-                os.system(startup)
-
-
-                # Start the timer
-                start_time = time.time()
-
-
-                # Run the convolution operation in a loop, accessing layers linearly
-                for i in range(required_iterations):
-                    # Linearly access the convolutional layer from the pre-created list
-                    operator = operators[i % num_layers]
-                    
-                    # Apply the convolution operation
-                    output = operator(ifmap)
-
-                # Stop the timer
-                end_time = time.time()
-
-                # Stopping the gpu stats logging running in the background
-                os.system(finishup)
-
-                # Calculate the time taken
-                total_time = end_time - start_time
-                # print(f"Total time for {required_iterations} iterations: {total_time:.4f} seconds")
-
-                iterations, time_difference_seconds, time_per_iteration, filtered_mean_value2, std_value2, total_energy_joules, energy_per_iteration_in_milli_joule = process_log_file('current_temp.log', required_iterations)
-
-                print(example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule)
-
-                new_measurements.append((example_layer, input_size, time_per_iteration, energy_per_iteration_in_milli_joule))
-
-                # os.system('head current_temp.log')
+                # PyTorch Benchmark Timer
+                num_repeats = 1  # Number of times to repeat the measurement
+                timer = benchmark.Timer(
+                    stmt="run_inference(operators, num_layers,required_iterations, ifmap)",  # Statement to benchmark  # Setup the function and variables
+                    setup="from __main__ import run_inference",
+                    globals={
+                        "operators": operators,
+                        "required_iterations": required_iterations,
+                        "num_layers": num_layers,
+                        "ifmap": ifmap
+                    },
+                    num_threads=1,  # Number of threads to use
+                    label="Latency Measurement",
+                    sub_label="torch.utils.benchmark"
+                )
 
 
-            DATASET_DIR = "dataset_history/"
+                start_sub = time.time()
+                operation_start_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+                process = subprocess.Popen(startup_command, shell=True, preexec_fn=os.setsid)
+                processes.append(process)
+
+                #Actual benchmarking call
+
+                profile_result = timer.timeit(num_repeats)
+
+                # Stop GPU stats logging for the latest process
+                os.killpg(os.getpgid(processes[-1].pid), signal.SIGTERM)  # Use processes[-1] to get the last process
+
+                operation_stop_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+                end_sub = time.time()
+
+                subprocess_outside_time= end_sub-start_sub
+
+                print(f"Elapsed time subprocess: {subprocess_outside_time} seconds")
+                # Calculate and print total time
+                print(f"Latency, should be 1/3 of elapsed time: {profile_result.mean}s")
+
+
+
+                log_running_atm = f"current_{gpu}.log"
+
+                (
+                    iterations, 
+                    time_difference_seconds, 
+                    time_per_iteration,
+                    filtered_mean_value2, 
+                    filtered_std_value2, 
+                    total_energy_joules,
+                    energy_per_iteration_in_milli_joule, 
+                    total_energy_joules_error,
+                    energy_per_iteration_in_milli_joule_error,
+                    energy_per_iteration_in_milli_joule_std
+                ) = process_log_file(log_running_atm, 3*required_iterations)
+
+                print(
+                    example_layer,
+                    input_size,
+                    profile_result.mean/required_iterations,
+                    energy_per_iteration_in_milli_joule,
+                    energy_per_iteration_in_milli_joule_error,
+                    energy_per_iteration_in_milli_joule_std,
+                    iterations, 
+                    time_difference_seconds, 
+                    filtered_mean_value2, 
+                    filtered_std_value2, 
+                    total_energy_joules, 
+                    total_energy_joules_error,
+                    time_per_iteration,
+                    operation_start_datetime,
+                    operation_stop_datetime
+                )
+
+                new_measurements.append((
+                    example_layer,
+                    input_size,
+                    profile_result.mean/required_iterations,
+                    energy_per_iteration_in_milli_joule,
+                    energy_per_iteration_in_milli_joule_error,
+                    energy_per_iteration_in_milli_joule_std,
+                    iterations, 
+                    time_difference_seconds, 
+                    filtered_mean_value2, 
+                    filtered_std_value2, 
+                    total_energy_joules, 
+                    total_energy_joules_error,
+                    time_per_iteration,
+                    operation_start_datetime,
+                    operation_stop_datetime
+                ))
+
+
+
+            DATASET_DIR = f"datasets_newbench/dataset_history_{gpu}/"
 
             # Ensure the dataset directory exists
             os.makedirs(DATASET_DIR, exist_ok=True)
 
             # Example: Load, append, and save the dataset
-            dataset = load_latest_dataset()
+            dataset = load_latest_dataset(DATASET_DIR)
 
             dataset.extend(new_measurements)  # Append new data
-            save_dataset(dataset)
-
+            save_dataset(dataset, DATASET_DIR)
+            
     config['done'] = True
 
-    with open('./../measurements/' + entry + '/summary.yml', 'w') as file:
+    with open(meas_dir_path_to_be_added + entry + '/summary.yml', 'w') as file:
         yaml.safe_dump(config, file)
 
 
-## comment for git testing
+os.killpg(os.getpgid(outside_log.pid), signal.SIGTERM)

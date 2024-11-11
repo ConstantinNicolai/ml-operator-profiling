@@ -6,7 +6,7 @@ import pickle
 import math
 
 # Load the saved .pt file
-dataset = torch.load('datasets/dataset_history_RTX2080TI/dataset_20241025_220117.pt', map_location=torch.device('cpu'))
+dataset = torch.load('datasets_newbench/dataset_history_A30/dataset_20241110_182037.pt', map_location=torch.device('cpu'))
 
 # print("#########################################")
 

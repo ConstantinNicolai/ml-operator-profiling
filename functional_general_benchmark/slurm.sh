@@ -3,7 +3,7 @@
 #SBATCH --partition=all
 #SBATCH --nodes=1 
 #SBATCH --job-name=operator_profiling
-#SBATCH --output=gpu_kernel_time.out
+#SBATCH --output=A30_no_tc_full_model
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:A30:1
 
@@ -15,4 +15,4 @@ conda activate constabass
 
 
 
-python3 gpu_kernel_time_meas.py
+python3 full_model_meas.py --gpu=A30_no_tc

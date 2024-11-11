@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 plt.figure(figsize=(30, 12))
 
 # Loop over files (modify the range or filenames as needed)
-for i in range(2):
+for i in range(1):
     # Set up the filename for each iteration
-    log = f"current_continousA30.log"
+    log = f"continous_logs/current_continuous_A30_2024-11-10_16-56-00.log"
     df = pd.read_csv(log, delimiter=',', on_bad_lines='skip', header=None)
 
     # Assign column names
@@ -73,7 +73,7 @@ for i in range(2):
 # Final plot adjustments
 plt.xlabel('Time (seconds)')
 plt.ylabel('Power [W]')
-plt.title('Continous Power A30 pytorhc bench')
+plt.title('Continous Power')
 plt.legend()
 plt.grid(visible=True, which='both', linestyle='--', linewidth=0.5)
 plt.minorticks_on()
@@ -81,5 +81,5 @@ plt.grid(which='major', linestyle='-', linewidth=0.7)
 plt.grid(which='minor', linestyle=':', linewidth=0.5)
 
 # Save the plot
-plt.savefig('plots/logs/current_continousA30.png', format='png')
+plt.savefig('plots/logs/current_continous_log.png', format='png')
 plt.show()
