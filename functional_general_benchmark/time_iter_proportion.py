@@ -6,6 +6,7 @@ import pickle
 import lzma
 import yaml
 import os
+import numpy as np
 import torch.nn.init as init
 import time
 import math
@@ -29,8 +30,19 @@ def run_inference(operators, num_layers: int, required_iterations: int , input_t
         output = operator(input_tensor)
     return output
 
+# Define the range of iteration counts
+min_iters = 1
+max_iters = 100000
+num_points = 150  # Adjust based on the number of test points you need
 
-iternumberlist= [500000,100000,50000, 10000, 5000, 1000, 500, 100, 50, 40, 30, 20, 10, 10, 10, 10 ,10 , 5 ,2 ,2 ,1 ,1 ,1,1] #500000, 100000,
+# Use a logarithmic scale to create the test points
+test_points = np.logspace(np.log10(min_iters), np.log10(max_iters), num=num_points, dtype=int)
+
+# Remove duplicates by converting to a set and back to a list, then sort
+test_points = sorted(set(test_points))
+
+
+iternumberlist= test_points#[200000,100000,50000, 10000, 5000, 1000, 500, 100, 50, 40, 30, 20, 10, 10, 10, 10 ,10 , 5 ,2 ,2 ,1 ,1 ,1,1] #500000, 100000,
 
 input_size = (32, 64, 12, 12)
 
@@ -97,4 +109,4 @@ for num in iternumberlist:
 
     profile_result = timer.timeit(num_repeats)
 
-    print(f"Iterations per second: {num/profile_result.mean}", f"Latency: {profile_result.mean}s")
+    print(num,profile_result.mean)
