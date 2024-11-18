@@ -34,26 +34,26 @@ log_fitted_top_iterations = slope * log_top_runtime + intercept
 residuals_top = log_top_iterations - log_fitted_top_iterations
 std_dev_residuals = np.std(residuals_top)
 
-# Identify points that deviate more than 3 sigma in the full dataset
+# Identify points that deviate more than 5 sigma in the full dataset
 log_fitted_iterations = slope * np.log10(runtime) + intercept
 log_actual_iterations = np.log10(iterations)
 residuals_all = log_actual_iterations - log_fitted_iterations
-outliers = np.abs(residuals_all) > 3 * std_dev_residuals
+outliers = np.abs(residuals_all) > 5 * std_dev_residuals
 
 # Determine the cutoff runtime below which there are outliers
 cutoff_runtime = runtime[np.argmax(outliers)] if np.any(outliers) else None
 
-# Plot data, linear fit, 3 sigma bounds, and mark the cutoff point
+# Plot data, linear fit, 5 sigma bounds, and mark the cutoff point
 plt.figure(figsize=(10, 6))
 plt.plot(runtime, iterations, marker='o', linestyle='-', color='b', label='Data')
 plt.plot(runtime, fitted_iterations, color='r', linestyle='--', label='Linear Fit (Top 6/7)')
-plt.scatter(runtime[outliers], iterations[outliers], color='orange', label='3σ Outliers')
+plt.scatter(runtime[outliers], iterations[outliers], color='orange', label='5σ Outliers')
 
-# Add 3 sigma bounds
-upper_bound = 10**(log_fitted_iterations + 3 * std_dev_residuals)
-lower_bound = 10**(log_fitted_iterations - 3 * std_dev_residuals)
-plt.plot(runtime, upper_bound, color='g', linestyle=':', label='+3σ Bound')
-plt.plot(runtime, lower_bound, color='g', linestyle=':', label='-3σ Bound')
+# Add 5 sigma bounds
+upper_bound = 10**(log_fitted_iterations + 5 * std_dev_residuals)
+lower_bound = 10**(log_fitted_iterations - 5 * std_dev_residuals)
+plt.plot(runtime, upper_bound, color='g', linestyle=':', label='+5σ Bound')
+plt.plot(runtime, lower_bound, color='g', linestyle=':', label='-5σ Bound')
 
 largest_outlier = 0
 for i in np.where(outliers)[0]:
@@ -67,7 +67,7 @@ if cutoff_runtime:
 
 plt.xlabel('Runtime [s]')
 plt.ylabel('Iterations')
-plt.title('Iteration Runtime Proportionality with 3σ Bounds')
+plt.title('Iteration Runtime Proportionality with 5σ Bounds')
 plt.xscale('log')
 plt.yscale('log')
 plt.grid(True)
@@ -78,7 +78,7 @@ plt.savefig('plots/proport/A30_with_fit_and_sigma.png', format='png')
 
 
 # Print the number of outliers and the actual data points
-print(f"Number of points outside 3σ range: {np.sum(outliers)}")
+print(f"Number of points outside 5σ range: {np.sum(outliers)}")
 print("Outliers (Runtime [s], Iterations):")
 for i in np.where(outliers)[0]:
     print(f"({runtime[i]:.5f}, {iterations[i]})")

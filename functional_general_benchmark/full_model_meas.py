@@ -21,7 +21,7 @@ from utils import get_model_and_weights, extract_layer_info, parse_model_and_wei
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 iterations = 2000
-
+T_CUTOFF = 0.00034
 
 # Set up command-line argument parsing
 parser = argparse.ArgumentParser(description="Set GPU type for benchmarking.")
@@ -174,6 +174,11 @@ for entry in os.listdir(meas_dir_path):
     #     operation_start_datetime,
     #     operation_stop_datetime
     # )
+
+
+    total_time_uncertainty = T_CUTOFF/profile_result.mean
+    
+    
 
 
     print(

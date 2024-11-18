@@ -10,6 +10,8 @@ import time
 import subprocess
 import signal
 import argparse
+import math
+import statistics
 from datetime import datetime
 import torch.utils.benchmark as benchmark
 from utils import get_model_and_weights, extract_layer_info, parse_model_and_weights, process_model, forward_hook_new, process_log_file,get_latest_dataset_file, load_latest_dataset, save_dataset
@@ -18,10 +20,14 @@ from utils import get_model_and_weights, extract_layer_info, parse_model_and_wei
 # Set up command-line argument parsing
 parser = argparse.ArgumentParser(description="Set GPU type for benchmarking.")
 parser.add_argument("--gpu", type=str, required=True, help="Specify the GPU type (e.g., A30, V100, etc.)")
+parser.add_argument("--rundur", type=int, required=True, help="Set duration per benchmark run of N iteration")
+parser.add_argument("--runnr", type=int, required=True, help="Set number of runs")
 
 # Parse arguments
 args = parser.parse_args()
 gpu = args.gpu
+rundur = args.rundur
+runnr = args.runnr
 
 if gpu == "A30_no_tc":
     torch.backends.cuda.matmul.allow_tf32 = False
@@ -129,7 +135,7 @@ for entry in os.listdir(meas_dir_path):
 
                 time_per_iteration = warmup_time / 10000
 
-                required_iterations = int(3 / time_per_iteration)
+                required_iterations = int(rundur / time_per_iteration)
 
                 # PyTorch Benchmark Timer
                 num_repeats = 1  # Number of times to repeat the measurement
@@ -156,7 +162,8 @@ for entry in os.listdir(meas_dir_path):
 
                 #Actual benchmarking call
 
-                profile_result = timer.timeit(num_repeats)
+                # profile_result = timer.timeit(num_repeats)
+                profile_result = timer.blocked_autorange(callback=None, min_run_time=rundur * runnr)
 
                 # Stop GPU stats logging for the latest process
                 os.killpg(os.getpgid(processes[-1].pid), signal.SIGTERM)  # Use processes[-1] to get the last process
@@ -167,9 +174,10 @@ for entry in os.listdir(meas_dir_path):
 
                 subprocess_outside_time= end_sub-start_sub
 
-                print(f"Elapsed time subprocess: {subprocess_outside_time} seconds")
-                # Calculate and print total time
-                print(f"Latency, should be 1/3 of elapsed time: {profile_result.mean}s")
+
+                # print(f"Elapsed time subprocess: {subprocess_outside_time} seconds")
+                # # Calculate and print total time
+                # print(f"Latency, should be 1/3 of elapsed time: {profile_result.mean}s")
 
 
 
@@ -178,55 +186,70 @@ for entry in os.listdir(meas_dir_path):
                 (
                     iterations, 
                     time_difference_seconds, 
-                    time_per_iteration,
-                    filtered_mean_value2, 
-                    filtered_std_value2, 
+                    old_time_per_iteration,
+                    filtered_power_mean, 
+                    filtered_power_std, 
                     total_energy_joules,
-                    energy_per_iteration_in_milli_joule, 
+                    energy_per_iteration_in_milli_joule,
                     total_energy_joules_error,
                     energy_per_iteration_in_milli_joule_error,
                     energy_per_iteration_in_milli_joule_std
-                ) = process_log_file(log_running_atm, 3*required_iterations)
+                ) = process_log_file(log_running_atm, len(profile_result.times)*required_iterations)
+
+
+                stddev_time = statistics.stdev(profile_result.times)
+                new_time_per_iteration = profile_result.mean/required_iterations
+                new_time_per_iteration_std = stddev_time/required_iterations
+                new_energy_per_iteration_in_milli_joule = new_time_per_iteration*filtered_power_mean*1000
+                relative_error_time_per_iteration = new_time_per_iteration_std/new_time_per_iteration
+                relative_error_power = filtered_power_std/filtered_power_mean
+                new_energy_per_iteration_in_milli_joule_std = 1000 * new_time_per_iteration*filtered_power_mean *math.sqrt(relative_error_time_per_iteration**2 + relative_error_power**2)
+                total_runtime = sum(profile_result.times)
+                total_energy_joules = (new_energy_per_iteration_in_milli_joule / 1000) * required_iterations
+                total_energy_joules_std = (new_energy_per_iteration_in_milli_joule_std / 1000) * required_iterations
+
 
                 print(
                     example_layer,
                     input_size,
-                    profile_result.mean/required_iterations,
-                    energy_per_iteration_in_milli_joule,
+                    new_time_per_iteration,
+                    new_energy_per_iteration_in_milli_joule,
                     energy_per_iteration_in_milli_joule_error,
-                    energy_per_iteration_in_milli_joule_std,
+                    new_energy_per_iteration_in_milli_joule_std,
                     iterations, 
-                    time_difference_seconds, 
-                    filtered_mean_value2, 
-                    filtered_std_value2, 
+                    total_runtime,
+                    filtered_power_mean, 
+                    filtered_power_std, 
                     total_energy_joules, 
-                    total_energy_joules_error,
-                    time_per_iteration,
+                    total_energy_joules_std,
+                    old_time_per_iteration,
                     operation_start_datetime,
-                    operation_stop_datetime
+                    operation_stop_datetime,
+                    new_time_per_iteration_std
                 )
 
                 new_measurements.append((
                     example_layer,
                     input_size,
-                    profile_result.mean/required_iterations,
-                    energy_per_iteration_in_milli_joule,
+                    new_time_per_iteration,
+                    new_energy_per_iteration_in_milli_joule,
                     energy_per_iteration_in_milli_joule_error,
-                    energy_per_iteration_in_milli_joule_std,
+                    new_energy_per_iteration_in_milli_joule_std,
                     iterations, 
-                    time_difference_seconds, 
-                    filtered_mean_value2, 
-                    filtered_std_value2, 
+                    total_runtime,
+                    filtered_power_mean, 
+                    filtered_power_std, 
                     total_energy_joules, 
-                    total_energy_joules_error,
-                    time_per_iteration,
+                    total_energy_joules_std,
+                    old_time_per_iteration,
                     operation_start_datetime,
-                    operation_stop_datetime
+                    operation_stop_datetime,
+                    new_time_per_iteration_std
                 ))
 
 
 
-            DATASET_DIR = f"datasets_newbench/dataset_history_{gpu}/"
+            DATASET_DIR = f"datasets_finalbench/dataset_history_{gpu}/"
 
             # Ensure the dataset directory exists
             os.makedirs(DATASET_DIR, exist_ok=True)

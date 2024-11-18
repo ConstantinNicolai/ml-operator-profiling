@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#SBATCH --partition=all
+#SBATCH --nodelist=csg-rivulet04
 #SBATCH --nodes=1 
-#SBATCH --job-name=operator_profiling
-#SBATCH --output=A30_no_tc_full_model
+#SBATCH --job-name=operations_profiling
+#SBATCH --output=finalbench_all_operations_A30
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:A30:1
 
@@ -15,4 +15,4 @@ conda activate constabass
 
 
 
-python3 full_model_meas.py --gpu=A30_no_tc
+python3 general_pipeline_block2.py --gpu=A30 --rundur=4 --runnr=4

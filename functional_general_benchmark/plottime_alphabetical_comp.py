@@ -27,8 +27,8 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'A30_no_tc_full_model'
-prediction_file = 'datasets_newbench/dataset_history_A30_no_tc/summed_up.txt'
+measurement_file = 'A30_full_model'
+prediction_file = 'datasets_newbench/dataset_history_A30/summed_up.txt'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_prediction_file(prediction_file)
@@ -61,20 +61,20 @@ if small_indices:
     index = np.arange(len(small_models))
     bar_width = 0.35
 
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(5, 5))
     bar1 = ax.bar(index, small_measured, bar_width, label='Measured', color=turquoise_color)
     bar2 = ax.bar(index + bar_width, small_predicted, bar_width, label='Summed', color=maroon_color)
 
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Time (ms)')
-    ax.set_title(f'Measured and Summed Runtime A30 no TC')
+    # ax.set_title(f'Measured and Summed Runtime A30 no TC')
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(small_models, rotation=45, ha='right')
     ax.legend()
     plt.tight_layout()
-    plt.savefig('plots/time/timecomparison_A30_no_tc_small.png', format='png')
-    plt.savefig('plots/time/timecomparison_A30_no_tc_small.pdf', format='pdf')
+    plt.savefig('plots/time/timecomparison_A30_small.png', format='png')
+    plt.savefig('plots/time/timecomparison_A30_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values, sorted alphabetically by model
 if large_indices:
@@ -89,18 +89,18 @@ if large_indices:
     index = np.arange(len(large_models))
     bar_width = 0.35
 
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(5, 5))
     bar1 = ax.bar(index, large_measured, bar_width, label='Measured', color=turquoise_color)
     bar2 = ax.bar(index + bar_width, large_predicted, bar_width, label='Summed', color=maroon_color)
 
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Time (ms)')
-    ax.set_title(f'Measured and Summed Runtime A30 no TC')
+    # ax.set_title(f'Measured and Summed Runtime A30 no TC')
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(large_models, rotation=45, ha='right')
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/time/timecomparison_A30_no_tc_large.png', format='png')
-    plt.savefig('plots/time/timecomparison_A30_no_tc_large.pdf', format='pdf')
+    plt.savefig('plots/time/timecomparison_A30_large.png', format='png')
+    plt.savefig('plots/time/timecomparison_A30_large.pdf', format='pdf')

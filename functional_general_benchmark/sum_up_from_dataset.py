@@ -109,6 +109,8 @@ for entry in os.listdir('./../measurements/A30'):
     energy_sum = 0
     energy_error_squared_sum = 0
 
+    # print(working_list[0])
+
     for item in working_list:
         # print(item)
         # print(item[4])
@@ -117,6 +119,8 @@ for entry in os.listdir('./../measurements/A30'):
         count_of_this_layer = item[1]
         runtime = item[3]
         energy = item[4]
+        iterations = item[7]
+        runtime_for_all_iterations = item[8]
         energy_error = item[6]
         if math.isnan(runtime) == False:
             time_sum = time_sum + count_of_this_layer * runtime

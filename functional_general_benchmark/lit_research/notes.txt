@@ -1,0 +1,7 @@
+Offline performance and energy consumption prediction model of deep learning training tasks by  Jianchen Han, Yingwen Chen 
+I want access to this paper !!
+
+ATTENTION: random forest can only learn values in the range of the training samples
+dynamic valotage and frequency scaling can screw things up. at least if we cant hit it over the head with a law of large numbers approach club
+
+

@@ -31,9 +31,11 @@ def read_prediction_file(filename):
 # Example usage
 measurement_file = 'A30_full_model'
 prediction_file = 'A30_no_tc_full_model'
+third_file = 'RTX2080TI_full_model'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_measurement_file(prediction_file)
+third_one = read_measurement_file(third_file)
 
 # Ensure the sets of models/input sizes match between measurements and predictions
 common_keys = set(measurements.keys()) & set(predictions.keys())
@@ -42,7 +44,7 @@ common_keys = set(measurements.keys()) & set(predictions.keys())
 models = list(common_keys)
 measured_values = [measurements[key] for key in common_keys]
 predicted_values = [predictions[key] for key in common_keys]
-
+third_values = [third_one[key] for key in common_keys]
 # Set threshold for splitting the y-axis (you can adjust this based on your data)
 threshold = 5  # Now in Joules (since mJ to J conversion is done)
 
@@ -55,19 +57,21 @@ if small_indices:
     small_models = [models[i] for i in small_indices]
     small_measured = [measured_values[i] for i in small_indices]
     small_predicted = [predicted_values[i] for i in small_indices]
+    small_third = [third_values[i] for i in small_indices]
 
     index = np.arange(len(small_models))
-    bar_width = 0.35
+    bar_width = 0.25
 
     fig, ax = plt.subplots(figsize=(6, 6))
     bar1 = ax.bar(index, small_measured, bar_width, label='TC', color=turquoise_color)
     bar2 = ax.bar(index + bar_width, small_predicted, bar_width, label='TC Disabled', color=maroon_color)
+    bar3 = ax.bar(index + 2*bar_width, small_third, bar_width, label='2080TI', color="darkgreen")
 
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
     ax.set_title(f'Measured Energy with and without Tensor Cores A30', fontsize = fontsize)
-    ax.set_xticks(index + bar_width / 2)
+    ax.set_xticks(index + bar_width)
     ax.set_xticklabels(small_models, rotation=45, ha='right')
     ax.legend()
 
@@ -80,19 +84,21 @@ if large_indices:
     large_models = [models[i] for i in large_indices]
     large_measured = [measured_values[i] for i in large_indices]
     large_predicted = [predicted_values[i] for i in large_indices]
+    large_third = [third_values[i] for i in large_indices]
 
     index = np.arange(len(large_models))
-    bar_width = 0.35
+    bar_width = 0.25  # Reduced bar width to fit three bars side-by-side
 
     fig, ax = plt.subplots(figsize=(6, 6))
     bar1 = ax.bar(index, large_measured, bar_width, label='TC', color=turquoise_color)
     bar2 = ax.bar(index + bar_width, large_predicted, bar_width, label='TC Disabled', color=maroon_color)
+    bar3 = ax.bar(index + 2*bar_width, large_third, bar_width, label='2080TI', color="darkgreen")
 
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
-    ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Measured Energy with and without Tensor Cores A30', fontsize = fontsize)
-    ax.set_xticks(index + bar_width / 2)
+    ax.set_ylabel('Energy Consumption (J)')
+    ax.set_title(f'Measured Energy with and without Tensor Cores A30', fontsize=fontsize)
+    ax.set_xticks(index + bar_width)
     ax.set_xticklabels(large_models, rotation=45, ha='right')
     ax.legend()
 
