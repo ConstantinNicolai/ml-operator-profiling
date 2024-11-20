@@ -6,7 +6,7 @@ import pickle
 import math
 
 # Load the saved .pt file
-dataset = torch.load('datasets_newbench/dataset_history_A30/dataset_20241110_182037.pt', map_location=torch.device('cpu'))
+dataset = torch.load('datasets_finalbench/dataset_history_RTX2080TI/dataset_20241117_025405.pt', map_location=torch.device('cpu'))
 
 # print("#########################################")
 
@@ -108,6 +108,7 @@ for entry in os.listdir('./../measurements/A30'):
     time_sum = 0
     energy_sum = 0
     energy_error_squared_sum = 0
+    runtime_error_squared_sum = 0
 
     # print(working_list[0])
 
@@ -122,10 +123,15 @@ for entry in os.listdir('./../measurements/A30'):
         iterations = item[7]
         runtime_for_all_iterations = item[8]
         energy_error = item[6]
+        runtime_error = item[16]
         if math.isnan(runtime) == False:
             time_sum = time_sum + count_of_this_layer * runtime
         else:
             print("encountered nan value in runtime, incomplete sum")
+        if math.isnan(runtime_error) == False:
+            runtime_error_squared_sum = runtime_error_squared_sum + count_of_this_layer * runtime_error * runtime_error
+        else:
+            print("encountered nan value in runtime error, incomplete sum")
         if math.isnan(energy) == False:
             energy_sum = energy_sum + count_of_this_layer * energy
         else:
@@ -133,9 +139,10 @@ for entry in os.listdir('./../measurements/A30'):
         if math.isnan(energy_error) == False:
             energy_error_squared_sum = energy_error_squared_sum + count_of_this_layer * energy_error * energy_error
         else:
-            print("encountered nan value in energy, incomplete sum")
+            print("encountered nan value in energy error, incomplete sum")
 
     print(1000*time_sum, "[ms]")
+    print(1000*math.sqrt(runtime_error_squared_sum), '[ms]')
     print(energy_sum, "[mJ]")
     print(math.sqrt(energy_error_squared_sum), '[mJ]')
 

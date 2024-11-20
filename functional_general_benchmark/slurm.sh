@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#SBATCH --nodelist=csg-rivulet04
+#SBATCH --nodelist=csg-brook02
 #SBATCH --nodes=1 
 #SBATCH --job-name=operations_profiling
-#SBATCH --output=finalbench_all_operations_A30
+#SBATCH --output=fullmodel_RTX2080TI
 #SBATCH --ntasks-per-node=1
-#SBATCH --gres=gpu:A30:1
+#SBATCH --gres=gpu:RTX2080TI:1
 
 
 
@@ -15,4 +15,4 @@ conda activate constabass
 
 
 
-python3 general_pipeline_block2.py --gpu=A30 --rundur=4 --runnr=4
+python3 full_model_meas.py --gpu=RTX2080TI --rundur=12 --runnr=3

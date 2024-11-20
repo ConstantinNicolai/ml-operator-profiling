@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import linregress
 
+
+
 # Load the data from the file
 data = np.loadtxt('iter_A30', delimiter=' ')
 
@@ -44,8 +46,8 @@ outliers = np.abs(residuals_all) > 5 * std_dev_residuals
 cutoff_runtime = runtime[np.argmax(outliers)] if np.any(outliers) else None
 
 # Plot data, linear fit, 5 sigma bounds, and mark the cutoff point
-plt.figure(figsize=(10, 6))
-plt.plot(runtime, iterations, marker='o', linestyle='-', color='b', label='Data')
+plt.figure(figsize=(6, 6))
+plt.plot(runtime, iterations, marker='.', linestyle='-', color='b', label='Data')
 plt.plot(runtime, fitted_iterations, color='r', linestyle='--', label='Linear Fit (Top 6/7)')
 plt.scatter(runtime[outliers], iterations[outliers], color='orange', label='5σ Outliers')
 
@@ -75,6 +77,7 @@ plt.legend()
 
 # Save the plot
 plt.savefig('plots/proport/A30_with_fit_and_sigma.png', format='png')
+plt.savefig('plots/proport/A30_with_fit_and_sigma.pdf', format='pdf')
 
 
 # Print the number of outliers and the actual data points

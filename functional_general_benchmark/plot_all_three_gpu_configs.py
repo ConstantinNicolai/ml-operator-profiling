@@ -11,10 +11,11 @@ def read_measurement_file(filename):
     measurements = {}
     with open(filename, 'r') as file:
         lines = file.readlines()
-        for i in range(0, len(lines), 2):  # Every 2 lines form a single entry
+        for i in range(0, len(lines), 5):  # Every 2 lines form a single entry
             model_input_size = lines[i].strip()  # Read the whole line as a key (model + input size)
-            energy_mJ = float(lines[i+1].split()[2])  # The energy value (ignore units)
-            measurements[model_input_size] = energy_mJ / 1000  # Convert mJ to J
+            energy = float(lines[i+3]) #, float(lines[i+4])
+            # energy = float(lines[i+1].split()[2]), float(lines[i+1].split()[6])
+            measurements[model_input_size] = energy  # Convert mJ to J
     return measurements
 
 # Function to read the prediction file
@@ -29,9 +30,9 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'A30_full_model'
-prediction_file = 'A30_no_tc_full_model'
-third_file = 'RTX2080TI_full_model'
+measurement_file = 'A30_fullmodel'
+prediction_file = 'A30_no_tc_fullmodel'
+third_file = 'RTX2080TI_fullmodel'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_measurement_file(prediction_file)
@@ -42,9 +43,9 @@ common_keys = set(measurements.keys()) & set(predictions.keys())
 
 # Prepare data for plotting
 models = list(common_keys)
-measured_values = [measurements[key] for key in common_keys]
-predicted_values = [predictions[key] for key in common_keys]
-third_values = [third_one[key] for key in common_keys]
+measured_values = [measurements[key]/1000 for key in common_keys]
+predicted_values = [predictions[key]/1000 for key in common_keys]
+third_values = [third_one[key]/1000 for key in common_keys]
 # Set threshold for splitting the y-axis (you can adjust this based on your data)
 threshold = 5  # Now in Joules (since mJ to J conversion is done)
 
@@ -63,8 +64,8 @@ if small_indices:
     bar_width = 0.25
 
     fig, ax = plt.subplots(figsize=(6, 6))
-    bar1 = ax.bar(index, small_measured, bar_width, label='TC', color=turquoise_color)
-    bar2 = ax.bar(index + bar_width, small_predicted, bar_width, label='TC Disabled', color=maroon_color)
+    bar1 = ax.bar(index, small_measured, bar_width, label='A30 with TC', color=turquoise_color)
+    bar2 = ax.bar(index + bar_width, small_predicted, bar_width, label='A30 no TC', color=maroon_color)
     bar3 = ax.bar(index + 2*bar_width, small_third, bar_width, label='2080TI', color="darkgreen")
 
     # Add labels and titles
@@ -76,8 +77,8 @@ if small_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/tc_compare/tc_no_tc_small.png', format='png')
-    plt.savefig('plots/tc_compare/tc_no_tc_small.pdf', format='pdf')
+    plt.savefig('plots/tc_compare/all_three_small.png', format='png')
+    plt.savefig('plots/tc_compare/all_three_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values
 if large_indices:
@@ -90,8 +91,8 @@ if large_indices:
     bar_width = 0.25  # Reduced bar width to fit three bars side-by-side
 
     fig, ax = plt.subplots(figsize=(6, 6))
-    bar1 = ax.bar(index, large_measured, bar_width, label='TC', color=turquoise_color)
-    bar2 = ax.bar(index + bar_width, large_predicted, bar_width, label='TC Disabled', color=maroon_color)
+    bar1 = ax.bar(index, large_measured, bar_width, label='A30 with TC', color=turquoise_color)
+    bar2 = ax.bar(index + bar_width, large_predicted, bar_width, label='A30 no TC', color=maroon_color)
     bar3 = ax.bar(index + 2*bar_width, large_third, bar_width, label='2080TI', color="darkgreen")
 
     # Add labels and titles
@@ -103,5 +104,5 @@ if large_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/tc_compare/tc_no_tc_large.png', format='png')
-    plt.savefig('plots/tc_compare/tc_no_tc_large.pdf', format='pdf')
+    plt.savefig('plots/tc_compare/all_three_large.png', format='png')
+    plt.savefig('plots/tc_compare/all_three_large.pdf', format='pdf')
