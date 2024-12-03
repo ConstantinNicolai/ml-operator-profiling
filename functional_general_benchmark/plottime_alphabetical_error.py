@@ -10,7 +10,7 @@ def read_measurement_file(filename):
     measurements = {}
     with open(filename, 'r') as file:
         lines = file.readlines()
-        for i in range(0, len(lines), 2):  # Every 2 lines form a single entry
+        for i in range(0, len(lines), 5):  # Every 2 lines form a single entry
             model_input_size = lines[i].strip()  # Read the whole line as a key (model + input size)
             time_ms = float(lines[i+1].split()[0])  # Extract time value in ms
             time_error = float(lines[i+2].split()[0])  # Extract time error in ms
@@ -30,7 +30,7 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'A30_full_model'
+measurement_file = 'A30_fullmodel'
 prediction_file = 'datasets_newbench/dataset_history_A30/summed_up.txt'
 
 measurements = read_measurement_file(measurement_file)
@@ -47,7 +47,7 @@ measured_errors = [measurements[key][1] for key in common_keys]
 predicted_errors = [predictions[key][1] for key in common_keys]
 
 # Set threshold for splitting the y-axis
-threshold = 24  # Adjust this threshold based on your data
+threshold = 18  # Adjust this threshold based on your data
 
 # Separate data into two groups: "small" and "large" values
 small_indices = [i for i, val in enumerate(measured_values) if val < threshold]

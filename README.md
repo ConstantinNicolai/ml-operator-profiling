@@ -20,6 +20,9 @@ time side rigour\
 
 Shijie MACs and FLOPs per Kernel\
 
+
+POWER DELAY PRODUCT\
+
 ## Today's To do's
 Read this paper: Inspired by: Lorenz Braun, Sotirios Nikas, Chen Song, Vincent Heuveline and Holger Fröning, A Simple Model for Portable and Fast Prediction of Execution Time and Power Consumption of GPU Kernels - see website \
 Measure the dataset for conv2D with a sensible, but moderate amount of configurable parameters. Then perform an energy comparison with ResNet50. Done. As expected by only measuring the conv2D layers we measure less energy in the addition of those then for the full model. Next we should also measure some linear layers we need for the resnets. \
