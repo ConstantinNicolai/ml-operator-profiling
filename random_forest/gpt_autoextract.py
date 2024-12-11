@@ -11,7 +11,7 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
 # Load the saved .pt file
-dataset = torch.load('../functional_general_benchmark/datasets_finalbench/dataset_history_A30/dataset_20241117_202731.pt', map_location=torch.device('cpu'))
+dataset = torch.load('../functional_general_benchmark/datasets_finalbench/dataset_history_A30_no_tc/dataset_20241117_024455.pt', map_location=torch.device('cpu'))
 
 
 dataset_list = [list(item) for item in dataset]
@@ -30,8 +30,12 @@ dataset_list = [list(item) for item in dataset]
 
 layers = [row[0] for row in dataset_list]
 input_sizes = [row[1] for row in dataset_list]
+runtimes = [row[2] for row in dataset_list]
+wattages = [row[8] for row in dataset_list]
 
-print(input_sizes[0:6])
+# print(input_sizes[0:6])
+# print(runtimes[0:6])
+# print(wattages[0:6])
 
 # Predefined list of attributes to consider
 attributes_to_extract = [
@@ -151,23 +155,102 @@ df = add_input_sizes_with_flags_to_df(df, input_sizes)
 # pd.set_option('display.max_rows', None)  # Show all rows
 # pd.set_option('display.max_columns', None)
 
-print(df)
+# print(df)
 
 # # Display the DataFrame
 # print(df.to_numpy())
 
-print(df.to_numpy()[0:3])
+# print(df.to_numpy()[0:3])
 
-# def check_array_elements(arr):
-#     # Check if the input is a NumPy array or list
-#     if not isinstance(arr, (np.ndarray, list)):
-#         raise ValueError("Input must be a NumPy array or a list.")
-    
-#     # Iterate through each element in the array or list with its index
-#     for idx, element in enumerate(arr):
-#         if not isinstance(element, (bool, int, float)):
-#             print(f"Invalid type found at index {idx}: {type(element)}")
-#             return False  # Return False if an element is not bool, int, or float
-#     return True  # Return True if all elements are valid types
+input_features = df.to_numpy()
 
-# check_array_elements(df.to_numpy())
+
+###############################################################
+
+
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+
+# Assuming you have 'input_features' for your inputs and 'runtimes' and 'wattages' for your targets
+# input_features = df.to_numpy()
+# runtimes = [row[2] for row in dataset_list]
+# wattages = [row[8] for row in dataset_list]
+
+# Find the min and max values for runtimes and wattages
+runtime_min, runtime_max = np.min(runtimes), np.max(runtimes)
+wattage_min, wattage_max = np.min(wattages), np.max(wattages)
+
+# Select indices where runtime or wattage are at their min or max
+train_indices = np.where((runtimes == runtime_min) | (runtimes == runtime_max) |
+                         (wattages == wattage_min) | (wattages == wattage_max))[0]
+
+# Get the remaining indices for random splitting
+remaining_indices = np.setdiff1d(np.arange(len(runtimes)), train_indices)
+
+# Split the remaining data randomly into train and test sets
+train_remaining, test_remaining = train_test_split(remaining_indices, test_size=0.2, random_state=42)
+
+# Combine the indices to get your final training set
+train_indices = np.concatenate([train_indices, train_remaining])
+
+# Create the final training and testing datasets
+X_train, X_test = input_features[train_indices], input_features[test_remaining]
+y_train_runtime, y_test_runtime = np.array(runtimes)[train_indices], np.array(runtimes)[test_remaining]
+y_train_wattage, y_test_wattage = np.array(wattages)[train_indices], np.array(wattages)[test_remaining]
+
+# Now you can train two separate models
+from sklearn.ensemble import RandomForestRegressor
+
+# Model for runtime prediction
+runtime_model = RandomForestRegressor(n_estimators=900, random_state=42, criterion='absolute_error')
+runtime_model.fit(X_train, y_train_runtime)  # Train on runtimes
+
+# Model for wattage prediction
+wattage_model = RandomForestRegressor(n_estimators=100, random_state=42, criterion='squared_error')
+wattage_model.fit(X_train, y_train_wattage)  # Train on wattages
+
+# Make predictions for runtime and wattage
+y_pred_runtime = runtime_model.predict(X_test)
+y_pred_wattage = wattage_model.predict(X_test)
+
+# Calculate the Mean Squared Error (MSE) for both models
+runtime_mse = mean_squared_error(y_test_runtime, y_pred_runtime)
+wattage_mse = mean_squared_error(y_test_wattage, y_pred_wattage)
+
+# Calculate energy predictions
+energy_pred = y_pred_runtime * y_pred_wattage
+
+# Print out test accuracy (MSE for both models) and some predictions
+print(f"Test MSE for Runtime Prediction: {runtime_mse:.4f}")
+print(f"Test MSE for Wattage Prediction: {wattage_mse:.4f}")
+print(f"Sample Predicted Runtimes: {y_pred_runtime[:5]}")
+print(f"Sample Predicted Wattages: {y_pred_wattage[:5]}")
+print(f"Sample Energy Predictions: {energy_pred[:5]}")
+
+from sklearn.metrics import r2_score
+
+r2_runtime = r2_score(y_test_runtime, y_pred_runtime)
+r2_wattage = r2_score(y_test_wattage, y_pred_wattage)
+
+print(f"R² for Runtime Prediction: {r2_runtime:.4f}")
+print(f"R² for Wattage Prediction: {r2_wattage:.4f}")
+
+
+# from sklearn.model_selection import RandomizedSearchCV
+# from scipy.stats import randint
+
+# param_dist = {
+#     'n_estimators': [100, 200, 300, 800],
+#     'max_depth': [5, 10, 20, None],
+#     'min_samples_split': randint(2, 10),
+#     'min_samples_leaf': randint(1, 10),
+#     'bootstrap': [True, False],
+#     'criterion' : ['squared_error','absolute_error']
+# }
+
+# random_search = RandomizedSearchCV(runtime_model, param_distributions=param_dist, n_iter=50, cv=5, random_state=42, n_jobs=-1)
+# random_search.fit(X_train, y_train_runtime)
+
+# print("Best parameters found: ", random_search.best_params_)
