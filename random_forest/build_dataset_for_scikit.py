@@ -44,11 +44,11 @@ list_of_pytorch_objects = [row[0] for row in rf_input_list]
 
 # print(list_of_pytorch_objects[0:4])
 
-for i in list_of_pytorch_objects:
-    try:
-        print(i.padding)
-    except:
-        continue
+# for i in list_of_pytorch_objects:
+#     try:
+#         print(i.padding)
+#     except:
+#         continue
 categories = [[row[0]._get_name()] for row in rf_input_list] 
 
 # print(categories)
@@ -62,12 +62,14 @@ rf_input_list_encoded = [list(encoded[i]) + row[1:] for i, row in enumerate(rf_i
 
 # rf_input_list_no_tuple = [inner_list[:-1] + list(inner_list[-1]) for inner_list in rf_input_list_encoded]
 
+print(rf_input_list_encoded[5])
 
 rf_input_list_no_tuple = [
     inner_list[:-1] + list(inner_list[-1])[:4] + [-1] * (4 - len(list(inner_list[-1])[:4]))
     for inner_list in rf_input_list_encoded
 ]
 
+print(rf_input_list_no_tuple[5])
 
 # print(rf_input_list_no_tuple[0:4])
 
