@@ -10,7 +10,13 @@ import glob
 from utils import get_model_and_weights, extract_layer_info, parse_model_and_weights, process_model, forward_hook_new
 
 
-filter_list = ['Conv2d','Linear','StochasticDepth', 'BatchNorm2d', 'AvgPool2d', 'AdaptiveAvgPool2d', 'ReLU'] #'Conv2d','Linear','StochasticDepth' , 'ConvTranspose2d'
+filter_list = [
+    'Conv2d', 'Linear', 'StochasticDepth', 
+    'BatchNorm2d', 'AvgPool2d', 'AdaptiveAvgPool2d', 
+    'ReLU', 'LayerNorm', 'GELU', 'NonDynamicallyQuantizableLinear',
+    'SiLU', 'Sigmoid', 'MaxPool2d', 
+]
+ #'Conv2d','Linear','StochasticDepth' , 'ConvTranspose2d'
 
 
 for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
