@@ -58,7 +58,7 @@ for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
 
 
         # Generate random input data
-        input_data = torch.randn(*input_size)
+        input_data = torch.randn(tuple(config['input_size']))
 
 
         # # Register the forward hook only for leaf nodes
@@ -86,7 +86,7 @@ for summary_file in glob.glob('./../measurements/*/*/summary.yml'):
         #     print(f'{key}: {value}')
 
 
-        tuple_str = "_".join(map(str, input_size))
+        tuple_str = "_".join(map(str, config['input_size']))
 
         # Format the filename using both variables 
         filename = f"{config['model_name']}_{tuple_str}.pkl.xz"
