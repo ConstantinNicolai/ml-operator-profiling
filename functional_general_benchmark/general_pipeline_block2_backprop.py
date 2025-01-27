@@ -127,9 +127,20 @@ for entry in os.listdir(meas_dir_path):
                 input_size = list_attemps[h][0][2]
 
 
-                example_layer = list_attemps[h][1][0]
+                example_layer1 = list_attemps[h][1][0]
 
-                print(example_layer)
+                print(example_layer1)
+
+                example_layer = example_layer1
+
+                if hasattr(example_layer, 'inplace'):
+
+                    example_layer.inplace = False
+
+
+
+
+                
 
 
                 operators = []
@@ -361,7 +372,7 @@ for entry in os.listdir(meas_dir_path):
 
 
                 print(
-                    example_layer,
+                    example_layer1,
                     input_size,
                     new_time_per_iteration,
                     new_energy_per_iteration_in_milli_joule,
@@ -389,7 +400,7 @@ for entry in os.listdir(meas_dir_path):
                 )
 
                 new_measurements.append((
-                    example_layer,
+                    example_layer1,
                     input_size,
                     new_time_per_iteration,
                     new_energy_per_iteration_in_milli_joule,
