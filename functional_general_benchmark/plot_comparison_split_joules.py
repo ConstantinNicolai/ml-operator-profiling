@@ -29,8 +29,9 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'dataset_history_A30/full_model_measurements_A30.txt'
-prediction_file = 'dataset_history_A30_round2/summed_up_dataset_20241015_101343.txt'
+measurement_file = 'datasets_fullmodel_train/dataset_history_A30/full_model_measurements_A30.txt'
+prediction_file = 'datasets_train/dataset_history_A30/summed_up_dataset_dataset_20250213_132513.txt'
+
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_prediction_file(prediction_file)
@@ -66,14 +67,14 @@ if small_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Measured and Summed Energy A30_2ndattempt', fontsize = fontsize)
+    ax.set_title(f'Measured and Summed Energy A30train_train', fontsize = fontsize)
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(small_models, rotation=45, ha='right')
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/comparison_A30_2ndattempt_small.png', format='png')
-    plt.savefig('plots/comparison_A30_2ndattempt_small.pdf', format='pdf')
+    plt.savefig('plots/train_train_small.png', format='png')
+    plt.savefig('plots/train_train_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values
 if large_indices:
@@ -91,11 +92,11 @@ if large_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Measured and Summed Energy A30_2ndattempt', fontsize = fontsize)
+    ax.set_title(f'Measured and Summed Energy A30train_train', fontsize = fontsize)
     ax.set_xticks(index + bar_width / 2)
     ax.set_xticklabels(large_models, rotation=45, ha='right')
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/comparison_A30_2ndattempt_large.png', format='png')
-    plt.savefig('plots/comparison_A30_2ndattempt_large.pdf', format='pdf')
+    plt.savefig('plots/train_train_large.png', format='png')
+    plt.savefig('plots/train_train_large.pdf', format='pdf')

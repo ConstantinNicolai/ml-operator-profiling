@@ -22,7 +22,7 @@ def read_prediction_file(filename):
     predictions = {}
     with open(filename, 'r') as file:
         lines = file.readlines()
-        for i in range(0, len(lines), 4):  # Every 4 lines form a single entry
+        for i in range(0, len(lines), 5):  # Every 4 lines form a single entry
             model_input_size = lines[i].strip()  # Read the whole line as a key (model + input size)
             time_ms = float(lines[i+1].split()[0])  # Extract time value in ms
             time_error = float(lines[i+2].split()[0])  # Extract time error in ms
@@ -30,8 +30,8 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'A30_fullmodel'
-prediction_file = 'datasets_newbench/dataset_history_A30/summed_up.txt'
+measurement_file = 'datasets_fullmodel_train/dataset_history_A30/full_model_measurements_A30.txt'
+prediction_file = 'datasets_train/dataset_history_A30/summed_up_dataset_dataset_20250213_132513.txt'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_prediction_file(prediction_file)
@@ -41,13 +41,13 @@ common_keys = set(measurements.keys()) & set(predictions.keys())
 
 # Prepare data for plotting
 models = list(common_keys)
-measured_values = [measurements[key][0] for key in common_keys]
+measured_values = [measurements[key][0]*1000 for key in common_keys]
 predicted_values = [predictions[key][0] for key in common_keys]
-measured_errors = [measurements[key][1] for key in common_keys]
+measured_errors = [measurements[key][1]*1000 for key in common_keys]
 predicted_errors = [predictions[key][1] for key in common_keys]
 
 # Set threshold for splitting the y-axis
-threshold = 18  # Adjust this threshold based on your data
+threshold = 150  # Adjust this threshold based on your data
 
 # Separate data into two groups: "small" and "large" values
 small_indices = [i for i, val in enumerate(measured_values) if val < threshold]
@@ -81,8 +81,8 @@ if small_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/time/timecomparison_A30_small.png', format='png')
-    plt.savefig('plots/time/timecomparison_A30_small.pdf', format='pdf')
+    plt.savefig('plots/train/timecomparison_A30_small.png', format='png')
+    plt.savefig('plots/train/timecomparison_A30_small.pdf', format='pdf')
 
 # Plot for large values
 if large_indices:
@@ -112,5 +112,5 @@ if large_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/time/timecomparison_A30_large.png', format='png')
-    plt.savefig('plots/time/timecomparison_A30_large.pdf', format='pdf')
+    plt.savefig('plots/train/timecomparison_A30_large.png', format='png')
+    plt.savefig('plots/train/timecomparison_A30_large.pdf', format='pdf')

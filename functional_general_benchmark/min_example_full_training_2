@@ -1,0 +1,42 @@
+Traceback (most recent call last):
+  File "/csghome/kx225/ml-operator-profiling/functional_general_benchmark/min_ex.py", line 35, in <module>
+    output = model(inputs)     # Forward pass
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torchvision/models/convnext.py", line 176, in forward
+    return self._forward_impl(x)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torchvision/models/convnext.py", line 170, in _forward_impl
+    x = self.features(x)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/container.py", line 219, in forward
+    input = module(input)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/container.py", line 219, in forward
+    input = module(input)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torchvision/models/convnext.py", line 63, in forward
+    result = self.layer_scale * self.block(input)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/container.py", line 219, in forward
+    input = module(input)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/csghome/kx225/.conda/envs/constabass/lib/python3.9/site-packages/torch/nn/modules/linear.py", line 117, in forward
+    return F.linear(input, self.weight, self.bias)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 576.00 MiB. GPU 0 has a total capacity of 23.60 GiB of which 396.25 MiB is free. Including non-PyTorch memory, this process has 23.21 GiB memory in use. Of the allocated memory 22.92 GiB is allocated by PyTorch, and 18.53 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

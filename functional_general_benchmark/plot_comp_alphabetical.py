@@ -30,8 +30,8 @@ def read_prediction_file(filename):
     return predictions
 
 # Example usage
-measurement_file = 'A30_fullmodel'
-prediction_file = 'datasets_finalbench/dataset_history_A30/summed_up'
+measurement_file = 'datasets_fullmodel_train/dataset_history_A30/full_model_measurements_A30.txt'
+prediction_file = 'datasets_train/dataset_history_A30/summed_up_dataset_dataset_20250213_132513.txt'
 
 measurements = read_measurement_file(measurement_file)
 predictions = read_prediction_file(prediction_file)
@@ -47,7 +47,7 @@ measured_errors = [measurements[key][1]/1000 for key in common_keys]
 predicted_errors = [predictions[key][1] for key in common_keys]
 
 # Set threshold for splitting the y-axis (you can adjust this based on your data)
-threshold = 3.2  # Now in Joules (since mJ to J conversion is done)
+threshold = 30  # Now in Joules (since mJ to J conversion is done)
 
 # Separate data into two groups: "small" and "large" values
 small_indices = [i for i, val in enumerate(measured_values) if val < threshold]
@@ -81,8 +81,8 @@ if small_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/newbench/comparison_A30_std_small.png', format='png')
-    plt.savefig('plots/newbench/comparison_A30_std_small.pdf', format='pdf')
+    plt.savefig('plots/train/comparison_A30_std_small.png', format='png')
+    plt.savefig('plots/train/comparison_A30_std_small.pdf', format='pdf')
 
 # Create the grouped bar plot for large values, sorted alphabetically by model
 if large_indices:
@@ -112,5 +112,5 @@ if large_indices:
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig('plots/newbench/comparison_A30_std_large.png', format='png')
-    plt.savefig('plots/newbench/comparison_A30_std_large.pdf', format='pdf')
+    plt.savefig('plots/train/comparison_A30_std_large.png', format='png')
+    plt.savefig('plots/train/comparison_A30_std_large.pdf', format='pdf')

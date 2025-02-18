@@ -130,6 +130,18 @@ def parse_model_and_weights():
 
 
 
+def get_num_classes(model):
+    # Find the last layer with learnable weights
+    if isinstance(model, models.Inception3):
+        return 1000
+    else: 
+        for name, module in reversed(list(model.named_modules())):
+            if isinstance(module, nn.Linear) and module.out_features > 1:
+                return module.out_features  # Standard classifiers (e.g., ResNet, EfficientNet)
+            if isinstance(module, nn.Conv2d) and module.out_channels > 1:
+                return module.out_channels  # For models like SqueezeNet
+
+        raise ValueError("No valid classification layer found in the model.")
 
 
 

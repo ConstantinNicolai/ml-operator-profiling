@@ -429,7 +429,7 @@ for entry in os.listdir(meas_dir_path):
 
 
 
-            DATASET_DIR = f"datasets_finalbench/dataset_history_{gpu}/"
+            DATASET_DIR = f"datasets_train/dataset_history_{gpu}/"
 
             # Ensure the dataset directory exists
             os.makedirs(DATASET_DIR, exist_ok=True)
