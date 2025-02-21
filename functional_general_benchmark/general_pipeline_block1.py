@@ -13,10 +13,10 @@ from utils import get_model_and_weights, extract_layer_info, parse_model_and_wei
 filter_list = [
     'Conv2d', 'Linear', 'StochasticDepth', 
     'BatchNorm2d', 'AvgPool2d', 'AdaptiveAvgPool2d', 
-    'ReLU', 'LayerNorm', 'GELU', 'NonDynamicallyQuantizableLinear',
+    'ReLU', 'LayerNorm', 'GELU', 
     'SiLU', 'Sigmoid', 'MaxPool2d', 
 ]
- #'Conv2d','Linear','StochasticDepth' , 'ConvTranspose2d'
+ #'Conv2d','Linear','StochasticDepth' , 'ConvTranspose2d', 'NonDynamicallyQuantizableLinear',
 
 
 for summary_file in glob.glob('./../measurements/*/*/summary.yml'):

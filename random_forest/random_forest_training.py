@@ -17,6 +17,9 @@ dataset = torch.load('../functional_general_benchmark/datasets_train/dataset_his
 dataset_list = [list(item) for item in dataset]
 
 
+print(dataset_list[4])
+
+
 # # Example PyTorch objects (test layers as specified)
 # layers = [
 #     nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=True),
@@ -167,7 +170,7 @@ input_features = df.to_numpy()
 
 ###############################################################
 
-
+print(input_features[0])
 
 
 
@@ -277,3 +280,12 @@ print(f"Modified Features: {feature_vector}")
 print(f"Predicted Runtime: {predicted_runtime[0]:.4f}")
 print(f"Predicted Wattage: {predicted_wattage[0]:.4f}")
 print(f"Predicted Energy Consumption: {predicted_energy[0]:.4f}")
+
+
+
+import joblib
+
+# Save models to files
+joblib.dump(runtime_model, 'model_dump/runtime_model.pkl')
+joblib.dump(wattage_model, 'model_dump/wattage_model.pkl')
+
