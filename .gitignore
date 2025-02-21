@@ -53,3 +53,7 @@ datasets/
 
 functional_general_benchmark/current*
 functional_general_benchmark/continous_logs/
+
+random_forest/*.pkl
+
+random_forest/model_dump/*.pkl
