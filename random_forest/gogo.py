@@ -3,9 +3,10 @@ import lzma
 import pickle
 import pandas as pd
 import numpy as np
+import math
 
 
-with lzma.open('../measurements/original/alexnet_32,3,224,224/alexnet_32_3_224_224.pkl.xz_filtered') as file_:
+with lzma.open('../predictions/A30/wide_resnet50_2_32,3,224,224/wide_resnet50_2_32_3_224_224.pkl.xz_filtered') as file_:
     saved_dict = pickle.load(file_)
 
     list_attemps = list(saved_dict.items())
@@ -175,25 +176,78 @@ input_features = df.to_numpy()
 # for i in range(len(input_features)):
 #     input_features[i]
 
-print(input_features[2])
-print(len(input_features[2]))
+# print(input_features[2])
+# print(len(input_features[2]))
 
+# input_features[2].reshape(1,-1)
 
+# # Extract the feature vector for the selected index
+# feature_vector = input_features[2]
 
-# Extract the feature vector for the selected index
-feature_vector = input_features[2]
-
-# Reshape the modified feature vector for prediction
-test_input = feature_vector.reshape(1, -1)
+# # Reshape the modified feature vector for prediction
+# test_input = feature_vector.reshape(1, -1)
 # Load models
 runtime_model = joblib.load('model_dump/runtime_model.pkl')
 wattage_model = joblib.load('model_dump/wattage_model.pkl')
 
-# Example: Making predictions
-y_pred_runtime = runtime_model.predict(test_input)
-y_pred_wattage = wattage_model.predict(test_input)
-energy_pred = y_pred_runtime * y_pred_wattage
 
-print(f"Sample Predicted Runtimes: {y_pred_runtime[:5]}")
-print(f"Sample Predicted Wattages: {y_pred_wattage[:5]}")
-print(f"Sample Energy Predictions: {energy_pred[:5]}")
+for i in range(len(input_features)):
+
+
+    # Example: Making predictions
+    y_pred_runtime = runtime_model.predict(input_features[i].reshape(1,-1))
+    y_pred_wattage = wattage_model.predict(input_features[i].reshape(1,-1))
+    energy_pred = y_pred_runtime * y_pred_wattage
+
+
+    # print(type(y_pred_runtime))
+    list_attemps[i][1].append(list_attemps[i][0][-1])
+    list_attemps[i][1].append(y_pred_runtime[0])
+    list_attemps[i][1].append(y_pred_wattage[0])
+    list_attemps[i][1].append(energy_pred[0])
+
+
+
+
+result = [row[1] for row in list_attemps]
+
+# for row in result:
+#     print(row)
+
+
+# Initialize sums
+time_sum = 0
+energy_sum = 0
+# energy_error_squared_sum = 0
+# time_error_squared_sum = 0
+
+
+for item in result:
+    count_of_this_layer = item[1]
+    runtime = item[3]
+    energy = item[5]
+    # iterations = item[7]
+    # runtime_for_all_iterations = item[8]
+    # energy_error = 0
+    # runtime_error = 0
+    if math.isnan(runtime) == False:
+        time_sum = time_sum + count_of_this_layer * runtime
+    else:
+        print("encountered nan value in runtime, incomplete sum")
+    # if math.isnan(runtime_error) == False:
+    #     runtime_error_squared_sum = runtime_error_squared_sum + count_of_this_layer * runtime_error * runtime_error
+    # else:
+    #     print("encountered nan value in runtime error, incomplete sum")
+    if math.isnan(energy) == False:
+        energy_sum = energy_sum + count_of_this_layer * energy
+    else:
+        print("encountered nan value in energy, incomplete sum")
+    # if math.isnan(energy_error) == False:
+    #     energy_error_squared_sum = energy_error_squared_sum + count_of_this_layer * energy_error * energy_error
+    # else:
+    #     print("encountered nan value in energy error, incomplete sum")
+
+print(1000*time_sum, "[ms]")
+# print(1000*math.sqrt(runtime_error_squared_sum), '[ms]')
+print(energy_sum, "[mJ]")
+# print(math.sqrt(energy_error_squared_sum), '[mJ]')
