@@ -17,7 +17,7 @@ dataset = torch.load('../functional_general_benchmark/datasets_train/dataset_his
 dataset_list = [list(item) for item in dataset]
 
 
-print(dataset_list[4])
+print(dataset_list[0])
 
 
 # # Example PyTorch objects (test layers as specified)
@@ -145,8 +145,25 @@ feature_list = [extract_features_with_flags(layer, attributes_to_extract) for la
 # Convert to DataFrame
 df = pd.DataFrame(feature_list)
 
-# One-hot encode the layer type
-df = pd.get_dummies(df, columns=["type"], prefix="type")
+# # One-hot encode the layer type
+# df = pd.get_dummies(df, columns=["type"], prefix="type")
+
+# Load the encoder from the file
+with open('onehot_encoder.pkl', 'rb') as f:
+    encoder = pickle.load(f)
+
+# 2. Fit and transform the column (reshape is needed because we expect a 2D array)
+onehot_encoded = encoder.transform(df[["type"]])
+
+# 3. Convert to DataFrame with proper column names (using encoder.categories_)
+onehot_df = pd.DataFrame(onehot_encoded.astype(bool),
+                         columns=encoder.get_feature_names_out(["type"]),
+                         index=df.index)
+
+# Drop the original column and add the new one-hot encoded columns
+df = df.drop("type", axis=1)
+
+df = pd.concat([df, onehot_df], axis=1)
 
 # Replace NaN values with -1
 df = df.replace(np.nan, -1)
@@ -244,6 +261,72 @@ print(f"R² for Wattage Prediction: {r2_wattage:.4f}")
 print(f"Sample Predicted Runtimes: {y_pred_runtime[:5]}")
 print(f"Sample Predicted Wattages: {y_pred_wattage[:5]}")
 print(f"Sample Energy Predictions: {energy_pred[:5]}")
+
+
+
+
+##################################################
+
+
+
+
+import matplotlib.pyplot as plt
+import random
+import numpy as np
+
+# Select a random subset of 10 test samples
+num_samples = 10
+random_indices = random.sample(range(len(y_test_runtime)), num_samples)
+
+# Get the corresponding ground truth and predictions
+true_runtimes = y_test_runtime[random_indices]
+pred_runtimes = y_pred_runtime[random_indices]
+
+true_wattages = y_test_wattage[random_indices]
+pred_wattages = y_pred_wattage[random_indices]
+
+# Identify the one-hot encoded columns within X_test
+num_original_features = X_test.shape[1] - len(encoder.get_feature_names_out(["type"]))
+onehot_encoded_test = X_test[:, num_original_features:]  # Correctly isolate one-hot encoded section
+
+# Inverse transform to get back original layer types
+layer_types = encoder.inverse_transform(onehot_encoded_test)
+
+# Extract input sizes from X_test for the selected samples
+input_sizes = X_test[random_indices][:, [-2, -4, -6, -8]]  # Ensure correct slicing
+
+# Generate formatted labels combining operation name and input sizes
+labels = [f"{layer} ({int(sizes[0])}x{int(sizes[1])}x{int(sizes[2])}x{int(sizes[3])})" 
+          for layer, sizes in zip(layer_types[random_indices].flatten(), input_sizes)]
+
+# Set x-axis labels for plots
+x_labels = labels
+x = range(num_samples)
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# Runtime comparison plot
+axes[0].bar(x, true_runtimes, width=0.4, label="True Runtime", alpha=0.7)
+axes[0].bar([i + 0.4 for i in x], pred_runtimes, width=0.4, label="Predicted Runtime", alpha=0.7)
+axes[0].set_xticks([i + 0.2 for i in x])
+axes[0].set_xticklabels(x_labels, rotation=45, ha="right")
+axes[0].set_title("Runtime Prediction vs Ground Truth")
+axes[0].set_ylabel("Runtime")
+axes[0].legend()
+
+# Wattage comparison plot
+axes[1].bar(x, true_wattages, width=0.4, label="True Wattage", alpha=0.7)
+axes[1].bar([i + 0.4 for i in x], pred_wattages, width=0.4, label="Predicted Wattage", alpha=0.7)
+axes[1].set_xticks([i + 0.2 for i in x])
+axes[1].set_xticklabels(x_labels, rotation=45, ha="right")
+axes[1].set_title("Wattage Prediction vs Ground Truth")
+axes[1].set_ylabel("Wattage")
+axes[1].legend()
+
+plt.tight_layout()
+plt.savefig("testplot.png")
+
+
 
 
 print("###############################")

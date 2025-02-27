@@ -249,5 +249,5 @@ for item in result:
 
 print(1000*time_sum, "[ms]")
 # print(1000*math.sqrt(runtime_error_squared_sum), '[ms]')
-print(energy_sum, "[mJ]")
+print(1000*energy_sum, "[mJ]")
 # print(math.sqrt(energy_error_squared_sum), '[mJ]')
