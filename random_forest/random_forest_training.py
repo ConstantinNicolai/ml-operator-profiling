@@ -274,6 +274,9 @@ import matplotlib.pyplot as plt
 import random
 import numpy as np
 
+turquoise_color = '#25be48'
+maroon_color = '#be259b'
+
 # Select a random subset of 10 test samples
 num_samples = 10
 random_indices = random.sample(range(len(y_test_runtime)), num_samples)
@@ -286,14 +289,18 @@ true_wattages = y_test_wattage[random_indices]
 pred_wattages = y_pred_wattage[random_indices]
 
 # Identify the one-hot encoded columns within X_test
+
+
 num_original_features = X_test.shape[1] - len(encoder.get_feature_names_out(["type"]))
 onehot_encoded_test = X_test[:, num_original_features:]  # Correctly isolate one-hot encoded section
+onehot_encoded_test = X_test[:, -20:-8]
 
 # Inverse transform to get back original layer types
 layer_types = encoder.inverse_transform(onehot_encoded_test)
 
 # Extract input sizes from X_test for the selected samples
 input_sizes = X_test[random_indices][:, [-2, -4, -6, -8]]  # Ensure correct slicing
+
 
 # Generate formatted labels combining operation name and input sizes
 labels = [f"{layer} ({int(sizes[0])}x{int(sizes[1])}x{int(sizes[2])}x{int(sizes[3])})" 
@@ -303,7 +310,7 @@ labels = [f"{layer} ({int(sizes[0])}x{int(sizes[1])}x{int(sizes[2])}x{int(sizes[
 x_labels = labels
 x = range(num_samples)
 
-fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+fig, axes = plt.subplots(1, 2, figsize=(21, 8))
 
 # Runtime comparison plot
 axes[0].bar(x, true_runtimes, width=0.4, label="True Runtime", alpha=0.7)
@@ -324,7 +331,9 @@ axes[1].set_ylabel("Wattage")
 axes[1].legend()
 
 plt.tight_layout()
-plt.savefig("testplot.png")
+
+plt.savefig('testplot.png', format='png')
+plt.savefig('testplot.pdf', format='pdf')
 
 
 
