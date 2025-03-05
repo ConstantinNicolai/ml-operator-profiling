@@ -3,7 +3,7 @@
 #SBATCH --partition=rivulet
 #SBATCH --nodes=1 
 #SBATCH --job-name=operations_profiling
-#SBATCH --output=operations_A30_train
+#SBATCH --output=clocks.out
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:A30:1
 #SBATCH --time=96:00:00
@@ -24,5 +24,8 @@ conda activate constabass
 # python3 general_pipeline_block2_backprop.py --gpu=RTX2080TI --rundur=10 --runnr=5
 
 
-python3 full_model_meas_trainvalidation.py  -gpu=A30 --rundur=14 --runnr=5
+# python3 full_model_meas_trainvalidation.py  --gpu=A30 --rundur=20 --runnr=5
 
+# python3 general_pipeline_block1_predictions.py
+
+python3 clockscript.py

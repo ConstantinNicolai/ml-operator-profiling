@@ -274,8 +274,11 @@ import matplotlib.pyplot as plt
 import random
 import numpy as np
 
-turquoise_color = '#25be48'
-maroon_color = '#be259b'
+
+
+turquoise_color = '#2598be'
+maroon_color = '#BE254D'
+
 
 # Select a random subset of 10 test samples
 num_samples = 10
@@ -298,23 +301,26 @@ onehot_encoded_test = X_test[:, -20:-8]
 # Inverse transform to get back original layer types
 layer_types = encoder.inverse_transform(onehot_encoded_test)
 
-# Extract input sizes from X_test for the selected samples
+# Extract input sizes for selected samples
 input_sizes = X_test[random_indices][:, [-2, -4, -6, -8]]  # Ensure correct slicing
 
-
-# Generate formatted labels combining operation name and input sizes
-labels = [f"{layer} ({int(sizes[0])}x{int(sizes[1])}x{int(sizes[2])}x{int(sizes[3])})" 
-          for layer, sizes in zip(layer_types[random_indices].flatten(), input_sizes)]
+# Generate formatted labels, removing -1 values
+labels = []
+for layer, sizes in zip(layer_types[random_indices].flatten(), input_sizes):
+    valid_sizes = [str(int(size)) for size in sizes if size != -1]  # Filter out -1 values
+    label = f"{layer} ({'x'.join(valid_sizes)})"  # Join valid sizes with 'x'
+    labels.append(label)
 
 # Set x-axis labels for plots
 x_labels = labels
 x = range(num_samples)
 
+
 fig, axes = plt.subplots(1, 2, figsize=(21, 8))
 
 # Runtime comparison plot
-axes[0].bar(x, true_runtimes, width=0.4, label="True Runtime", alpha=0.7)
-axes[0].bar([i + 0.4 for i in x], pred_runtimes, width=0.4, label="Predicted Runtime", alpha=0.7)
+axes[0].bar(x, true_runtimes, width=0.4, label="True Runtime", alpha=0.7, color=turquoise_color)
+axes[0].bar([i + 0.4 for i in x], pred_runtimes, width=0.4, label="Predicted Runtime", alpha=0.7, color=maroon_color)
 axes[0].set_xticks([i + 0.2 for i in x])
 axes[0].set_xticklabels(x_labels, rotation=45, ha="right")
 axes[0].set_title("Runtime Prediction vs Ground Truth")
@@ -322,8 +328,8 @@ axes[0].set_ylabel("Runtime")
 axes[0].legend()
 
 # Wattage comparison plot
-axes[1].bar(x, true_wattages, width=0.4, label="True Wattage", alpha=0.7)
-axes[1].bar([i + 0.4 for i in x], pred_wattages, width=0.4, label="Predicted Wattage", alpha=0.7)
+axes[1].bar(x, true_wattages, width=0.4, label="True Wattage", alpha=0.7, color=turquoise_color)
+axes[1].bar([i + 0.4 for i in x], pred_wattages, width=0.4, label="Predicted Wattage", alpha=0.7, color=maroon_color)
 axes[1].set_xticks([i + 0.2 for i in x])
 axes[1].set_xticklabels(x_labels, rotation=45, ha="right")
 axes[1].set_title("Wattage Prediction vs Ground Truth")

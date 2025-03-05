@@ -56,6 +56,8 @@ for summary_file in glob.glob('./../predictions/*/*/summary.yml'):
 
         ##########################################################################
 
+        print(config['model_name'])
+
 
         # Generate random input data
         input_data = torch.randn(tuple(config['input_size']))
