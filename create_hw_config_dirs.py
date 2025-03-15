@@ -32,5 +32,5 @@ def copy_datasets_to_hardware(hardware_name):
             print(f"Dataset '{dataset}' already exists in hardware folder '{hardware_name}', skipping.")
 
 # Example usage:
-copy_datasets_to_hardware("RTX2080TI")
+copy_datasets_to_hardware("RTX2080TI_660_810")
 

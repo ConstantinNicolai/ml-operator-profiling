@@ -270,76 +270,163 @@ print(f"Sample Energy Predictions: {energy_pred[:5]}")
 
 
 
+# import matplotlib.pyplot as plt
+# import random
+# import numpy as np
+
+
+
+# turquoise_color = '#2598be'
+# maroon_color = '#BE254D'
+
+
+# # Select a random subset of 10 test samples
+# num_samples = 10
+# random_indices = random.sample(range(len(y_test_runtime)), num_samples)
+# random_indices = [26,27,28,29,30,31,32,33,34,35]
+
+# # Get the corresponding ground truth and predictions
+# true_runtimes = y_test_runtime[random_indices]
+# pred_runtimes = y_pred_runtime[random_indices]
+
+# true_wattages = y_test_wattage[random_indices]
+# pred_wattages = y_pred_wattage[random_indices]
+
+# # Identify the one-hot encoded columns within X_test
+
+
+# num_original_features = X_test.shape[1] - len(encoder.get_feature_names_out(["type"]))
+# onehot_encoded_test = X_test[:, num_original_features:]  # Correctly isolate one-hot encoded section
+# onehot_encoded_test = X_test[:, -20:-8]
+
+# # Inverse transform to get back original layer types
+# layer_types = encoder.inverse_transform(onehot_encoded_test)
+
+# # Extract input sizes for selected samples
+# input_sizes = X_test[random_indices][:, [-2, -4, -6, -8]]  # Ensure correct slicing
+
+# # Generate formatted labels, removing -1 values
+# labels = []
+# for layer, sizes in zip(layer_types[random_indices].flatten(), input_sizes):
+#     valid_sizes = [str(int(size)) for size in sizes if size != -1]  # Filter out -1 values
+#     label = f"{layer} ({'x'.join(valid_sizes)})"  # Join valid sizes with 'x'
+#     labels.append(label)
+
+# # Set x-axis labels for plots
+# x_labels = labels
+# x = range(num_samples)
+
+
+# fig, axes = plt.subplots(1, 2, figsize=(21, 8))
+
+# # Runtime comparison plot
+# axes[0].bar(x, true_runtimes, width=0.4, label="True Runtime", alpha=0.7, color=turquoise_color)
+# axes[0].bar([i + 0.4 for i in x], pred_runtimes, width=0.4, label="Predicted Runtime", alpha=0.7, color=maroon_color)
+# axes[0].set_xticks([i + 0.2 for i in x])
+# axes[0].set_xticklabels(x_labels, rotation=45, ha="right")
+# axes[0].set_title("Runtime Prediction vs Ground Truth")
+# axes[0].set_ylabel("Runtime")
+# axes[0].legend()
+
+# # Wattage comparison plot
+# axes[1].bar(x, true_wattages, width=0.4, label="True Wattage", alpha=0.7, color="orange")
+# axes[1].bar([i + 0.4 for i in x], pred_wattages, width=0.4, label="Predicted Wattage", alpha=0.7, color="purple")
+# axes[1].set_xticks([i + 0.2 for i in x])
+# axes[1].set_xticklabels(x_labels, rotation=45, ha="right")
+# axes[1].set_title("Wattage Prediction vs Ground Truth")
+# axes[1].set_ylabel("Wattage")
+# axes[1].legend()
+
+# plt.tight_layout()
+
+# plt.savefig('testplot.png', format='png')
+# plt.savefig('testplot.pdf', format='pdf')
+
+
 import matplotlib.pyplot as plt
 import random
 import numpy as np
 
 
-
 turquoise_color = '#2598be'
 maroon_color = '#BE254D'
 
-
 # Select a random subset of 10 test samples
 num_samples = 10
-random_indices = random.sample(range(len(y_test_runtime)), num_samples)
+random_indices = [26,27,28,29,30,31,32,33,34,35]
 
 # Get the corresponding ground truth and predictions
-true_runtimes = y_test_runtime[random_indices]
-pred_runtimes = y_pred_runtime[random_indices]
+true_runtimes = 1000*y_test_runtime[random_indices]
+pred_runtimes = 1000*y_pred_runtime[random_indices]
 
-true_wattages = y_test_wattage[random_indices]
-pred_wattages = y_pred_wattage[random_indices]
+true_power = y_test_wattage[random_indices]
+pred_power = y_pred_wattage[random_indices]
+
+# Compute energy consumption (runtime * power)
+true_energy = true_runtimes * true_power
+pred_energy = pred_runtimes * pred_power
 
 # Identify the one-hot encoded columns within X_test
-
-
 num_original_features = X_test.shape[1] - len(encoder.get_feature_names_out(["type"]))
-onehot_encoded_test = X_test[:, num_original_features:]  # Correctly isolate one-hot encoded section
 onehot_encoded_test = X_test[:, -20:-8]
 
 # Inverse transform to get back original layer types
 layer_types = encoder.inverse_transform(onehot_encoded_test)
 
 # Extract input sizes for selected samples
-input_sizes = X_test[random_indices][:, [-2, -4, -6, -8]]  # Ensure correct slicing
+input_sizes = X_test[random_indices][:, [-2, -4, -6, -8]]
 
 # Generate formatted labels, removing -1 values
 labels = []
 for layer, sizes in zip(layer_types[random_indices].flatten(), input_sizes):
-    valid_sizes = [str(int(size)) for size in sizes if size != -1]  # Filter out -1 values
-    label = f"{layer} ({'x'.join(valid_sizes)})"  # Join valid sizes with 'x'
+    valid_sizes = [str(int(size)) for size in sizes if size != -1]
+    label = f"{layer} ({'x'.join(valid_sizes)})"
     labels.append(label)
 
 # Set x-axis labels for plots
 x_labels = labels
 x = range(num_samples)
 
-
-fig, axes = plt.subplots(1, 2, figsize=(21, 8))
-
 # Runtime comparison plot
-axes[0].bar(x, true_runtimes, width=0.4, label="True Runtime", alpha=0.7, color=turquoise_color)
-axes[0].bar([i + 0.4 for i in x], pred_runtimes, width=0.4, label="Predicted Runtime", alpha=0.7, color=maroon_color)
-axes[0].set_xticks([i + 0.2 for i in x])
-axes[0].set_xticklabels(x_labels, rotation=45, ha="right")
-axes[0].set_title("Runtime Prediction vs Ground Truth")
-axes[0].set_ylabel("Runtime")
-axes[0].legend()
-
-# Wattage comparison plot
-axes[1].bar(x, true_wattages, width=0.4, label="True Wattage", alpha=0.7, color=turquoise_color)
-axes[1].bar([i + 0.4 for i in x], pred_wattages, width=0.4, label="Predicted Wattage", alpha=0.7, color=maroon_color)
-axes[1].set_xticks([i + 0.2 for i in x])
-axes[1].set_xticklabels(x_labels, rotation=45, ha="right")
-axes[1].set_title("Wattage Prediction vs Ground Truth")
-axes[1].set_ylabel("Wattage")
-axes[1].legend()
-
+plt.figure(figsize=(15, 10))
+plt.bar(x, true_runtimes, width=0.4, label="True Runtime", alpha=0.7, color=turquoise_color)
+plt.bar([i + 0.4 for i in x], pred_runtimes, width=0.4, label="Predicted Runtime", alpha=0.7, color=maroon_color)
+plt.xticks([i + 0.2 for i in x], x_labels, rotation=45, ha="right")
+plt.title("Runtime Prediction vs Ground Truth")
+plt.ylabel("Runtime [ms]")
+plt.legend()
 plt.tight_layout()
+plt.savefig('runtime_plot.png', format='png')
+plt.savefig('runtime_plot.pdf', format='pdf')
+plt.close()
 
-plt.savefig('testplot.png', format='png')
-plt.savefig('testplot.pdf', format='pdf')
+# Power comparison plot
+plt.figure(figsize=(15, 10))
+plt.bar(x, true_power, width=0.4, label="True Power", alpha=0.7, color="orange")
+plt.bar([i + 0.4 for i in x], pred_power, width=0.4, label="Predicted Power", alpha=0.7, color="purple")
+plt.xticks([i + 0.2 for i in x], x_labels, rotation=45, ha="right")
+plt.title("Power Prediction vs Ground Truth")
+plt.ylabel("Power [W]")
+plt.legend()
+plt.tight_layout()
+plt.savefig('power_plot.png', format='png')
+plt.savefig('power_plot.pdf', format='pdf')
+plt.close()
+
+# Energy consumption comparison plot
+plt.figure(figsize=(15, 10))
+plt.bar(x, true_energy, width=0.4, label="True Energy Consumption", alpha=0.7, color="green")
+plt.bar([i + 0.4 for i in x], pred_energy, width=0.4, label="Predicted Energy Consumption", alpha=0.7, color="red")
+plt.xticks([i + 0.2 for i in x], x_labels, rotation=45, ha="right")
+plt.title("Energy Consumption Prediction vs Ground Truth")
+plt.ylabel("Energy Consumption [mJ]")
+plt.legend()
+plt.tight_layout()
+plt.savefig('energy_plot.png', format='png')
+plt.savefig('energy_plot.pdf', format='pdf')
+plt.close()
+
+
 
 
 

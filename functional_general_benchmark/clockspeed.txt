@@ -1,0 +1,2 @@
+clocks.current.memory [MHz], clocks.current.graphics [MHz]
+405 MHz, 300 MHz
