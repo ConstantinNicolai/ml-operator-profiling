@@ -60,5 +60,7 @@ random_forest/*.pkl
 
 random_forest/model_dump/*.pkl
 
+random_forest/model_dump/*
+
 
 predictions/
