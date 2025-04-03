@@ -4,12 +4,44 @@ import yaml
 import lzma
 import pickle
 import math
+import argparse
+import re
+
+
+# Set up command-line argument parsing
+parser = argparse.ArgumentParser(description="set the path for the dataset")
+parser.add_argument("--path", type=str, required=True, help="Specify the path for the dataset")
+
+
+# Parse arguments
+args = parser.parse_args()
+path = args.path
 
 # Load the saved .pt file
 
 # This sets the dataset of operations used to sum up from
 
-dataset = torch.load('datasets_train/dataset_history_A30/dataset_20250213_132513.pt', map_location=torch.device('cpu'))
+string = "datasets_train/dataset_history_" + path
+
+# Regular expression to match filenames like dataset_YYYYMMDD_HHMMSS.pt
+pattern = re.compile(r"dataset_(\d{8})_(\d{6})\.pt")
+
+# Get all matching files
+files = [
+    f for f in os.listdir(string)
+    if pattern.match(f)
+]
+
+# Extract the latest file based on timestamp
+if files:
+    latest_file = max(files, key=lambda f: pattern.match(f).groups())
+    latest_file_path = os.path.join(string, latest_file)
+
+    # Load the dataset
+    dataset = torch.load(latest_file_path, map_location=torch.device("cpu"))
+
+
+#dataset = torch.load('datasets_train/dataset_history_A30/dataset_20250213_132513.pt', map_location=torch.device('cpu'))
 
 
 # Just converting the entries into lists

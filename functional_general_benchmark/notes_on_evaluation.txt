@@ -1,0 +1,10 @@
+sum_up_from_dataset_train.py
+
+has command line parameter in form:
+
+--path dataset_history_RTX2080TI_1920_810
+
+save output to temp file:
+
+temp_ops_RTX2080TI_1920_810
+
