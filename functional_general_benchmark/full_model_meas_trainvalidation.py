@@ -69,8 +69,8 @@ outside_log = subprocess.Popen(outside_logging_command, shell=True, preexec_fn=o
 
 new_measurements = []
 
-meas_dir_path = f"./../predictions/{gpu}"
-meas_dir_path_to_be_added = f"./../predictions/{gpu}/"
+meas_dir_path = f"./../predictions/A30"
+meas_dir_path_to_be_added = f"./../predictions/A30/"
 
 for entry in os.listdir(meas_dir_path):
     with open(meas_dir_path_to_be_added + entry + '/summary.yml', 'r') as file:
