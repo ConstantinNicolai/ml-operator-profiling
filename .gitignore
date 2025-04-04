@@ -62,5 +62,9 @@ random_forest/model_dump/*.pkl
 
 random_forest/model_dump/*
 
+random_forest/model_dump/runtime_model.pkl
+
+random_forest/model_dump/wattage_model.pkl
+
 
 predictions/
