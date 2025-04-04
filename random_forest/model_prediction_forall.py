@@ -7,6 +7,17 @@ import math
 import glob
 import os
 import yaml
+import argparse
+
+
+# Set up command-line argument parsing
+parser = argparse.ArgumentParser(description="set the path for the dataset")
+parser.add_argument("--clock", type=int, required=True, help="Specify the clock in MHz that you want predictions for")
+
+
+# Parse arguments
+args = parser.parse_args()
+clock = args.clock
 
 
 list_attemps = []
@@ -188,6 +199,8 @@ df = df.replace(np.nan, -1)
 df = replace_applicable_flags(df)
 
 df = add_input_sizes_with_flags_to_df(df, input_sizes)
+
+df['clockspeed'] = clock
 
 # pd.set_option('display.max_rows', None)  # Show all rows
 # pd.set_option('display.max_columns', None)

@@ -17,3 +17,4 @@ python3 fullmodel_output.py --path=$TEST > temp_fm_$TEST
 
 python3 plot_comp_alphabetical.py temp_fm_$TEST temp_ops_$TEST $TEST
 
+python3 plot_time_alphabetical.py temp_fm_$TEST temp_ops_$TEST $TEST

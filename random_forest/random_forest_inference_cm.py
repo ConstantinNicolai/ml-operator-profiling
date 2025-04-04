@@ -73,8 +73,8 @@ print(dataset_list[0])
 
 layers = [row[0] for row in dataset_list]
 input_sizes = [row[1] for row in dataset_list]
-runtimes = [row[16] for row in dataset_list]
-wattages = [row[21] for row in dataset_list]
+runtimes = [row[2] for row in dataset_list]
+wattages = [row[8] for row in dataset_list]
 
 # print(input_sizes[0:6])
 # print(runtimes[0:6])
