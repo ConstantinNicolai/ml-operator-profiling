@@ -21,7 +21,7 @@ path = args.path
 
 # This sets the dataset of operations used to sum up from
 
-string = "datasets_fullmodel_train/dataset_history_" + path
+string = "../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_" + path
 
 # Regular expression to match filenames like dataset_YYYYMMDD_HHMMSS.pt
 pattern = re.compile(r"dataset_(\d{8})_(\d{6})\.pt")
@@ -61,14 +61,14 @@ dataset_list = [list(item) for item in dataset]
 
 for item in dataset_list:
     cucu = item[1]
-    square_brackets = (cucu[0],cucu[1],cucu[2],cucu[3])
+    square_brackets = [cucu[0],cucu[1],cucu[2],cucu[3]]
     print(item[16], square_brackets)
     a = item[2]*1000
     print(f"{a:.50f}".rstrip('0').rstrip('.'))
-    a = item[15]*1000
-    print(f"{a:.50f}".rstrip('0').rstrip('.'))
+    # a = item[15]*1000
+    # print(f"{a:.50f}".rstrip('0').rstrip('.'))
     a = item[3]
     print(f"{a:.50f}".rstrip('0').rstrip('.'))
-    a = item[5]
-    print(f"{a:.50f}".rstrip('0').rstrip('.'))
+    # a = item[5]
+    # print(f"{a:.50f}".rstrip('0').rstrip('.'))
 

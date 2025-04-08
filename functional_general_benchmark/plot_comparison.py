@@ -1,5 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
+import re
+
+
+# Set up command-line argument parsing
+parser = argparse.ArgumentParser(description="set the path for the dataset")
+parser.add_argument("--clock", type=str, required=True, help="Specify the path for the dataset")
+
+
+# Parse arguments
+args = parser.parse_args()
+clock = args.clock
 
 # Function to read the measurement file
 def read_measurement_file(filename):
@@ -13,21 +25,21 @@ def read_measurement_file(filename):
             measurements[model_input_size] = energy_mJ
     return measurements
 
-# Function to read the prediction file
-def read_prediction_file(filename):
-    predictions = {}
-    with open(filename, 'r') as file:
-        lines = file.readlines()
-        for i in range(0, len(lines), 4):  # Every 4 lines form a single entry
-            model_input_size = lines[i].strip()  # Read the whole line as a key (model + input size)
-            # Split the third line and extract the energy value (ignore units)
-            energy_mJ = float(lines[i+3].split()[0])  # The second element is the energy value, ignore units
-            predictions[model_input_size] = energy_mJ
-    return predictions
+# # Function to read the prediction file
+# def read_prediction_file(filename):
+#     predictions = {}
+#     with open(filename, 'r') as file:
+#         lines = file.readlines()
+#         for i in range(0, len(lines), 4):  # Every 4 lines form a single entry
+#             model_input_size = lines[i].strip()  # Read the whole line as a key (model + input size)
+#             # Split the third line and extract the energy value (ignore units)
+#             energy_mJ = float(lines[i+3].split()[0])  # The second element is the energy value, ignore units
+#             predictions[model_input_size] = energy_mJ
+#     return predictions
 
 # Example usage
-measurement_file = 'datasets_fullmodel_validation/dataset_history_A30/fullmodel.txt'
-prediction_file = '../random_forest/model_predictions.txt'
+measurement_file = '../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_A30_'+clock+'/fullmodel.txt'
+prediction_file = '../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_A30_'+clock+'/prediction.txt'
 
 
 measurements = read_measurement_file(measurement_file)
@@ -38,25 +50,26 @@ common_keys = set(measurements.keys()) & set(predictions.keys())
 
 # Prepare data for plotting
 models = sorted(common_keys)
-measured_values = [measurements[key] for key in common_keys]
-predicted_values = [predictions[key] for key in common_keys]
+measured_values = [measurements[key]/1000 for key in models]
+predicted_values = [predictions[key]/1000 for key in models]
+
 
 # Create the grouped bar plot
 bar_width = 0.35
 index = np.arange(len(models))
 
 fig, ax = plt.subplots(figsize=(15, 10))
-bar1 = ax.bar(index, measured_values, bar_width, label='Measured', color='g')
-bar2 = ax.bar(index + bar_width, predicted_values, bar_width, label='Predicted', color='b')
+bar1 = ax.bar(index, measured_values, bar_width, label='Measured', color='black')
+bar2 = ax.bar(index + bar_width, predicted_values, bar_width, label='Predicted', color='orange')
 
 # Add labels and titles
 ax.set_xlabel('Model and Input Size')
-ax.set_ylabel('Energy Consumption [mJ]')
-ax.set_title('Comparison of Measured and Predicted Energy Consumption')
+ax.set_ylabel('Energy Consumption [J]')
+# ax.set_title('Comparison of Measured and Predicted Energy Consumption')
 ax.set_xticks(index + bar_width / 2)
 ax.set_xticklabels(models, rotation=45, ha='right')
 ax.legend()
 
 plt.tight_layout()
-plt.savefig('plots/validation/full_models_compare.png', format='png')
-plt.savefig('plots/validation/full_models_compare.pdf', format='pdf')
+plt.savefig('../functional_general_benchmark/plots/prediction/pred_A30_'+clock+'_train.png', format='png')
+plt.savefig('../functional_general_benchmark/plots/prediction/pred_A30_'+clock+'_train.pdf', format='pdf')
