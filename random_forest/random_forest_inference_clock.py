@@ -51,8 +51,8 @@ def load_latest_dataset_from_dir(clockspeed_dir, clockspeed_label):
     input_sizes = [row[1] for row in dataset_list]
     # runtimes = [row[16] for row in dataset_list]
     # wattages = [row[21] for row in dataset_list]
-    runtimes.extend([row[16] for row in dataset_list])
-    wattages.extend([row[21] for row in dataset_list])
+    runtimes.extend([row[2] for row in dataset_list])
+    wattages.extend([row[8] for row in dataset_list])
     
 
     # print(input_sizes[0:6])
@@ -427,6 +427,6 @@ print(f"Predicted Energy Consumption: {predicted_energy[0]:.4f}")
 import joblib
 
 # Save models to files
-joblib.dump(runtime_model, 'model_dump/runtime_model_clockinput_train.pkl')
-joblib.dump(wattage_model, 'model_dump/wattage_model_clockinput_train.pkl')
+joblib.dump(runtime_model, 'model_dump/runtime_model_clockinput_inf.pkl')
+joblib.dump(wattage_model, 'model_dump/wattage_model_clockinput_inf.pkl')
 

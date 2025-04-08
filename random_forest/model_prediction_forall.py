@@ -13,11 +13,13 @@ import argparse
 # Set up command-line argument parsing
 parser = argparse.ArgumentParser(description="set the path for the dataset")
 parser.add_argument("--clock", type=int, required=True, help="Specify the clock in MHz that you want predictions for")
+parser.add_argument("--mode", type=str, required=True, help="Specify train or inf")
 
 
 # Parse arguments
 args = parser.parse_args()
 clock = args.clock
+mode = args.mode
 
 
 list_attemps = []
@@ -228,8 +230,8 @@ input_features = df.to_numpy()
 # # Reshape the modified feature vector for prediction
 # test_input = feature_vector.reshape(1, -1)
 # Load models
-runtime_model = joblib.load('model_dump/runtime_model.pkl')
-wattage_model = joblib.load('model_dump/wattage_model.pkl')
+runtime_model = joblib.load('model_dump/runtime_model_clockinput_'+mode+'.pkl')
+wattage_model = joblib.load('model_dump/wattage_model_clockinput_'+mode+'.pkl')
 
 
 for i in range(len(input_features)):

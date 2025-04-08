@@ -24,7 +24,7 @@ sleep 5;
 echo "Query clock to confirm"
 nvidia-smi --query-gpu=clocks.gr,clocks.mem --format=csv;
 
-python3 full_model_meas_trainvalidation.py  --gpu=A30_210 --rundur=14 --runnr=42
+python3 full_model_meas_infvalidation.py  --gpu=A30_210 --rundur=14 --runnr=30
 # python3 full_model_meas_train.py --gpu=A30_210 --rundur=12 --runnr=60
 # python3 general_pipeline_block2_backprop.py --gpu=A30_210 --rundur=10 --runnr=25
 
