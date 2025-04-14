@@ -11,14 +11,14 @@ TEST="$1"
 
 echo $TEST
 
-ls ../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_A30_$TEST
+ls ../functional_general_benchmark/datasets_fullmodel_inf_validation/dataset_history_A30_$TEST
 
-ls ../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_A30_210
+ls ../functional_general_benchmark/datasets_fullmodel_inf_validation/dataset_history_A30_210
 
-python3 ../functional_general_benchmark/fullmodel_output.py --path=A30_$TEST > ../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_A30_$TEST/fullmodel.txt
+python3 ../functional_general_benchmark/fullmodel_output.py --path=A30_$TEST > ../functional_general_benchmark/datasets_fullmodel_inf_validation/dataset_history_A30_$TEST/fullmodel.txt
 
 
-python3 model_prediction_forall.py --clock=$TEST --mode=train > ../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_A30_$TEST/prediction.txt
+python3 model_prediction_forall.py --clock=$TEST --mode=inf > ../functional_general_benchmark/datasets_fullmodel_inf_validation/dataset_history_A30_$TEST/prediction.txt
 
 
 python3 ../functional_general_benchmark/plot_comparison.py --clock=$TEST 

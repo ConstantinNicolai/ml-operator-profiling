@@ -29,22 +29,22 @@ len_list = []
 meas_dir_path = f"../predictions/A30"
 meas_dir_path_to_be_added = f"../predictions/A30/"
 
-for entry in os.listdir(meas_dir_path):
-    filtered_files = glob.glob(meas_dir_path_to_be_added + entry + '/*.pkl.xz_filtered')
+# for entry in os.listdir(meas_dir_path):
+#     filtered_files = glob.glob(meas_dir_path_to_be_added + entry + '/*.pkl.xz_filtered')
 
-    if not filtered_files:
-        print(f"No matching file found for {entry}")
-        continue  # Skip to the next entry
+#     if not filtered_files:
+#         print(f"No matching file found for {entry}")
+#         continue  # Skip to the next entry
 
-    file_path = filtered_files[0]  # Take the first matching file
+#     file_path = filtered_files[0]  # Take the first matching file
 
-    # Open the compressed file correctly
-    with lzma.open(file_path, 'rb') as file_:
-        saved_dict = pickle.load(file_)
+#     # Open the compressed file correctly
+#     with lzma.open(file_path, 'rb') as file_:
+#         saved_dict = pickle.load(file_)
 
-
-# with lzma.open('../predictions/A30/wide_resnet50_2_32,3,224,224/wide_resnet50_2_32_3_224_224.pkl.xz_filtered') as file_:
-#     saved_dict = pickle.load(file_)
+#efficientnet_b5_32,3,299,299/efficientnet_b5_32_3_299_299.pkl.xz_filtered
+with lzma.open('../predictions/A30/wide_resnet50_2_32,3,224,224/wide_resnet50_2_32_3_224_224.pkl.xz_filtered') as file_:
+    saved_dict = pickle.load(file_)
 
     list_attemps_section = list(saved_dict.items())
 
@@ -233,68 +233,7 @@ input_features = df.to_numpy()
 runtime_model = joblib.load('model_dump/runtime_model_clockinput_'+mode+'.pkl')
 wattage_model = joblib.load('model_dump/wattage_model_clockinput_'+mode+'.pkl')
 
-
-
-
-start = time.time()
-
-# Batch predictions
-y_pred_runtime = runtime_model.predict(input_features)
-y_pred_wattage = wattage_model.predict(input_features)
-energy_pred = y_pred_runtime * y_pred_wattage
-
-elapsed = (time.time() - start) * 1000  # convert to ms
-print("time to predict all models in one batch")
-print(f"{elapsed:.2f}")
-
-
-
-
-# Loop just to append values (no model calls inside)
-for i in range(len(input_features)):
-    list_attemps[i][1].append(list_attemps[i][0][-1])
-    list_attemps[i][1].append(y_pred_runtime[i])
-    list_attemps[i][1].append(y_pred_wattage[i])
-    list_attemps[i][1].append(energy_pred[i])
-
-
-
-print("times to predict each model input combintation as an individual batch")
-
-counter = 0
-
-position_in_result = 0
-
-
-for entry in os.listdir(meas_dir_path):
-    with open(meas_dir_path_to_be_added + entry + '/summary.yml', 'r') as summ:
-        config = yaml.safe_load(summ)
-
-    print(config['model_name'], config['input_size'])
-
-    old_position = position_in_result
-
-    position_in_result = position_in_result + len_list[counter]
-
-    input_section = input_features[old_position:position_in_result]
-
-
-    start = time.time()
-
-    # Batch predictions
-    y_pred_runtime = runtime_model.predict(input_section)
-    y_pred_wattage = wattage_model.predict(input_section)
-    energy_pred = y_pred_runtime * y_pred_wattage
-
-    elapsed = (time.time() - start) * 1000  # convert to ms
-    print(f"{elapsed:.2f}")
-
-    counter = counter +1
-
-
-
-
-
+# start = time.time()
 # for i in range(len(input_features)):
 
 #     # Example: Making predictions
@@ -312,10 +251,36 @@ for entry in os.listdir(meas_dir_path):
 #     list_attemps[i][1].append(energy_pred[0])
 
 
-print('predicted times and energy consumption for the selected settings')
+# elapsed = (time.time() - start) * 1000  # convert to milliseconds
+# print(f"{elapsed:.2f}")
+
+
+
+start = time.time()
+
+# Batch predictions
+y_pred_runtime = runtime_model.predict(input_features)
+y_pred_wattage = wattage_model.predict(input_features)
+energy_pred = y_pred_runtime * y_pred_wattage
+
+elapsed = (time.time() - start) * 1000  # convert to ms
+print(f"{elapsed:.2f}")
+
+
+
+
+
+# Loop just to append values (no model calls inside)
+for i in range(len(input_features)):
+    list_attemps[i][1].append(list_attemps[i][0][-1])
+    list_attemps[i][1].append(y_pred_runtime[i])
+    list_attemps[i][1].append(y_pred_wattage[i])
+    list_attemps[i][1].append(energy_pred[i])
+
+
+
 
 result = [row[1] for row in list_attemps]
-
 
 
 counter = 0
@@ -323,63 +288,60 @@ counter = 0
 position_in_result = 0
 
 
-for entry in os.listdir(meas_dir_path):
-    with open(meas_dir_path_to_be_added + entry + '/summary.yml', 'r') as summ:
-        config = yaml.safe_load(summ)
+# for entry in os.listdir(meas_dir_path):
+#     with open(meas_dir_path_to_be_added + entry + '/summary.yml', 'r') as summ:
+#         config = yaml.safe_load(summ)
 
-    print(config['model_name'], config['input_size'])
+#     print(config['model_name'], config['input_size'])
 
-    old_position = position_in_result
+#     old_position = position_in_result
 
-    position_in_result = position_in_result + len_list[counter]
+#     position_in_result = position_in_result + len_list[counter]
 
-    result_section = result[old_position:position_in_result]
+#     result_section = result[old_position:position_in_result]
+
+# Initialize sums
+time_sum = 0
+energy_sum = 0
+# energy_error_squared_sum = 0
+# time_error_squared_sum = 0
 
 
-    # Initialize sums
-    time_sum = 0
-    energy_sum = 0
-    # energy_error_squared_sum = 0
-    # time_error_squared_sum = 0
+for item in result:
+    count_of_this_layer = item[1]
+    runtime = item[3]
+    energy = item[5]
+    # iterations = item[7]
+    # runtime_for_all_iterations = item[8]
+    # energy_error = 0
+    # runtime_error = 0
+    if math.isnan(runtime) == False:
+        time_sum = time_sum + count_of_this_layer * runtime
+    else:
+        print("encountered nan value in runtime, incomplete sum")
+    # if math.isnan(runtime_error) == False:
+    #     runtime_error_squared_sum = runtime_error_squared_sum + count_of_this_layer * runtime_error * runtime_error
+    # else:
+    #     print("encountered nan value in runtime error, incomplete sum")
+    if math.isnan(energy) == False:
+        energy_sum = energy_sum + count_of_this_layer * energy
+    else:
+        print("encountered nan value in energy, incomplete sum")
+    # if math.isnan(energy_error) == False:
+    #     energy_error_squared_sum = energy_error_squared_sum + count_of_this_layer * energy_error * energy_error
+    # else:
+    #     print("encountered nan value in energy error, incomplete sum")
 
-
-    for item in result_section:
-        count_of_this_layer = item[1]
-        runtime = item[3]
-        energy = item[5]
-        # iterations = item[7]
-        # runtime_for_all_iterations = item[8]
-        # energy_error = 0
-        # runtime_error = 0
-        if math.isnan(runtime) == False:
-            time_sum = time_sum + count_of_this_layer * runtime
-        else:
-            print("encountered nan value in runtime, incomplete sum")
-        # if math.isnan(runtime_error) == False:
-        #     runtime_error_squared_sum = runtime_error_squared_sum + count_of_this_layer * runtime_error * runtime_error
-        # else:
-        #     print("encountered nan value in runtime error, incomplete sum")
-        if math.isnan(energy) == False:
-            energy_sum = energy_sum + count_of_this_layer * energy
-        else:
-            print("encountered nan value in energy, incomplete sum")
-        # if math.isnan(energy_error) == False:
-        #     energy_error_squared_sum = energy_error_squared_sum + count_of_this_layer * energy_error * energy_error
-        # else:
-        #     print("encountered nan value in energy error, incomplete sum")
-
-    print(1000*time_sum)
-    # print(1000*math.sqrt(runtime_error_squared_sum), '[ms]')
-    print(1000*energy_sum)
-    # print(math.sqrt(energy_error_squared_sum), '[mJ]')
+print(1000*time_sum)
+# print(1000*math.sqrt(runtime_error_squared_sum), '[ms]')
+print(1000*energy_sum)
+# print(math.sqrt(energy_error_squared_sum), '[mJ]')
 
 
 
 
     
-    counter = counter +1
-
-
+    # counter = counter +1
 
 
 # for row in result:

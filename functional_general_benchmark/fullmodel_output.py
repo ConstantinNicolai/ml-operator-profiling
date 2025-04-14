@@ -21,7 +21,7 @@ path = args.path
 
 # This sets the dataset of operations used to sum up from
 
-string = "../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_" + path
+string = "../functional_general_benchmark/datasets_fullmodel_inf_validation/dataset_history_" + path
 
 # Regular expression to match filenames like dataset_YYYYMMDD_HHMMSS.pt
 pattern = re.compile(r"dataset_(\d{8})_(\d{6})\.pt")

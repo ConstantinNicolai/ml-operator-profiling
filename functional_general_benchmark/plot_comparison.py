@@ -21,7 +21,7 @@ def read_measurement_file(filename):
         for i in range(0, len(lines), 3):  # Every 2 lines form a single entry
             model_input_size = lines[i].strip()  # Read the whole line as a key (model + input size)
             # Split the second line and extract the energy value (ignore units)
-            energy_mJ = float(lines[i+2])  # The fourth element is the energy value, ignore units
+            energy_mJ = float(lines[i+1])  # The fourth element is the energy value, ignore units
             measurements[model_input_size] = energy_mJ
     return measurements
 
@@ -38,8 +38,8 @@ def read_measurement_file(filename):
 #     return predictions
 
 # Example usage
-measurement_file = '../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_A30_'+clock+'/fullmodel.txt'
-prediction_file = '../functional_general_benchmark/datasets_fullmodel_train_validation/dataset_history_A30_'+clock+'/prediction.txt'
+measurement_file = '../functional_general_benchmark/datasets_fullmodel_inf_validation/dataset_history_A30_'+clock+'/fullmodel.txt'
+prediction_file = '../functional_general_benchmark/datasets_fullmodel_inf_validation/dataset_history_A30_'+clock+'/prediction.txt'
 
 
 measurements = read_measurement_file(measurement_file)
@@ -50,8 +50,8 @@ common_keys = set(measurements.keys()) & set(predictions.keys())
 
 # Prepare data for plotting
 models = sorted(common_keys)
-measured_values = [measurements[key]/1000 for key in models]
-predicted_values = [predictions[key]/1000 for key in models]
+measured_values = [measurements[key] for key in models]
+predicted_values = [predictions[key] for key in models]
 
 
 # Create the grouped bar plot
@@ -59,17 +59,17 @@ bar_width = 0.35
 index = np.arange(len(models))
 
 fig, ax = plt.subplots(figsize=(15, 10))
-bar1 = ax.bar(index, measured_values, bar_width, label='Measured', color='black')
-bar2 = ax.bar(index + bar_width, predicted_values, bar_width, label='Predicted', color='orange')
+bar1 = ax.bar(index, measured_values, bar_width, label='Measured', color='g')
+bar2 = ax.bar(index + bar_width, predicted_values, bar_width, label='Predicted', color='b')
 
 # Add labels and titles
 ax.set_xlabel('Model and Input Size')
-ax.set_ylabel('Energy Consumption [J]')
+ax.set_ylabel('Runtime [ms]')
 # ax.set_title('Comparison of Measured and Predicted Energy Consumption')
 ax.set_xticks(index + bar_width / 2)
 ax.set_xticklabels(models, rotation=45, ha='right')
 ax.legend()
 
 plt.tight_layout()
-plt.savefig('../functional_general_benchmark/plots/prediction/pred_A30_'+clock+'_train.png', format='png')
-plt.savefig('../functional_general_benchmark/plots/prediction/pred_A30_'+clock+'_train.pdf', format='pdf')
+plt.savefig('../functional_general_benchmark/plots/prediction/timepred_A30_'+clock+'_inf.png', format='png')
+plt.savefig('../functional_general_benchmark/plots/prediction/timepred_A30_'+clock+'_inf.pdf', format='pdf')
