@@ -16,6 +16,10 @@ from sklearn.preprocessing import OneHotEncoder
 ###############
 from datetime import datetime
 
+
+
+
+
 runtimes = []
 wattages = []
 
@@ -219,15 +223,91 @@ print(input_features[0])
 
 
 
+# import numpy as np
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import mean_squared_error, r2_score
+# from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
+# from xgboost import XGBRegressor  # Import XGBoost
+# from sklearn.neural_network import MLPRegressor  # Import MLP
+
+
+# def get_model(model_type, n_estimators=100, criterion='squared_error', random_state=42):
+#     if model_type == 'random_forest':
+#         return RandomForestRegressor(n_estimators=n_estimators, criterion=criterion, random_state=random_state)
+#     elif model_type == 'extra_trees':
+#         return ExtraTreesRegressor(n_estimators=n_estimators, criterion=criterion, random_state=random_state)
+#     elif model_type == 'xgboost':
+#         return XGBRegressor(n_estimators=n_estimators, objective='reg:squarederror', random_state=random_state)
+#     elif model_type == 'mlp':
+#         return MLPRegressor(hidden_layer_sizes=(100, 50), activation='relu', solver='adam', max_iter=500, random_state=random_state)
+#     else:
+#         raise ValueError("Unsupported model type. Choose 'random_forest', 'extra_trees', 'xgboost', or 'mlp'.")
+
+
+# # Assuming you have 'input_features' for your inputs and 'runtimes' and 'wattages' for your targets
+# # input_features = df.to_numpy()
+# # runtimes = [row[2] for row in dataset_list]
+# # wattages = [row[8] for row in dataset_list]
+
+# runtime_min, runtime_max = np.min(runtimes), np.max(runtimes)
+# wattage_min, wattage_max = np.min(wattages), np.max(wattages)
+
+# train_indices = np.where((runtimes == runtime_min) | (runtimes == runtime_max) |
+#                          (wattages == wattage_min) | (wattages == wattage_max))[0]
+
+# remaining_indices = np.setdiff1d(np.arange(len(runtimes)), train_indices)
+# train_remaining, test_remaining = train_test_split(remaining_indices, test_size=0.2, random_state=42)
+# train_indices = np.concatenate([train_indices, train_remaining])
+
+# X_train, X_test = input_features[train_indices], input_features[test_remaining]
+# y_train_runtime, y_test_runtime = np.array(runtimes)[train_indices], np.array(runtimes)[test_remaining]
+# y_train_wattage, y_test_wattage = np.array(wattages)[train_indices], np.array(wattages)[test_remaining]
+
+# # Choose the model type here
+# model_type_runtime = 'random_forest'   # 'random_forest' or 'extra_trees'
+# model_type_wattage = 'random_forest' # 'random_forest' or 'extra_trees'
+
+# # Create and train models
+# runtime_model = get_model(model_type_runtime, n_estimators=900, criterion='squared_error')
+# runtime_model.fit(X_train, y_train_runtime)
+
+# wattage_model = get_model(model_type_wattage, n_estimators=100, criterion='squared_error')
+# wattage_model.fit(X_train, y_train_wattage)
+
+# # Predictions
+# y_pred_runtime = runtime_model.predict(X_test)
+# y_pred_wattage = wattage_model.predict(X_test)
+# energy_pred = y_pred_runtime * y_pred_wattage
+
+# # Metrics
+# runtime_mse = mean_squared_error(y_test_runtime, y_pred_runtime)
+# wattage_mse = mean_squared_error(y_test_wattage, y_pred_wattage)
+# r2_runtime = r2_score(y_test_runtime, y_pred_runtime)
+# r2_wattage = r2_score(y_test_wattage, y_pred_wattage)
+
+# # Output
+# print(f"Test MSE for Runtime Prediction: {runtime_mse:.4f}")
+# print(f"Test MSE for Wattage Prediction: {wattage_mse:.4f}")
+# print(f"R² for Runtime Prediction: {r2_runtime:.4f}")
+# print(f"R² for Wattage Prediction: {r2_wattage:.4f}")
+# print(f"Sample Predicted Runtimes: {y_pred_runtime[:5]}")
+# print(f"Sample Predicted Wattages: {y_pred_wattage[:5]}")
+# print(f"Sample Energy Predictions: {energy_pred[:5]}")
+
+
+
+#####################################################
+
+
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score  # Added cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
-from xgboost import XGBRegressor  # Import XGBoost
-from sklearn.neural_network import MLPRegressor  # Import MLP
+from xgboost import XGBRegressor
+from sklearn.neural_network import MLPRegressor
+from scipy.stats import spearmanr
 
-
-def get_model(model_type, n_estimators=100, criterion='squared_error', random_state=42):
+def get_model(model_type, n_estimators=100, criterion='squared_error', random_state=6447):
     if model_type == 'random_forest':
         return RandomForestRegressor(n_estimators=n_estimators, criterion=criterion, random_state=random_state)
     elif model_type == 'extra_trees':
@@ -239,12 +319,7 @@ def get_model(model_type, n_estimators=100, criterion='squared_error', random_st
     else:
         raise ValueError("Unsupported model type. Choose 'random_forest', 'extra_trees', 'xgboost', or 'mlp'.")
 
-
-# Assuming you have 'input_features' for your inputs and 'runtimes' and 'wattages' for your targets
-# input_features = df.to_numpy()
-# runtimes = [row[2] for row in dataset_list]
-# wattages = [row[8] for row in dataset_list]
-
+# --- Your existing data splitting logic ---
 runtime_min, runtime_max = np.min(runtimes), np.max(runtimes)
 wattage_min, wattage_max = np.min(wattages), np.max(wattages)
 
@@ -252,27 +327,69 @@ train_indices = np.where((runtimes == runtime_min) | (runtimes == runtime_max) |
                          (wattages == wattage_min) | (wattages == wattage_max))[0]
 
 remaining_indices = np.setdiff1d(np.arange(len(runtimes)), train_indices)
-train_remaining, test_remaining = train_test_split(remaining_indices, test_size=0.2, random_state=42)
+train_remaining, test_remaining = train_test_split(remaining_indices, test_size=0.2, random_state=56353)
 train_indices = np.concatenate([train_indices, train_remaining])
 
 X_train, X_test = input_features[train_indices], input_features[test_remaining]
 y_train_runtime, y_test_runtime = np.array(runtimes)[train_indices], np.array(runtimes)[test_remaining]
 y_train_wattage, y_test_wattage = np.array(wattages)[train_indices], np.array(wattages)[test_remaining]
 
-# Choose the model type here
-model_type_runtime = 'random_forest'   # 'random_forest' or 'extra_trees'
-model_type_wattage = 'random_forest' # 'random_forest' or 'extra_trees'
+# --- Model Selection ---
+model_type_runtime = 'random_forest'
+model_type_wattage = 'random_forest'
 
-# Create and train models
-runtime_model = get_model(model_type_runtime, n_estimators=900, criterion='absolute_error')
+# --- Cross-Validation ---  
+def evaluate_with_cv(model, X, y, model_name):
+    cv_scores = cross_val_score(model, X, y, cv=15, scoring='r2')
+    print(f"{model_name} CV R² scores: {cv_scores}")
+    print(f"{model_name} Mean CV R²: {np.mean(cv_scores):.4f} ± {np.std(cv_scores):.4f}\n")
+
+# Train and evaluate runtime model
+runtime_model = get_model(model_type_runtime, n_estimators=100, criterion='squared_error')
+# old num estimaros is 900
+evaluate_with_cv(runtime_model, X_train, y_train_runtime, "Runtime Model")
 runtime_model.fit(X_train, y_train_runtime)
-
-wattage_model = get_model(model_type_wattage, n_estimators=100, criterion='squared_error')
-wattage_model.fit(X_train, y_train_wattage)
-
-# Predictions
 y_pred_runtime = runtime_model.predict(X_test)
+
+# Train and evaluate wattage model
+wattage_model = get_model(model_type_wattage, n_estimators=100, criterion='squared_error')
+evaluate_with_cv(wattage_model, X_train, y_train_wattage, "Wattage Model")
+wattage_model.fit(X_train, y_train_wattage)
 y_pred_wattage = wattage_model.predict(X_test)
+
+# --- NEW: Feature Importance Correlation (Added) ---
+if model_type_runtime == 'random_forest' or model_type_runtime == 'xgboost':
+    # Get feature importances from both model types
+    xgb_temp = get_model('xgboost', n_estimators=100).fit(X_train, y_train_runtime)
+    xgb_temp_watt = get_model('xgboost', n_estimators=100).fit(X_train, y_train_wattage)
+
+    evaluate_with_cv(xgb_temp, X_train, y_train_runtime, "Runtime Model XGB")
+
+    evaluate_with_cv(xgb_temp_watt, X_train, y_train_wattage, "Wattage Model XGB")
+
+    rf_importances = runtime_model.feature_importances_
+    xgb_importances = xgb_temp.feature_importances_
+    corr, _ = spearmanr(rf_importances, xgb_importances)
+
+    rf_importances_watt = wattage_model.feature_importances_
+    xgb_importances_watt = xgb_temp_watt.feature_importances_
+    corr1, _ = spearmanr(rf_importances_watt, xgb_importances_watt)
+
+    print(f"\nFeature Importance Correlation (Random Forest vs XGBoost) runtime: {corr:.3f}")
+    print(f"\nFeature Importance Correlation (Random Forest vs XGBoost) wattage: {corr1:.3f}")
+
+
+    y_pred_runtime_xgb = xgb_temp.predict(X_test)
+    y_pred_wattage_xgb = xgb_temp_watt.predict(X_test)
+
+    r2_runtime_xgb = r2_score(y_test_runtime, y_pred_runtime_xgb)
+    r2_wattage_xgb = r2_score(y_test_wattage, y_pred_wattage_xgb)
+
+    print(f"Test R² for Runtime Prediction XGB: {r2_runtime_xgb:.4f}")
+    print(f"Test R² for Wattage Prediction XGB: {r2_wattage_xgb:.4f}")
+
+
+# --- Rest of your original code (unchanged) ---
 energy_pred = y_pred_runtime * y_pred_wattage
 
 # Metrics
@@ -281,11 +398,15 @@ wattage_mse = mean_squared_error(y_test_wattage, y_pred_wattage)
 r2_runtime = r2_score(y_test_runtime, y_pred_runtime)
 r2_wattage = r2_score(y_test_wattage, y_pred_wattage)
 
+
+
+
 # Output
+print("\n--- Test Set Evaluation ---")
 print(f"Test MSE for Runtime Prediction: {runtime_mse:.4f}")
 print(f"Test MSE for Wattage Prediction: {wattage_mse:.4f}")
-print(f"R² for Runtime Prediction: {r2_runtime:.4f}")
-print(f"R² for Wattage Prediction: {r2_wattage:.4f}")
+print(f"Test R² for Runtime Prediction: {r2_runtime:.4f}")
+print(f"Test R² for Wattage Prediction: {r2_wattage:.4f}")
 print(f"Sample Predicted Runtimes: {y_pred_runtime[:5]}")
 print(f"Sample Predicted Wattages: {y_pred_wattage[:5]}")
 print(f"Sample Energy Predictions: {energy_pred[:5]}")
@@ -293,11 +414,25 @@ print(f"Sample Energy Predictions: {energy_pred[:5]}")
 
 
 
-##################################################
-
 import matplotlib.pyplot as plt
 import random
 import numpy as np
+
+
+
+
+plt.rcParams.update({
+    'font.size': 18,
+    'axes.titlesize': 20,
+    'axes.labelsize': 18,
+    'xtick.labelsize': 15,
+    'ytick.labelsize': 14,
+    'legend.fontsize': 14,
+    'legend.title_fontsize': 17
+})
+
+
+
 
 
 turquoise_color = '#2598be'
@@ -330,97 +465,103 @@ onehot_encoded_test = X_test[:, -21:-9]
 layer_types = encoder.inverse_transform(onehot_encoded_test)
 
 # Extract input sizes for selected samples
-input_sizes = X_test[random_indices][:, [-2, -4, -6, -8]]
+input_sizes = X_test[random_indices][:, [-3, -5, -7, -9]]
+
+print("here!")
+print(input_sizes)
+
+clock_speeds_test_set = X_test[random_indices][:, [-1]]
 
 # Generate formatted labels, removing -1 values
 labels = []
-for layer, sizes in zip(layer_types[random_indices].flatten(), input_sizes):
+for layer, sizes, speeds in zip(layer_types[random_indices].flatten(), input_sizes, clock_speeds_test_set):
+    #print(speeds[0])
+    #speed_entries = [str(int(speed)) for speed in speeds if speed != -1]
     valid_sizes = [str(int(size)) for size in sizes if size != -1]
-    label = f"{layer} ({'x'.join(valid_sizes)})"
+    label = f"{layer} ({'x'.join(valid_sizes)}) {speeds[0]} MHz"
     labels.append(label)
 
 # Set x-axis labels for plots
 x_labels = labels
 x = range(num_samples)
 
-# Runtime comparison plot
-plt.figure(figsize=(15, 10))
-plt.bar(x, true_runtimes, width=0.4, label="True Runtime", alpha=0.7, color=turquoise_color)
-plt.bar([i + 0.4 for i in x], pred_runtimes, width=0.4, label="Predicted Runtime", alpha=0.7, color=maroon_color)
-plt.xticks([i + 0.2 for i in x], x_labels, rotation=45, ha="right")
-plt.title("Runtime Prediction vs Ground Truth")
-plt.ylabel("Runtime [ms]")
-plt.legend()
+
+# Create figure with 3 vertically stacked subplots
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(15, 24), sharex=True)
+
+# Plot 1: Runtime comparison
+ax1.bar(x, true_runtimes, width=0.4, label="Measured Runtime", alpha=0.7, color='#1f77b4')
+ax1.bar([i + 0.4 for i in x], pred_runtimes, width=0.4, label="Predicted Runtime", alpha=0.7, color='#ff7f0e')
+#ax1.set_title("Runtime Prediction vs Ground Truth")
+ax1.set_ylabel("Runtime [ms]")
+ax1.legend()
+
+
+# Plot 2: Power comparison
+ax2.bar(x, true_power, width=0.4, label="Measured Power", alpha=0.7, color='orange')
+ax2.bar([i + 0.4 for i in x], pred_power, width=0.4, label="Predicted Power", alpha=0.7, color='purple')
+#ax2.set_title("Power Prediction vs Ground Truth")
+ax2.set_ylabel("Power [W]")
+ax2.legend()
+
+
+# Plot 3: Energy comparison (will show x-axis labels)
+ax3.bar(x, true_energy, width=0.4, label="Measured Energy Consumption", alpha=0.7, color='green')
+ax3.bar([i + 0.4 for i in x], pred_energy, width=0.4, label="Predicted Energy Consumption", alpha=0.7, color='red')
+#ax3.set_title("Energy Consumption Prediction vs Ground Truth")
+ax3.set_ylabel("Energy [mJ]")
+ax3.legend()
+
+
+# Only show x-axis labels on the bottom plot
+ax3.set_xticks([i + 0.2 for i in x])
+ax3.set_xticklabels(x_labels, rotation=45, ha="right")
+
+# Adjust layout
 plt.tight_layout()
-plt.savefig('runtime_plot.png', format='png')
-plt.savefig('runtime_plot.pdf', format='pdf')
-plt.close()
 
-# Power comparison plot
-plt.figure(figsize=(15, 10))
-plt.bar(x, true_power, width=0.4, label="True Power", alpha=0.7, color="orange")
-plt.bar([i + 0.4 for i in x], pred_power, width=0.4, label="Predicted Power", alpha=0.7, color="purple")
-plt.xticks([i + 0.2 for i in x], x_labels, rotation=45, ha="right")
-plt.title("Power Prediction vs Ground Truth")
-plt.ylabel("Power [W]")
-plt.legend()
-plt.tight_layout()
-plt.savefig('power_plot.png', format='png')
-plt.savefig('power_plot.pdf', format='pdf')
-plt.close()
-
-# Energy consumption comparison plot
-plt.figure(figsize=(15, 10))
-plt.bar(x, true_energy, width=0.4, label="True Energy Consumption", alpha=0.7, color="green")
-plt.bar([i + 0.4 for i in x], pred_energy, width=0.4, label="Predicted Energy Consumption", alpha=0.7, color="red")
-plt.xticks([i + 0.2 for i in x], x_labels, rotation=45, ha="right")
-plt.title("Energy Consumption Prediction vs Ground Truth")
-plt.ylabel("Energy Consumption [mJ]")
-plt.legend()
-plt.tight_layout()
-plt.savefig('energy_plot.png', format='png')
-plt.savefig('energy_plot.pdf', format='pdf')
-plt.close()
+# Save the figure
+plt.savefig('stacked_comparison.png', format='png', dpi=300)
+plt.savefig('stacked_comparison.pdf', format='pdf')
 
 
 
 
 
+# print("###############################")
 
-print("###############################")
+# import random
 
-import random
+# # Select a random index from the training set
+# random_index = random.choice(train_indices)
 
-# Select a random index from the training set
-random_index = random.choice(train_indices)
+# # Extract the feature vector for the selected index
+# feature_vector = input_features[random_index]
 
-# Extract the feature vector for the selected index
-feature_vector = input_features[random_index]
+# # Display the selected feature vector
+# print("Original Feature Vector from Training Set:")
+# print(feature_vector)
 
-# Display the selected feature vector
-print("Original Feature Vector from Training Set:")
-print(feature_vector)
+# # Manually edit the feature vector
+# # Example: Modify specific features manually
+# feature_vector[27] = 83  # Edit feature at index 0
+# # feature_vector[2] = 0.5  # Edit feature at index 2
+# # You can manually modify any features as needed
 
-# Manually edit the feature vector
-# Example: Modify specific features manually
-feature_vector[27] = 83  # Edit feature at index 0
-# feature_vector[2] = 0.5  # Edit feature at index 2
-# You can manually modify any features as needed
+# # Reshape the modified feature vector for prediction
+# test_input = feature_vector.reshape(1, -1)
 
-# Reshape the modified feature vector for prediction
-test_input = feature_vector.reshape(1, -1)
+# # Use the trained models to make predictions on this edited input
+# predicted_runtime = runtime_model.predict(test_input)
+# predicted_wattage = wattage_model.predict(test_input)
+# predicted_energy = predicted_runtime * predicted_wattage
 
-# Use the trained models to make predictions on this edited input
-predicted_runtime = runtime_model.predict(test_input)
-predicted_wattage = wattage_model.predict(test_input)
-predicted_energy = predicted_runtime * predicted_wattage
-
-# Output predictions for the manually edited input
-print("\nPredictions for Manually Edited Input:")
-print(f"Modified Features: {feature_vector}")
-print(f"Predicted Runtime: {predicted_runtime[0]:.4f}")
-print(f"Predicted Wattage: {predicted_wattage[0]:.4f}")
-print(f"Predicted Energy Consumption: {predicted_energy[0]:.4f}")
+# # Output predictions for the manually edited input
+# print("\nPredictions for Manually Edited Input:")
+# print(f"Modified Features: {feature_vector}")
+# print(f"Predicted Runtime: {predicted_runtime[0]:.4f}")
+# print(f"Predicted Wattage: {predicted_wattage[0]:.4f}")
+# print(f"Predicted Energy Consumption: {predicted_energy[0]:.4f}")
 
 
 

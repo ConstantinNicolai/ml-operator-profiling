@@ -71,7 +71,7 @@ if small_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')  # Updated to Joules
-    ax.set_title(f'Measured Energy with and without Tensor Cores A30', fontsize = fontsize)
+    ax.set_title(f'Energy Meausurements 3 GPUs, small model-input sets', fontsize = fontsize)
     ax.set_xticks(index + bar_width)
     ax.set_xticklabels(small_models, rotation=45, ha='right')
     ax.legend()
@@ -98,7 +98,7 @@ if large_indices:
     # Add labels and titles
     ax.set_xlabel('Model and Input Size')
     ax.set_ylabel('Energy Consumption (J)')
-    ax.set_title(f'Measured Energy with and without Tensor Cores A30', fontsize=fontsize)
+    ax.set_title(f'Energy Meausurements 3 GPUs, large model-input sets', fontsize=fontsize)
     ax.set_xticks(index + bar_width)
     ax.set_xticklabels(large_models, rotation=45, ha='right')
     ax.legend()

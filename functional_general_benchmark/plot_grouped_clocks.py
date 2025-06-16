@@ -2,6 +2,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+
+plt.rcParams.update({
+    'font.size': 18,
+    'axes.titlesize': 20,
+    'axes.labelsize': 18,
+    'xtick.labelsize': 15,
+    'ytick.labelsize': 14,
+    'legend.fontsize': 14,
+    'legend.title_fontsize': 17
+})
+
+
 # Your function to read a measurement file
 def read_measurement_file(filename):
     measurements = {}
@@ -26,7 +38,7 @@ all_models = set()
 # Read measurements for all clock speeds
 data_by_clock = {}
 for clock in clock_speeds:
-    file_path = os.path.join(base_path, f'dataset_history_A30_{clock}', 'prediction.txt')
+    file_path = os.path.join(base_path, f'dataset_history_A30_{clock}', 'fullmodel.txt')
     measurements = read_measurement_file(file_path)
     data_by_clock[clock] = measurements
     all_models.update(measurements.keys())
@@ -37,7 +49,7 @@ models = sorted(all_models)
 # Create grouped bar plot
 bar_width = 0.1
 x = np.arange(len(models))
-fig, ax = plt.subplots(figsize=(15, 8))
+fig, ax = plt.subplots(figsize=(15, 11))
 
 for i, clock in enumerate(clock_speeds):
     # Some models might be missing from some clocks – default to 0
@@ -46,12 +58,12 @@ for i, clock in enumerate(clock_speeds):
 
 # Axis and labels
 ax.set_xlabel('Model and Input Size')
-ax.set_ylabel('Runtime [ms]')  # Change this if you switch to runtime
+ax.set_ylabel('Time [ms]')  # Change this if you switch to runtime
 # ax.set_title('Measured Energy Consumption Across Clock Speeds')
 ax.set_xticks(x + (bar_width * (len(clock_speeds) - 1) / 2))
 ax.set_xticklabels(models, rotation=45, ha='right')
 ax.legend(title='Clock Speed [MHz]')
 
 plt.tight_layout()
-plt.savefig('plots/clocks/predicted_time_across_clocks_inference.png', format = 'png')
-plt.savefig('plots/clocks/predicted_time_across_clocks_inference.pdf', format = 'pdf')
+plt.savefig('plots/clocks/measured_time_across_clocks_inference.png', format = 'png')
+plt.savefig('plots/clocks/measured_time_across_clocks_inference.pdf', format = 'pdf')
